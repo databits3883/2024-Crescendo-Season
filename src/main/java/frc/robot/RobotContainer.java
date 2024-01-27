@@ -20,10 +20,12 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
+import frc.robot.subsystems.ScoringArm;
 import frc.robot.subsystems.Drive.DriveSubsystem;
 import frc.robot.subsystems.Drive.FieldDriverStick;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
@@ -38,12 +40,27 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 public class RobotContainer {
   // The robot's subsystems
   private final DriveSubsystem m_robotDrive = new DriveSubsystem(this);
+  private final ScoringArm m_ScoringArm = new ScoringArm();
 
   // The driver's controller
   Joystick m_driverController = new Joystick(OIConstants.kDriverControllerPort);
   FieldDriverStick m_driveStick = new FieldDriverStick(m_driverController);
 
+  // the copilot controller
+  Joystick m_copilotController = new Joystick(OIConstants.kCopilotControllerPort);
+
+
+  //Buttons on the drivers controller
   JoystickButton m_calibrateButton = new JoystickButton(m_driverController, 8);
+
+
+  //Buttons on the copilots controller
+  JoystickButton m_jogArmUpButton = new JoystickButton(m_copilotController, 3);
+  JoystickButton m_jogArmDownButton = new JoystickButton(m_copilotController, 4);
+
+  JoystickButton m_incLauncherRPM = new JoystickButton(m_copilotController, 7);
+  JoystickButton m_decLauncherRPM = new JoystickButton(m_copilotController, 8);
+  
 
   //PathPlannerTrajectory path = PathPlannerPath.loadPath("Froggy Demo Path", 1, 1);
   PathPlannerPath path = PathPlannerPath.fromPathFile("Example Path");
@@ -82,16 +99,16 @@ public class RobotContainer {
         //     m_robotDrive));
 
 
-        SmartDashboard.putNumber("Drive X P", DriveConstants.kXController.getP());
-        SmartDashboard.putNumber("Drive Y P", DriveConstants.kYController.getP());
-        SmartDashboard.putNumber("Drive X I", DriveConstants.kXController.getI());
-        SmartDashboard.putNumber("Drive Y I", DriveConstants.kYController.getI());
-        SmartDashboard.putNumber("Drive X D", DriveConstants.kXController.getD());
-        SmartDashboard.putNumber("Drive Y D", DriveConstants.kYController.getD());
+        // SmartDashboard.putNumber("Drive X P", DriveConstants.kXController.getP());
+        // SmartDashboard.putNumber("Drive Y P", DriveConstants.kYController.getP());
+        // SmartDashboard.putNumber("Drive X I", DriveConstants.kXController.getI());
+        // SmartDashboard.putNumber("Drive Y I", DriveConstants.kYController.getI());
+        // SmartDashboard.putNumber("Drive X D", DriveConstants.kXController.getD());
+        // SmartDashboard.putNumber("Drive Y D", DriveConstants.kYController.getD());
         
-        SmartDashboard.putNumber("Theta P",DriveConstants.kThetaController.getP());
-        SmartDashboard.putNumber("Theta I",DriveConstants.kThetaController.getI());
-        SmartDashboard.putNumber("Theta D",DriveConstants.kThetaController.getD());
+        // SmartDashboard.putNumber("Theta P",DriveConstants.kThetaController.getP());
+        // SmartDashboard.putNumber("Theta I",DriveConstants.kThetaController.getI());
+        // SmartDashboard.putNumber("Theta D",DriveConstants.kThetaController.getD());
 
         AutoBuilder.configureHolonomic(m_robotDrive::getPose,
         m_robotDrive::resetOdometry,
@@ -110,6 +127,7 @@ public class RobotContainer {
 
   public void setupAutoChooser(){
     SendableChooser<Command> autoChooser = AutoBuilder.buildAutoChooser("Nothing");
+    autoChooser.addOption("Nothing", new PrintCommand("You selected the auto to do nothing"));
     Shuffleboard.getTab("Game Screen").add(autoChooser);
   }
 
@@ -122,6 +140,12 @@ public class RobotContainer {
   private void configureButtonBindings() {
     m_calibrateButton.onTrue(new InstantCommand(() -> m_robotDrive.calibrate()));
     new JoystickButton(m_driverController,1).onTrue(new InstantCommand(() -> UpdateTrajectoryPIDValues()));
+
+    m_jogArmUpButton.onTrue(new InstantCommand(() -> m_ScoringArm.ChangeArmAngle(5), m_ScoringArm));
+    m_jogArmDownButton.onTrue(new InstantCommand(() -> m_ScoringArm.ChangeArmAngle(-5), m_ScoringArm));
+
+    m_incLauncherRPM.onTrue(new InstantCommand(() -> m_ScoringArm.ChangeLaunchSpeed(5), m_ScoringArm));
+    m_decLauncherRPM.onTrue(new InstantCommand(() -> m_ScoringArm.ChangeLaunchSpeed(-5), m_ScoringArm));
   }
 
   /**

@@ -45,6 +45,13 @@ public final class Constants {
 
   }
 
+  public static final class ClimbConstants{
+
+    public static final int kLeftArmMotorChannel = 0;
+    public static final int kRightArmMotorChannel = 0;
+
+  }
+
   public static final class DriveConstants {
     public static final int kGyroPort = 14;
     public static final double kGyroFront = 0;
@@ -168,4 +175,5 @@ public final class Constants {
       // Add kinematics to ensure max speed is actually obeyed
       .setKinematics(DriveConstants.kDriveKinematics);
   }
+
 }

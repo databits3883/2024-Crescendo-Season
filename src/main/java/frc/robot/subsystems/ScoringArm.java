@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkAbsoluteEncoder;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
@@ -19,13 +20,14 @@ public class ScoringArm extends SubsystemBase {
 
   public CANSparkMax launchMotorLeader = new CANSparkMax(ScoringArmConstants.kLaunchMotorLeaderID, MotorType.kBrushless);
   public CANSparkMax launchMotorFollower = new CANSparkMax(ScoringArmConstants.kLaunchMotorFollowerID, MotorType.kBrushless);
+  public RelativeEncoder launchSpeedEncoder;
   public PIDController launchSpeedPIDController = new PIDController(ScoringArmConstants.kLaunchSpeedP,ScoringArmConstants.kLaunchSpeedI,ScoringArmConstants.kLaunchSpeedD);
 
 
   public AbsoluteEncoder absArmAngleEncoder;
   public CANSparkMax armAngleMotorLeader = new CANSparkMax(ScoringArmConstants.kArmAngleMotorLeader, MotorType.kBrushless);
   public CANSparkMax armAngleMotorFollower = new CANSparkMax(ScoringArmConstants.kArmAngleMotorFollower, MotorType.kBrushless);
-  public PIDController anglePidController = new PIDController(ScoringArmConstants.kAngleP, ScoringArmConstants.kAngleI, ScoringArmConstants.kAngleD);
+  public PIDController anglePIDController = new PIDController(ScoringArmConstants.kAngleP, ScoringArmConstants.kAngleI, ScoringArmConstants.kAngleD);
 
   /** Creates a new ScoringArm. */
   public ScoringArm() {
@@ -36,36 +38,44 @@ public class ScoringArm extends SubsystemBase {
     absArmAngleEncoder.setVelocityConversionFactor(1);
 
 
-    anglePidController.setP(ScoringArmConstants.kAngleP);
-    anglePidController.setI(ScoringArmConstants.kAngleI);
-    anglePidController.setD(ScoringArmConstants.kAngleD);
-    anglePidController.setIZone(ScoringArmConstants.kAngleIZone);
-    anglePidController.setTolerance(ScoringArmConstants.kAnglePosTolerance,ScoringArmConstants.kAngleVelTolerance);
-    anglePidController.setSetpoint(absArmAngleEncoder.getPosition());
+    anglePIDController.setP(ScoringArmConstants.kAngleP);
+    anglePIDController.setI(ScoringArmConstants.kAngleI);
+    anglePIDController.setD(ScoringArmConstants.kAngleD);
+    anglePIDController.setIZone(ScoringArmConstants.kAngleIZone);
+    anglePIDController.setTolerance(ScoringArmConstants.kAnglePosTolerance,ScoringArmConstants.kAngleVelTolerance);
+    anglePIDController.setSetpoint(absArmAngleEncoder.getPosition());
 
-    anglePidController.setP(ScoringArmConstants.kLaunchSpeedP);
-    anglePidController.setI(ScoringArmConstants.kLaunchSpeedI);
-    anglePidController.setD(ScoringArmConstants.kLaunchSpeedD);
-    anglePidController.setIZone(ScoringArmConstants.kLaunchSpeedIZone);
-    anglePidController.setTolerance(ScoringArmConstants.kLaunchSpeedPosTolerance,ScoringArmConstants.kLaunchSpeedVelTolerance);
-    anglePidController.setSetpoint(0);//tell the launch motors to start at 0 speed
+    launchSpeedPIDController.setP(ScoringArmConstants.kLaunchSpeedP);
+    launchSpeedPIDController.setI(ScoringArmConstants.kLaunchSpeedI);
+    launchSpeedPIDController.setD(ScoringArmConstants.kLaunchSpeedD);
+    launchSpeedPIDController.setIZone(ScoringArmConstants.kLaunchSpeedIZone);
+    launchSpeedPIDController.setTolerance(ScoringArmConstants.kLaunchSpeedPosTolerance,ScoringArmConstants.kLaunchSpeedVelTolerance);
+    launchSpeedPIDController.setSetpoint(0);//tell the launch motors to start at 0 speed
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
 
-    if (!anglePidController.atSetpoint()) {
-      RunAnglePIDControl();
+    if (!anglePIDController.atSetpoint()) {
+      RunAnglePIDControl();//runs PID control if the motor is not at the setpoint
     }
+    else{
+      armAngleMotorLeader.set(0);//stops the motor if you are at the setpoint
+    }
+
+    
+    RunLaunchSpeedPIDControl();
+    
+
   }
 
   public void RunAnglePIDControl(){
-    armAngleMotorFollower.set(anglePidController.calculate(absArmAngleEncoder.getPosition()));
+    armAngleMotorLeader.set(anglePIDController.calculate(absArmAngleEncoder.getPosition()));
   }
 
   public void SetArmAngle(double armDeg){
-    anglePidController.setSetpoint(armDeg);
+    anglePIDController.setSetpoint(armDeg);
   }
 
   public void ChangeArmAngle(double deg){
@@ -73,14 +83,14 @@ public class ScoringArm extends SubsystemBase {
   }
 
   public void RunLaunchSpeedPIDControl(){
-    launchMotor1.set(launchSpeedPIDController.calculate());
+    launchMotorLeader.set(launchSpeedPIDController.calculate(launchSpeedEncoder.getVelocity()));
   }
 
-  public void SetLaunchSpeed(double armDeg){
- 
+  public void SetLaunchSpeed(double launchRPM){
+    launchSpeedPIDController.setSetpoint(launchRPM);
   }
 
-  public void ChangeLaunchSpeed(double deg){
-
+  public void ChangeLaunchSpeed(double deltaRPM){
+    SetLaunchSpeed(launchSpeedPIDController.getSetpoint()+deltaRPM);
   }
 }
