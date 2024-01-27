@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.subsystems.Climb;
+package frc.robot.subsystems.climb;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkLowLevel.MotorType;
@@ -16,11 +16,14 @@ public class ClimbSystem extends SubsystemBase {
   public double armBalance = 0.5; //determines which arm should pull harder in order to keep the robot balanced while climbing
   public PIDController balancePidController = new PIDController(0, 0, 0);
   
-  public CANSparkMax leftArmMotor = new CANSparkMax(Constants.ClimbConstants.kLeftArmMotorChannel, MotorType.kBrushed);
-  public CANSparkMax rightArmMotor = new CANSparkMax(Constants.ClimbConstants.kRightArmMotorChannel, MotorType.kBrushed);
+  public CANSparkMax leftArmMotor;
+  public CANSparkMax rightArmMotor;
 
   /** Creates a new ClimbSystem. */
   public ClimbSystem() {
+    //leftArmMotor = new CANSparkMax(Constants.ClimbConstants.kLeftArmMotorChannel, MotorType.kBrushed);
+    //rightArmMotor = new CANSparkMax(Constants.ClimbConstants.kRightArmMotorChannel, MotorType.kBrushed);
+
     balancePidController.setSetpoint(0);
     
   }

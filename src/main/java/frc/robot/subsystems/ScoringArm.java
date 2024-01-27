@@ -17,27 +17,34 @@ import frc.robot.Constants.ScoringArmConstants;
 
 public class ScoringArm extends SubsystemBase {
 
-  public CANSparkMax intakeMotor = new CANSparkMax(ScoringArmConstants.kIntakeMotorID, MotorType.kBrushless);
-  public Servo flapServo = new Servo(0);
+  public CANSparkMax intakeMotor;
+  public Servo flapServo1 = new Servo(ScoringArmConstants.kFlapServo1Channel);
+  public Servo flapServo2 = new Servo(ScoringArmConstants.kFlapServo2Channel);
 
-  public CANSparkMax launchMotorLeader = new CANSparkMax(ScoringArmConstants.kLaunchMotorLeaderID, MotorType.kBrushless);
-  public CANSparkMax launchMotorFollower = new CANSparkMax(ScoringArmConstants.kLaunchMotorFollowerID, MotorType.kBrushless);
+  public CANSparkMax launchMotorLeader;
+  public CANSparkMax launchMotorFollower;
   public RelativeEncoder launchSpeedEncoder;
   public PIDController launchSpeedPIDController = new PIDController(ScoringArmConstants.kLaunchSpeedP,ScoringArmConstants.kLaunchSpeedI,ScoringArmConstants.kLaunchSpeedD);
 
 
   public AbsoluteEncoder absArmAngleEncoder;
-  public CANSparkMax armAngleMotorLeader = new CANSparkMax(ScoringArmConstants.kArmAngleMotorLeader, MotorType.kBrushless);
-  public CANSparkMax armAngleMotorFollower = new CANSparkMax(ScoringArmConstants.kArmAngleMotorFollower, MotorType.kBrushless);
+  public CANSparkMax armAngleMotorLeader;
+  public CANSparkMax armAngleMotorFollower;
   public PIDController anglePIDController = new PIDController(ScoringArmConstants.kAngleP, ScoringArmConstants.kAngleI, ScoringArmConstants.kAngleD);
 
   /** Creates a new ScoringArm. */
   public ScoringArm() {
 
-    armAngleMotorFollower.follow(armAngleMotorLeader);
-    absArmAngleEncoder = armAngleMotorLeader.getAbsoluteEncoder(SparkAbsoluteEncoder.Type.kDutyCycle);
-    absArmAngleEncoder.setPositionConversionFactor(360);
-    absArmAngleEncoder.setVelocityConversionFactor(1);
+    //armAngleMotorLeader = new CANSparkMax(ScoringArmConstants.kArmAngleMotorLeader, MotorType.kBrushless);
+    //armAngleMotorFollower = new CANSparkMax(ScoringArmConstants.kArmAngleMotorFollower, MotorType.kBrushless);
+    //launchMotorLeader = new CANSparkMax(ScoringArmConstants.kLaunchMotorLeaderID, MotorType.kBrushless);
+    //launchMotorFollower = new CANSparkMax(ScoringArmConstants.kLaunchMotorFollowerID, MotorType.kBrushless);
+    //intakeMotor = new CANSparkMax(ScoringArmConstants.kIntakeMotorID, MotorType.kBrushless);
+
+    //armAngleMotorFollower.follow(armAngleMotorLeader);
+    //absArmAngleEncoder = armAngleMotorLeader.getAbsoluteEncoder(SparkAbsoluteEncoder.Type.kDutyCycle);
+    //absArmAngleEncoder.setPositionConversionFactor(360);
+    //absArmAngleEncoder.setVelocityConversionFactor(1);
 
 
     anglePIDController.setP(ScoringArmConstants.kAngleP);
@@ -45,7 +52,7 @@ public class ScoringArm extends SubsystemBase {
     anglePIDController.setD(ScoringArmConstants.kAngleD);
     anglePIDController.setIZone(ScoringArmConstants.kAngleIZone);
     anglePIDController.setTolerance(ScoringArmConstants.kAnglePosTolerance,ScoringArmConstants.kAngleVelTolerance);
-    anglePIDController.setSetpoint(absArmAngleEncoder.getPosition());
+    //anglePIDController.setSetpoint(absArmAngleEncoder.getPosition());
 
     launchSpeedPIDController.setP(ScoringArmConstants.kLaunchSpeedP);
     launchSpeedPIDController.setI(ScoringArmConstants.kLaunchSpeedI);
@@ -59,15 +66,15 @@ public class ScoringArm extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
 
-    if (!anglePIDController.atSetpoint()) {
-      RunAnglePIDControl();//runs PID control if the motor is not at the setpoint
-    }
-    else{
-      armAngleMotorLeader.set(0);//stops the motor if you are at the setpoint
-    }
+    //if (!anglePIDController.atSetpoint()) {
+    //  RunAnglePIDControl();//runs PID control if the motor is not at the setpoint
+    //}
+    //else{
+    //  armAngleMotorLeader.set(0);//stops the motor if you are at the setpoint
+    //}
 
     
-    RunLaunchSpeedPIDControl();
+    //RunLaunchSpeedPIDControl();
     
 
   }
@@ -97,7 +104,7 @@ public class ScoringArm extends SubsystemBase {
   }
 
   public void Intake(){
-    flapServo.set(0);
+    SetFlap(0);
     intakeMotor.set(0.1);
   }
 
@@ -106,7 +113,12 @@ public class ScoringArm extends SubsystemBase {
   }
 
   public void Launch(){
-    flapServo.set(0.1);
+    SetFlap(0.1);
     intakeMotor.set(0.1);
+  }
+
+  public void SetFlap(double pos){
+    flapServo1.set(pos);
+    flapServo2.set(pos);
   }
 }

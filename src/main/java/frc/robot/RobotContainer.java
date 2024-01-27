@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import java.io.File;
 import java.util.Optional;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -11,10 +12,15 @@ import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.ReplanningConfig;
 
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -23,9 +29,10 @@ import frc.robot.Commands.ClimbAndBalance;
 import frc.robot.Commands.RunIntake;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
+import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.ScoringArm;
-import frc.robot.subsystems.Drive.DriveSubsystem;
-import frc.robot.subsystems.Drive.FieldDriverStick;
+import frc.robot.subsystems.drive.FieldDriverStick;
+import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
@@ -42,8 +49,9 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
  */
 public class RobotContainer {
   // The robot's subsystems
-  private final DriveSubsystem m_robotDrive = new DriveSubsystem(this);
+  
   private final ScoringArm m_ScoringArm = new ScoringArm();
+  private final SwerveSubsystem drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),"swerve/sparkflex"));
 
   // The driver's controller
   Joystick m_driverController = new Joystick(OIConstants.kDriverControllerPort);
@@ -70,6 +78,18 @@ public class RobotContainer {
   JoystickButton m_outtakeButton = new JoystickButton(m_copilotController, 14);
 
   JoystickButton m_launchButton = new JoystickButton(m_copilotController, 1);
+
+  JoystickButton m_flapTestOpen = new JoystickButton(m_copilotController, 11);
+  JoystickButton m_flapTestClosed = new JoystickButton(m_copilotController, 12);
+  JoystickButton m_intakeTest = new JoystickButton(m_copilotController, 10);
+  JoystickButton m_outtakeTest = new JoystickButton(m_copilotController, 9);
+
+
+  //Face forward
+  Pose2d defaultFaceForwardPose = new Pose2d(2,7,Rotation2d.fromDegrees(0));
+
+  //Face Right, move diagonal
+  Pose2d defaultZeroPosition = new Pose2d(0.33 ,0.33,Rotation2d.fromDegrees(0));
   
 
   //PathPlannerTrajectory path = PathPlannerPath.loadPath("Froggy Demo Path", 1, 1);
@@ -85,61 +105,33 @@ public class RobotContainer {
     // Configure the button bindings
     configureButtonBindings();
 
-    DriveConstants.kThetaController.enableContinuousInput(-180, 180);
 
-    // Configure default commands
-    m_robotDrive.setDefaultCommand(
-        // The left stick controls translation of the robot.
-        // Turning is controlled by the X axis of the right stick.
-        new RunCommand(
-            () ->
-                m_robotDrive.drive(
-                    m_driveStick.getX(),
-                    m_driveStick.getY() ,
-                    m_driveStick.getZ(),
-                    true),
-            m_robotDrive));
-        // new RunCommand(
-        //     () ->
-        //         m_robotDrive.drive(
-        //             0,
-        //             0.1,
-        //             0,
-        //             true),
-        //     m_robotDrive));
+    Command driveFieldOrientedAnglularVelocity = drivebase.driveCommand(
+        () -> MathUtil.applyDeadband(-m_driveStick.getX(), OperatorConstants.LEFT_Y_DEADBAND),
+        () -> MathUtil.applyDeadband(-m_driveStick.getY(), OperatorConstants.LEFT_X_DEADBAND),
+        () -> MathUtil.applyDeadband(m_driveStick.getZ(), OperatorConstants.RIGHT_X_DEADBAND));
 
+    Command driveFieldOrientedDirectAngleSim = drivebase.simDriveCommand(
+        () -> MathUtil.applyDeadband(-m_driveStick.getX(), OperatorConstants.LEFT_Y_DEADBAND),
+        () -> MathUtil.applyDeadband(-m_driveStick.getY(), OperatorConstants.LEFT_X_DEADBAND),
+        () -> MathUtil.applyDeadband(m_driveStick.getZ(), OperatorConstants.RIGHT_X_DEADBAND));
 
-        // SmartDashboard.putNumber("Drive X P", DriveConstants.kXController.getP());
-        // SmartDashboard.putNumber("Drive Y P", DriveConstants.kYController.getP());
-        // SmartDashboard.putNumber("Drive X I", DriveConstants.kXController.getI());
-        // SmartDashboard.putNumber("Drive Y I", DriveConstants.kYController.getI());
-        // SmartDashboard.putNumber("Drive X D", DriveConstants.kXController.getD());
-        // SmartDashboard.putNumber("Drive Y D", DriveConstants.kYController.getD());
+    drivebase.setDefaultCommand(
+        !RobotBase.isSimulation() ? driveFieldOrientedAnglularVelocity : driveFieldOrientedDirectAngleSim);
+   
+
         
-        // SmartDashboard.putNumber("Theta P",DriveConstants.kThetaController.getP());
-        // SmartDashboard.putNumber("Theta I",DriveConstants.kThetaController.getI());
-        // SmartDashboard.putNumber("Theta D",DriveConstants.kThetaController.getD());
+    drivebase.zeroGyro();
 
-        AutoBuilder.configureHolonomic(m_robotDrive::getPose,
-        m_robotDrive::resetOdometry,
-        m_robotDrive::getChassisSpeeds, 
-        m_robotDrive::driveFromChassisSpeeds,
-        new HolonomicPathFollowerConfig(Constants.DriveConstants.kMaxSpeedMetersPerSecond, Constants.DriveConstants.kRobotDriveRadius, new ReplanningConfig(true, true)),
-        () -> (myAlliance == "Blue") ? false : true,
-        m_robotDrive);
+
+    //Set default to robot on field position
+    drivebase.resetOdometry(defaultZeroPosition);
   }
 
   public void robotInit(){
-    Constants.DriveConstants.kThetaController.enableContinuousInput(-180, 180);
-
-    setupAutoChooser();
+    
   }
 
-  public void setupAutoChooser(){
-    SendableChooser<Command> autoChooser = AutoBuilder.buildAutoChooser("Nothing");
-    autoChooser.addOption("Nothing", new PrintCommand("You selected the auto to do nothing"));
-    Shuffleboard.getTab("Game Screen").add(autoChooser);
-  }
 
   /**
    * Use this method to define your button->command mappings. Buttons can be created by
@@ -148,8 +140,8 @@ public class RobotContainer {
    * {@link JoystickButton}.
    */
   private void configureButtonBindings() {
-    m_calibrateButton.onTrue(new InstantCommand(() -> m_robotDrive.calibrate()));
-    new JoystickButton(m_driverController,1).onTrue(new InstantCommand(() -> UpdateTrajectoryPIDValues()));
+    m_calibrateButton.onTrue((new InstantCommand(drivebase::zeroGyro)));
+    
 
     m_jogArmUpButton.onTrue(new InstantCommand(() -> m_ScoringArm.ChangeArmAngle(5), m_ScoringArm));
     m_jogArmDownButton.onTrue(new InstantCommand(() -> m_ScoringArm.ChangeArmAngle(-5), m_ScoringArm));
@@ -158,8 +150,14 @@ public class RobotContainer {
     m_decLauncherRPM.onTrue(new InstantCommand(() -> m_ScoringArm.ChangeLaunchSpeed(-5), m_ScoringArm));
 
     m_intakeButton.whileTrue(new RunIntake(1));
-    m_launchButton.whileTrue(new AimAndLaunch());
+    m_launchButton.whileTrue(new AimAndLaunch(m_ScoringArm));
     m_climbButton.whileTrue(new ClimbAndBalance());
+
+    m_flapTestClosed.onTrue(new InstantCommand(() -> m_ScoringArm.SetFlap(1)));
+    m_flapTestOpen.onTrue(new InstantCommand(() -> m_ScoringArm.SetFlap(0)));
+
+    m_intakeTest.onTrue(new InstantCommand(() ->m_ScoringArm.Intake() ));
+    m_outtakeTest.onTrue(new InstantCommand(() ->m_ScoringArm.Outtake() ));
   }
 
   /**
@@ -187,27 +185,11 @@ public class RobotContainer {
     //FollowTrajectory trajectoryDrive = new FollowTrajectory(exampleTrajectory, m_robotDrive, true, true);
     
     // Run path following command, then stop at the end.
-    return autoChooser.getSelected();
+    return drivebase.getAutonomousCommand("crazy", true);
    //m_robotDrive.setDisplayTrajectory(exampleTrajectory);
    //return new PrintCommand("not doing anything in autonomous");
   }
 
 
-  public void UpdateTrajectoryPIDValues(){
-    DriveConstants.kXController.setP(SmartDashboard.getNumber("Drive X P", DriveConstants.kXController.getP()));
-    DriveConstants.kYController.setP(SmartDashboard.getNumber("Drive Y P", DriveConstants.kYController.getP()));
-    DriveConstants.kXController.setI(SmartDashboard.getNumber("Drive X I", DriveConstants.kXController.getI()));
-    DriveConstants.kYController.setI(SmartDashboard.getNumber("Drive Y I", DriveConstants.kYController.getI()));
-    DriveConstants.kXController.setD(SmartDashboard.getNumber("Drive X D", DriveConstants.kXController.getD()));
-    DriveConstants.kYController.setD(SmartDashboard.getNumber("Drive Y D", DriveConstants.kYController.getD()));
-    
-    DriveConstants.kThetaController.setP(SmartDashboard.getNumber("Theta P",DriveConstants.kYController.getP()));
-    DriveConstants.kThetaController.setI(SmartDashboard.getNumber("Theta I",DriveConstants.kXController.getI()));
-    DriveConstants.kThetaController.setD(SmartDashboard.getNumber("Theta D",DriveConstants.kYController.getD()));
-  }
-
-  public void setAlliance(Optional<Alliance> alliance) {
-    
-    myAlliance = alliance.toString();
-  }
+  
 }
