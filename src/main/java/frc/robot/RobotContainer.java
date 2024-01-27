@@ -18,6 +18,9 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Commands.AimAndLaunch;
+import frc.robot.Commands.ClimbAndBalance;
+import frc.robot.Commands.RunIntake;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.ScoringArm;
@@ -60,6 +63,13 @@ public class RobotContainer {
 
   JoystickButton m_incLauncherRPM = new JoystickButton(m_copilotController, 7);
   JoystickButton m_decLauncherRPM = new JoystickButton(m_copilotController, 8);
+
+  JoystickButton m_climbButton = new JoystickButton(m_copilotController, 2);
+
+  JoystickButton m_intakeButton = new JoystickButton(m_copilotController, 13);
+  JoystickButton m_outtakeButton = new JoystickButton(m_copilotController, 14);
+
+  JoystickButton m_launchButton = new JoystickButton(m_copilotController, 1);
   
 
   //PathPlannerTrajectory path = PathPlannerPath.loadPath("Froggy Demo Path", 1, 1);
@@ -146,6 +156,10 @@ public class RobotContainer {
 
     m_incLauncherRPM.onTrue(new InstantCommand(() -> m_ScoringArm.ChangeLaunchSpeed(5), m_ScoringArm));
     m_decLauncherRPM.onTrue(new InstantCommand(() -> m_ScoringArm.ChangeLaunchSpeed(-5), m_ScoringArm));
+
+    m_intakeButton.whileTrue(new RunIntake(1));
+    m_launchButton.whileTrue(new AimAndLaunch());
+    m_climbButton.whileTrue(new ClimbAndBalance());
   }
 
   /**

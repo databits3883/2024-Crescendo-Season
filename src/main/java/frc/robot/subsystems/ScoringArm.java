@@ -11,12 +11,14 @@ import com.revrobotics.SparkAbsoluteEncoder;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ScoringArmConstants;
 
 public class ScoringArm extends SubsystemBase {
 
   public CANSparkMax intakeMotor = new CANSparkMax(ScoringArmConstants.kIntakeMotorID, MotorType.kBrushless);
+  public Servo flapServo = new Servo(0);
 
   public CANSparkMax launchMotorLeader = new CANSparkMax(ScoringArmConstants.kLaunchMotorLeaderID, MotorType.kBrushless);
   public CANSparkMax launchMotorFollower = new CANSparkMax(ScoringArmConstants.kLaunchMotorFollowerID, MotorType.kBrushless);
@@ -92,5 +94,19 @@ public class ScoringArm extends SubsystemBase {
 
   public void ChangeLaunchSpeed(double deltaRPM){
     SetLaunchSpeed(launchSpeedPIDController.getSetpoint()+deltaRPM);
+  }
+
+  public void Intake(){
+    flapServo.set(0);
+    intakeMotor.set(0.1);
+  }
+
+  public void Outtake(){
+    intakeMotor.set(-0.1);
+  }
+
+  public void Launch(){
+    flapServo.set(0.1);
+    intakeMotor.set(0.1);
   }
 }
