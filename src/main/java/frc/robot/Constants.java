@@ -26,10 +26,10 @@ public final class Constants {
 
   public static final class ScoringArmConstants {
     public static final int kIntakeMotorID = 10;
-    public static final int kLaunchMotorLeaderID = 26;
-    public static final int kLaunchMotorFollowerID = 27;
-    public static final int kArmAngleMotorLeader = 28;
-    public static final int kArmAngleMotorFollower = 29;
+    public static final int kLaunchMotorLeaderID = 11;
+    public static final int kLaunchMotorFollowerID = 12;
+    public static final int kArmAngleMotorLeader = 13;
+    //public static final int kArmAngleMotorFollower = 29;
 
 
     public static final double kAngleP = 0;

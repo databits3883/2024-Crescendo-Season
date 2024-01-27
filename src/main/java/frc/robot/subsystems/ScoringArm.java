@@ -35,16 +35,16 @@ public class ScoringArm extends SubsystemBase {
   /** Creates a new ScoringArm. */
   public ScoringArm() {
 
-    //armAngleMotorLeader = new CANSparkMax(ScoringArmConstants.kArmAngleMotorLeader, MotorType.kBrushless);
+    armAngleMotorLeader = new CANSparkMax(ScoringArmConstants.kArmAngleMotorLeader, MotorType.kBrushless);
     //armAngleMotorFollower = new CANSparkMax(ScoringArmConstants.kArmAngleMotorFollower, MotorType.kBrushless);
-    //launchMotorLeader = new CANSparkMax(ScoringArmConstants.kLaunchMotorLeaderID, MotorType.kBrushless);
-    //launchMotorFollower = new CANSparkMax(ScoringArmConstants.kLaunchMotorFollowerID, MotorType.kBrushless);
-    //intakeMotor = new CANSparkMax(ScoringArmConstants.kIntakeMotorID, MotorType.kBrushless);
+    launchMotorLeader = new CANSparkMax(ScoringArmConstants.kLaunchMotorLeaderID, MotorType.kBrushless);
+    launchMotorFollower = new CANSparkMax(ScoringArmConstants.kLaunchMotorFollowerID, MotorType.kBrushless);
+    intakeMotor = new CANSparkMax(ScoringArmConstants.kIntakeMotorID, MotorType.kBrushless);
 
     //armAngleMotorFollower.follow(armAngleMotorLeader);
-    //absArmAngleEncoder = armAngleMotorLeader.getAbsoluteEncoder(SparkAbsoluteEncoder.Type.kDutyCycle);
-    //absArmAngleEncoder.setPositionConversionFactor(360);
-    //absArmAngleEncoder.setVelocityConversionFactor(1);
+    absArmAngleEncoder = armAngleMotorLeader.getAbsoluteEncoder(SparkAbsoluteEncoder.Type.kDutyCycle);
+    absArmAngleEncoder.setPositionConversionFactor(360);
+    absArmAngleEncoder.setVelocityConversionFactor(1);
 
 
     anglePIDController.setP(ScoringArmConstants.kAngleP);
@@ -52,7 +52,7 @@ public class ScoringArm extends SubsystemBase {
     anglePIDController.setD(ScoringArmConstants.kAngleD);
     anglePIDController.setIZone(ScoringArmConstants.kAngleIZone);
     anglePIDController.setTolerance(ScoringArmConstants.kAnglePosTolerance,ScoringArmConstants.kAngleVelTolerance);
-    //anglePIDController.setSetpoint(absArmAngleEncoder.getPosition());
+    anglePIDController.setSetpoint(absArmAngleEncoder.getPosition());
 
     launchSpeedPIDController.setP(ScoringArmConstants.kLaunchSpeedP);
     launchSpeedPIDController.setI(ScoringArmConstants.kLaunchSpeedI);
