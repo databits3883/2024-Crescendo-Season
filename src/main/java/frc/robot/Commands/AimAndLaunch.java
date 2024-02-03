@@ -22,7 +22,8 @@ public class AimAndLaunch extends Command {
   @Override
   public void initialize() {
     scoringArm.SetLaunchSpeed(distToSpeakerMeters);
-    scoringArm.SetArmAngle(180 -(90 + angleFromHorizonToSpeakerDeg) );
+    scoringArm.SetArmAngle(180 -(90 + angleFromHorizonToSpeakerDeg) );//(height * 9.8)/Math.sin(Math.acos((distance * 9.8) / other stuff(see james)))
+    
   }
 
   // Called every time the scheduler runs while the command is scheduled.

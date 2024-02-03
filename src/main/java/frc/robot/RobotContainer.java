@@ -74,14 +74,14 @@ public class RobotContainer {
 
   JoystickButton m_climbButton = new JoystickButton(m_copilotController, 2);
 
-  JoystickButton m_intakeButton = new JoystickButton(m_copilotController, 13);
-  JoystickButton m_outtakeButton = new JoystickButton(m_copilotController, 14);
+  JoystickButton m_intakeButton = new JoystickButton(m_copilotController, 4);
+  JoystickButton m_outtakeButton = new JoystickButton(m_copilotController, 5);
 
   JoystickButton m_launchButton = new JoystickButton(m_copilotController, 1);
 
-  JoystickButton m_flapTestOpen = new JoystickButton(m_copilotController, 11);
-  JoystickButton m_flapTestClosed = new JoystickButton(m_copilotController, 12);
-  JoystickButton m_intakeTest = new JoystickButton(m_copilotController, 10);
+  JoystickButton m_flapTestOpen = new JoystickButton(m_copilotController, 6);
+  JoystickButton m_flapTestClosed = new JoystickButton(m_copilotController, 7);
+  JoystickButton m_intakeTest = new JoystickButton(m_copilotController, 8);
   JoystickButton m_outtakeTest = new JoystickButton(m_copilotController, 9);
 
 

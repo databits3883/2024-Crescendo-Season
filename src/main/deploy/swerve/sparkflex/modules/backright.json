@@ -11,14 +11,14 @@
   },
   "encoder": {
     "type": "cancoder",
-    "id": 12,
+    "id": 11,
     "canbus": null
   },
   "inverted": {
     "drive": true,
     "angle": false
   },
-  "absoluteEncoderOffset": -229.05,
+  "absoluteEncoderOffset": -234.15,
   "location": {
     "front": -9,
     "left": -14.5
