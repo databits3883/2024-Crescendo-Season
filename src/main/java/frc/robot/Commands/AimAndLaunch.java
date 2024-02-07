@@ -5,24 +5,30 @@
 package frc.robot.Commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants.ScoringArmConstants;
 import frc.robot.subsystems.ScoringArm;
 
 public class AimAndLaunch extends Command {
 
   public double angleFromHorizonToSpeakerDeg = 0;
-  public double distToSpeakerMeters = 0;
+  public double distanceMeters = 0;
   public ScoringArm scoringArm;
   /** Creates a new AimAndLaunch. */
   public AimAndLaunch(ScoringArm arm) {
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(arm);
+    scoringArm = arm;
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    scoringArm.SetLaunchSpeed(distToSpeakerMeters);
-    scoringArm.SetArmAngle(180 -(90 + angleFromHorizonToSpeakerDeg) );//(height * 9.8)/Math.sin(Math.acos((distance * 9.8) / other stuff(see james)))
+
+    double angle = Math.atan(ScoringArmConstants.kSpeakerHeight/distanceMeters);
+    double velocity = Math.sqrt((19.6*ScoringArmConstants.kSpeakerHeight)/(2*Math.sin(angle)));
+    scoringArm.SetLaunchSpeed(velocity);
+    
+    
     
   }
 

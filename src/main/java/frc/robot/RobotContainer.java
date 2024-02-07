@@ -26,7 +26,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Commands.AimAndLaunch;
 import frc.robot.Commands.ClimbAndBalance;
-import frc.robot.Commands.RunIntake;
+import frc.robot.Commands.Intake;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.OperatorConstants;
@@ -37,6 +37,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 
@@ -66,16 +67,16 @@ public class RobotContainer {
 
 
   //Buttons on the copilots controller
-  JoystickButton m_jogArmUpButton = new JoystickButton(m_copilotController, 3);
-  JoystickButton m_jogArmDownButton = new JoystickButton(m_copilotController, 4);
+  JoystickButton m_jogArmUpButton = new JoystickButton(m_copilotController, 10);
+  JoystickButton m_jogArmDownButton = new JoystickButton(m_copilotController, 11);
 
-  JoystickButton m_incLauncherRPM = new JoystickButton(m_copilotController, 7);
-  JoystickButton m_decLauncherRPM = new JoystickButton(m_copilotController, 8);
+  JoystickButton m_incLauncherRPM = new JoystickButton(m_copilotController, 4);
+  JoystickButton m_decLauncherRPM = new JoystickButton(m_copilotController, 5);
 
   JoystickButton m_climbButton = new JoystickButton(m_copilotController, 2);
 
   JoystickButton m_intakeButton = new JoystickButton(m_copilotController, 4);
-  JoystickButton m_outtakeButton = new JoystickButton(m_copilotController, 5);
+  //JoystickButton m_outtakeButton = new JoystickButton(m_copilotController, 5);
 
   JoystickButton m_launchButton = new JoystickButton(m_copilotController, 1);
 
@@ -149,15 +150,15 @@ public class RobotContainer {
     m_incLauncherRPM.onTrue(new InstantCommand(() -> m_ScoringArm.ChangeLaunchSpeed(5), m_ScoringArm));
     m_decLauncherRPM.onTrue(new InstantCommand(() -> m_ScoringArm.ChangeLaunchSpeed(-5), m_ScoringArm));
 
-    m_intakeButton.whileTrue(new RunIntake(1));
+    m_intakeButton.whileTrue(new Intake(m_ScoringArm));
     m_launchButton.whileTrue(new AimAndLaunch(m_ScoringArm));
     m_climbButton.whileTrue(new ClimbAndBalance());
 
     m_flapTestClosed.onTrue(new InstantCommand(() -> m_ScoringArm.SetFlap(1)));
     m_flapTestOpen.onTrue(new InstantCommand(() -> m_ScoringArm.SetFlap(0)));
 
-    m_intakeTest.onTrue(new InstantCommand(() ->m_ScoringArm.Intake() ));
-    m_outtakeTest.onTrue(new InstantCommand(() ->m_ScoringArm.Outtake() ));
+    m_intakeTest.onTrue(new StartEndCommand(() ->m_ScoringArm.Intake() , () -> m_ScoringArm.StopIntake()));
+    m_outtakeTest.onTrue(new StartEndCommand(() ->m_ScoringArm.Outtake() , () -> m_ScoringArm.StopIntake()));
   }
 
   /**

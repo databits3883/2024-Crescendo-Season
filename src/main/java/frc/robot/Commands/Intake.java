@@ -5,24 +5,35 @@
 package frc.robot.Commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.ScoringArm;
 
-public class RunIntake extends Command {
-  /** Creates a new RunIntake. */
-  public RunIntake(double speed) {
-    // Use addRequirements() here to declare subsystem dependencies.
+public class Intake extends Command {
+
+  ScoringArm joeArm;
+
+  /** Creates a new Intake. */
+  public Intake(ScoringArm billyArm) {
+    joeArm = billyArm; 
+    addRequirements(joeArm);
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+    joeArm.Intake();
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {}
+  public void execute() {
+    joeArm.Intake();
+  }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    joeArm.StopIntake();
+  }
 
   // Returns true when the command should end.
   @Override
