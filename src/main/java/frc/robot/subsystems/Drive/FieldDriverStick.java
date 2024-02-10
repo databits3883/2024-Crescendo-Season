@@ -6,8 +6,6 @@ package frc.robot.subsystems.drive;
 
 import edu.wpi.first.wpilibj.Joystick;
 import frc.robot.RobotContainer;
-import frc.robot.Constants.DriveConstants;
-import frc.robot.Constants.OIConstants;
 
 /** Add your docs here. */
 public class FieldDriverStick {

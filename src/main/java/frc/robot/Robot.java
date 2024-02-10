@@ -4,10 +4,16 @@
 
 package frc.robot;
 
+import java.io.File;
+import java.io.IOException;
+
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import swervelib.parser.SwerveParser;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -19,6 +25,9 @@ public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
   private RobotContainer m_robotContainer;
+  private boolean didAutoRun = false;
+
+  private Timer disabledTimer;
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -28,9 +37,15 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
+
+    disabledTimer = new Timer();
+
+    addPeriodic(() -> RobotContainer.setAlliance(DriverStation.getAlliance()), 1);
     
     m_robotContainer = new RobotContainer();
     m_robotContainer.robotInit();
+
+
   }
 
   /**
@@ -51,27 +66,38 @@ public class Robot extends TimedRobot {
 
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {
+    m_robotContainer.setMotorBrake(true);
+
+    disabledTimer.reset();
+    disabledTimer.start();
+  }
 
   @Override
-  public void disabledPeriodic() {}
+  public void disabledPeriodic() {
+    if (disabledTimer.hasElapsed(Constants.Drivebase.WHEEL_LOCK_TIME))
+    {
+      m_robotContainer.setMotorBrake(false);
+      disabledTimer.stop();
+    }
+  }
 
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
+    didAutoRun = true;
+    m_robotContainer.setMotorBrake(true);
+
+    //Set initial state, will probably get overridden in the selected auto routine
+    m_robotContainer.setInitialPose();
+
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
-    /*
-     * String autoSelected = SmartDashboard.getString("Auto Selector",
-     * "Default"); switch(autoSelected) { case "My Auto": autonomousCommand
-     * = new MyAutoCommand(); break; case "Default Auto": default:
-     * autonomousCommand = new ExampleCommand(); break; }
-     */
-
     // schedule the autonomous command (example)
-    if (m_autonomousCommand != null) {
+    if (m_autonomousCommand != null)
+    {
       m_autonomousCommand.schedule();
-    }
+    }    
   }
 
   /** This function is called periodically during autonomous. */
@@ -80,12 +106,17 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
-    // This makes sure that the autonomous stops running when
-    // teleop starts running. If you want the autonomous to
-    // continue until interrupted by another command, remove
-    // this line or comment it out.
-    if (m_autonomousCommand != null) {
+    if (m_autonomousCommand != null)
+    {
       m_autonomousCommand.cancel();
+    }
+    m_robotContainer.setDriveMode();
+    m_robotContainer.setMotorBrake(true);
+
+    //if we did not run an auto set initial state of robot
+    if (!didAutoRun) 
+    {
+      m_robotContainer.setInitialPose();
     }
   }
 
@@ -95,8 +126,14 @@ public class Robot extends TimedRobot {
 
   @Override
   public void testInit() {
-    // Cancels all running commands at the start of test mode.
-    CommandScheduler.getInstance().cancelAll();
+     CommandScheduler.getInstance().cancelAll();
+    try
+    {
+      new SwerveParser(new File(Filesystem.getDeployDirectory(), Constants.ROBOT_LONGCLAW_CONFIG_LOCATION));
+    } catch (IOException e)
+    {
+      throw new RuntimeException(e);
+    }
   }
 
   /** This function is called periodically during test mode. */

@@ -13,9 +13,9 @@ import com.revrobotics.CANSparkBase.ControlType;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ScoringArmConstants;
 
@@ -71,8 +71,8 @@ public class ScoringArm extends SubsystemBase {
     intakeMotor = new CANSparkMax(ScoringArmConstants.kIntakeMotorID, MotorType.kBrushless);
 
     absArmAngleEncoder = armAngleLeaderMotor.getAbsoluteEncoder(SparkAbsoluteEncoder.Type.kDutyCycle);
-    absArmAngleEncoder.setPositionConversionFactor((1/64)*360);
-    absArmAngleEncoder.setVelocityConversionFactor((1/64)*360 * 60);//degrees per second
+    absArmAngleEncoder.setPositionConversionFactor(360);
+    absArmAngleEncoder.setVelocityConversionFactor(360);//degrees per second
 
 
     anglePIDController.setP(ScoringArmConstants.kAngleP);

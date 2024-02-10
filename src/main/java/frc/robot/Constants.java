@@ -4,14 +4,9 @@
 
 package frc.robot;
 
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.trajectory.TrajectoryConfig;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import swervelib.math.Matter;
 import swervelib.parser.PIDFConfig;
@@ -38,7 +33,7 @@ public final class Constants {
     public static final int kArmAngleMotor4ID = 29;
 
 
-    public static final double kAngleP = 0.0;
+    public static final double kAngleP = 0.01;
     public static final double kAngleI = 0;
     public static final double kAngleD = 0;
     public static final double kAngleVelTolerance = 0;
@@ -72,7 +67,7 @@ public final class Constants {
   public static final double LOOP_TIME  = 0.13; //s, 20ms + 110ms sprk max velocity lag
   public static final double FIELD_WIDTH = Units.inchesToMeters(653.2);  // (76.1 + 250.5 ) * 2 = 653.2 inches
 
-  public static final String ROBOT_FROGGY_CONFIG_LOCATION = "swerve/neo";
+  public static final String ROBOT_LONGCLAW_CONFIG_LOCATION = "swerve/sparkflex";
 
   public static final class Auton
   {
