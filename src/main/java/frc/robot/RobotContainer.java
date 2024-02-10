@@ -33,6 +33,7 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.ScoringArm;
 import frc.robot.subsystems.drive.FieldDriverStick;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
+import frc.robot.subsystems.vision.VisionSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
@@ -53,6 +54,9 @@ public class RobotContainer {
   
   private final ScoringArm m_ScoringArm = new ScoringArm();
   private final SwerveSubsystem drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),"swerve/sparkflex"));
+
+    public static VisionSubsystem robotVision = new VisionSubsystem(Constants.VisionConstants.cameraY, Constants.VisionConstants.cameraX, Constants.VisionConstants.cameraZ, Constants.VisionConstants.cameraName);
+
 
   // The driver's controller
   Joystick m_driverController = new Joystick(OIConstants.kDriverControllerPort);
@@ -75,7 +79,7 @@ public class RobotContainer {
 
   JoystickButton m_climbButton = new JoystickButton(m_copilotController, 2);
 
-  JoystickButton m_intakeButton = new JoystickButton(m_copilotController, 4);
+  JoystickButton m_intakeButton = new JoystickButton(m_copilotController, 3);
   //JoystickButton m_outtakeButton = new JoystickButton(m_copilotController, 5);
 
   JoystickButton m_launchButton = new JoystickButton(m_copilotController, 1);
@@ -131,6 +135,28 @@ public class RobotContainer {
 
   public void robotInit(){
     
+  }
+
+  public static DriverStation.Alliance allianceColor = DriverStation.Alliance.Blue;
+
+  public static boolean isRedAlliance() 
+  {
+    return allianceColor.equals(DriverStation.Alliance.Red);
+  }
+
+  public static boolean isBlueAlliance() {
+    return !isRedAlliance();
+  }
+
+  public static void setAlliance(Optional<DriverStation.Alliance> color) {
+    if (color.isPresent()) {
+      DriverStation.Alliance currentColor = allianceColor;      
+      allianceColor = color.get();
+      if (!allianceColor.equals(currentColor))
+      {
+        System.out.println("Changed alliance to " +(isBlueAlliance()?"Blue":"Red"));
+      }
+    }
   }
 
 
@@ -192,5 +218,15 @@ public class RobotContainer {
   }
 
 
-  
+  public void zeroGyroWithAlliance()
+  {
+      if (isRedAlliance())
+      {
+        drivebase.zeroGyro();
+        //Set the pose 180 degrees
+        drivebase.resetOdometry(new Pose2d(drivebase.getPose().getTranslation(), Rotation2d.fromDegrees(180)));
+      } else {
+         drivebase.zeroGyro();      
+      }
+  }
 }

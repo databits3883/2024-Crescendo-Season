@@ -8,6 +8,8 @@ import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkAbsoluteEncoder;
+import com.revrobotics.SparkPIDController;
+import com.revrobotics.CANSparkBase.ControlType;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
 import edu.wpi.first.math.controller.PIDController;
@@ -23,8 +25,11 @@ public class ScoringArm extends SubsystemBase {
   public Servo flapServo = new Servo(ScoringArmConstants.kFlapServo1Channel);
 
   public CANSparkMax launchMotorLeader;
-  public RelativeEncoder launchSpeedEncoder;
-  public PIDController launchSpeedPIDController = new PIDController(ScoringArmConstants.kLaunchSpeedP,ScoringArmConstants.kLaunchSpeedI,ScoringArmConstants.kLaunchSpeedD);
+  public CANSparkMax launchMotorFollower;
+  public RelativeEncoder launchSpeedLeaderEncoder;
+  public RelativeEncoder launchSpeedFollowerEncoder;
+  public SparkPIDController launchSpeedLeaderPIDController;
+  public SparkPIDController launchSpeedFollowerPIDController;
   public double launchSpeedSetpoint = 0;
 
   public AbsoluteEncoder absArmAngleEncoder;
@@ -37,7 +42,9 @@ public class ScoringArm extends SubsystemBase {
     armAngleMotorLeader = new CANSparkMax(ScoringArmConstants.kArmAngleMotorLeader, MotorType.kBrushless);
 
     launchMotorLeader = new CANSparkMax(ScoringArmConstants.kLaunchMotorLeaderID, MotorType.kBrushless);
-    launchSpeedEncoder = launchMotorLeader.getEncoder();
+    launchMotorFollower = new CANSparkMax(ScoringArmConstants.kLaunchMotorFollowerID, MotorType.kBrushless);
+    launchSpeedLeaderEncoder = launchMotorLeader.getEncoder();
+    launchSpeedFollowerEncoder = launchMotorFollower.getEncoder();
     
     intakeMotor = new CANSparkMax(ScoringArmConstants.kIntakeMotorID, MotorType.kBrushless);
 
@@ -53,23 +60,37 @@ public class ScoringArm extends SubsystemBase {
     anglePIDController.setTolerance(ScoringArmConstants.kAnglePosTolerance,ScoringArmConstants.kAngleVelTolerance);
     anglePIDController.setSetpoint(absArmAngleEncoder.getPosition());
 
-    launchSpeedEncoder.setPositionConversionFactor(4*Math.PI);//diameter of wheel times pi
-    launchSpeedEncoder.setVelocityConversionFactor(4*Math.PI/60);
-    
+    launchSpeedLeaderPIDController = launchMotorLeader.getPIDController();
+    launchSpeedFollowerPIDController = launchMotorFollower.getPIDController();
 
-    launchSpeedPIDController.setP(ScoringArmConstants.kLaunchSpeedP);
-    launchSpeedPIDController.setI(ScoringArmConstants.kLaunchSpeedI);
-    launchSpeedPIDController.setD(ScoringArmConstants.kLaunchSpeedD);
-    launchSpeedPIDController.setIZone(ScoringArmConstants.kLaunchSpeedIZone);
-    launchSpeedPIDController.setTolerance(ScoringArmConstants.kLaunchSpeedPosTolerance,ScoringArmConstants.kLaunchSpeedVelTolerance);
-    launchSpeedPIDController.disableContinuousInput();
-    launchSpeedPIDController.setSetpoint(80);//tell the launch motors to start at 0 speed
-    Shuffleboard.getTab("Arm Debug").addDouble("Launch Vel Error", launchSpeedPIDController::getPositionError);
-    Shuffleboard.getTab("Arm Debug").addDouble("Launch Vel SP", launchSpeedPIDController::getSetpoint);
-    Shuffleboard.getTab("Arm Debug").addDouble("Launch Vel Encoder", launchSpeedEncoder::getVelocity);
-    Shuffleboard.getTab("Arm Debug").addDouble("Launch Vel Output", () -> launchSpeedPIDController.calculate(10));
+    launchSpeedLeaderEncoder.setPositionConversionFactor(4*Math.PI);//diameter of wheel times pi
+    launchSpeedLeaderEncoder.setVelocityConversionFactor(4*0.254*Math.PI/60);
+
+    launchSpeedFollowerEncoder.setPositionConversionFactor(4*Math.PI);//diameter of wheel times pi
+    launchSpeedFollowerEncoder.setVelocityConversionFactor(4*0.254*Math.PI/60);
+    
+    launchSpeedLeaderPIDController.setP(ScoringArmConstants.kLaunchSpeedP);
+    launchSpeedLeaderPIDController.setI(ScoringArmConstants.kLaunchSpeedI);
+    launchSpeedLeaderPIDController.setD(ScoringArmConstants.kLaunchSpeedD);
+    launchSpeedLeaderPIDController.setIZone(ScoringArmConstants.kLaunchSpeedIZone);
+    launchSpeedLeaderPIDController.setFF(ScoringArmConstants.kLaunchSpeedFF);
+
+    launchSpeedFollowerPIDController.setP(ScoringArmConstants.kLaunchSpeedP);
+    launchSpeedFollowerPIDController.setI(ScoringArmConstants.kLaunchSpeedI);
+    launchSpeedFollowerPIDController.setD(ScoringArmConstants.kLaunchSpeedD);
+    launchSpeedFollowerPIDController.setIZone(ScoringArmConstants.kLaunchSpeedIZone);
+    launchSpeedFollowerPIDController.setFF(ScoringArmConstants.kLaunchSpeedFF);
+    
+    
+    //Shuffleboard.getTab("Arm Debug").addDouble("Launch Vel Error", launchSpeedPIDController::getPositionError);
+    Shuffleboard.getTab("Arm Debug").addDouble("Launch Vel SP", ()-> launchSpeedSetpoint);
+    Shuffleboard.getTab("Arm Debug").addDouble("Launch Vel Encoder", launchSpeedLeaderEncoder::getVelocity);
+    //Shuffleboard.getTab("Arm Debug").addDouble("Launch Vel Output", () -> launchSpeedPIDController.calculate(10));
+
+    SetLaunchSpeed(0);//theoretical max of 622.9 meters per second
     
   }
+
 
   @Override
   public void periodic() {
@@ -84,7 +105,7 @@ public class ScoringArm extends SubsystemBase {
 
     
     RunLaunchSpeedPIDControl();
-    
+    //launchMotorLeader.set(0.1);
 
   }
 
@@ -101,15 +122,17 @@ public class ScoringArm extends SubsystemBase {
   }
 
   public void RunLaunchSpeedPIDControl(){
-    launchMotorLeader.set(launchSpeedPIDController.calculate(launchSpeedEncoder.getVelocity()));
+    //launchMotorLeader.set(launchSpeedPIDController.calculate(launchSpeedEncoder.getVelocity()));
+    launchSpeedLeaderPIDController.setReference(launchSpeedSetpoint, ControlType.kVelocity);
+    launchSpeedFollowerPIDController.setReference(launchSpeedSetpoint, ControlType.kVelocity);
   }
 
   public void SetLaunchSpeed(double launchRPM){
-    launchSpeedPIDController.setSetpoint(launchRPM);
+    launchSpeedSetpoint = launchRPM;
   }
 
   public void ChangeLaunchSpeed(double deltaRPM){
-    SetLaunchSpeed(launchSpeedPIDController.getSetpoint()+deltaRPM);
+    SetLaunchSpeed(launchSpeedSetpoint+deltaRPM);
   }
 
   public void Intake(){
@@ -132,5 +155,9 @@ public class ScoringArm extends SubsystemBase {
 
 public void StopIntake() {
     intakeMotor.set(0);
+}
+
+public boolean atLaunchSetpoint() {
+  return (Math.abs(launchSpeedSetpoint-launchSpeedLeaderEncoder.getVelocity()) < 1);
 }
 }

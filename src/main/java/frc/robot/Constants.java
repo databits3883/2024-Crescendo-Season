@@ -27,8 +27,8 @@ public final class Constants {
   public static final class ScoringArmConstants {
     public static final int kIntakeMotorID = 13;
     public static final int kLaunchMotorLeaderID = 15;
-    public static final int kLaunchMotorFollowerID = 17;//not used
-    public static final int kArmAngleMotorLeader = 16;
+    public static final int kLaunchMotorFollowerID = 16;
+    public static final int kArmAngleMotorLeader = 17;
     //public static final int kArmAngleMotorFollower = 29;
 
 
@@ -37,19 +37,20 @@ public final class Constants {
     public static final double kAngleD = 0;
     public static final double kAngleVelTolerance = 0;
     public static final double kAnglePosTolerance = 0;
-    public static final double kAngleIZone = 0;
+    public static final double kAngleIZone = Double.POSITIVE_INFINITY;
 
 
-    public static final double kLaunchSpeedP = 0.0001;
+    public static final double kLaunchSpeedP = 0.0045;
     public static final double kLaunchSpeedI = 0;
-    public static final double kLaunchSpeedD = 0.000;
-    public static final double kLaunchSpeedIZone = 0;
+    public static final double kLaunchSpeedD = 0.04;
+    public static final double kLaunchSpeedFF = 0.001;
     public static final double kLaunchSpeedPosTolerance = 0;
     public static final double kLaunchSpeedVelTolerance = 0;
     public static int kFlapServo1Channel=0;
     public static int kFlapServo2Channel=1;
+    public static double kLaunchSpeedIZone = 0;
 
-    public static final double kSpeakerHeight = 1.0;
+    public static final double kSpeakerHeight = 2.0;
 
   }
 
@@ -63,6 +64,7 @@ public final class Constants {
   public static final double ROBOT_MASS = (148 - 20.3) * 0.453592; // 32lbs * kg per pound
   public static final Matter CHASSIS    = new Matter(new Translation3d(0, 0, Units.inchesToMeters(8)), ROBOT_MASS);
   public static final double LOOP_TIME  = 0.13; //s, 20ms + 110ms sprk max velocity lag
+  public static final double FIELD_WIDTH = Units.inchesToMeters(653.2);  // (76.1 + 250.5 ) * 2 = 653.2 inches
 
   public static final class Auton
   {
@@ -109,5 +111,8 @@ public final class Constants {
     public static final double cameraZ = Units.inchesToMeters(12.5);
     public static final double cameraX = Units.inchesToMeters(1);
     public static final double cameraY = Units.inchesToMeters(10);
+    public static final String pipelineName = "apriltag";
+    public static final String cameraName = "Camera_Module_v1";
+
   }
 }

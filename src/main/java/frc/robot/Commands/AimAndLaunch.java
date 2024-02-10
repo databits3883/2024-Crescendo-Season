@@ -39,7 +39,7 @@ public class AimAndLaunch extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    if(!interrupted && scoringArm.anglePIDController.atSetpoint() && scoringArm.launchSpeedPIDController.atSetpoint()){
+    if(!interrupted && scoringArm.anglePIDController.atSetpoint() && scoringArm.atLaunchSetpoint()){
       scoringArm.Launch();
     }
   }
@@ -47,6 +47,6 @@ public class AimAndLaunch extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return scoringArm.anglePIDController.atSetpoint() && scoringArm.launchSpeedPIDController.atSetpoint();
+    return scoringArm.anglePIDController.atSetpoint() && scoringArm.atLaunchSetpoint();
   }
 }

@@ -5,6 +5,7 @@
 package frc.robot.subsystems.drive;
 
 import edu.wpi.first.wpilibj.Joystick;
+import frc.robot.RobotContainer;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 
@@ -30,6 +31,8 @@ public class FieldDriverStick {
         //output = ReduceDecceleration(output, oldXInput);
         oldXInput = output;
         // return output * DriveConstants.kMaxSpeedMetersPerSecond;
+        //Inverse if we are on red alliance
+        if (RobotContainer.isRedAlliance()) output = -output;
         return output;
     }
 
@@ -45,6 +48,8 @@ public class FieldDriverStick {
         //output = ReduceDecceleration(output, oldYInput);
         oldYInput = output;
         // return output * DriveConstants.kMaxSpeedMetersPerSecond;
+        //Inverse if we are on red alliance
+        if (RobotContainer.isRedAlliance()) output = -output;
         return output;
     }
 
@@ -71,4 +76,3 @@ public class FieldDriverStick {
         return output;
     }
 }
-
