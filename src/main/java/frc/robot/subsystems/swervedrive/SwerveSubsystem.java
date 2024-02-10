@@ -1,7 +1,3 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot.subsystems.swervedrive;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -25,6 +21,7 @@ import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
 
@@ -37,6 +34,7 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 
 import swervelib.SwerveController;
 import swervelib.SwerveDrive;
+import swervelib.SwerveDriveTest;
 import swervelib.math.SwerveMath;
 import swervelib.parser.SwerveControllerConfiguration;
 import swervelib.parser.SwerveDriveConfiguration;
@@ -52,10 +50,7 @@ public class SwerveSubsystem extends SubsystemBase {
    * Swerve drive object.
    */
   private final SwerveDrive swerveDrive;
-  /**
-   * Maximum speed of the robot in meters per second, used to limit acceleration.
-   */
-  public double maximumSpeed = Units.feetToMeters(14.5);
+  
 
   /**
    * Initialize {@link SwerveDrive} with the directory provided.
@@ -86,7 +81,7 @@ public class SwerveSubsystem extends SubsystemBase {
     // objects being created.
     SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
     try {
-      swerveDrive = new SwerveParser(directory).createSwerveDrive(maximumSpeed);
+      swerveDrive = new SwerveParser(directory).createSwerveDrive(Constants.ROBOT_MAX_SPEED);
       // Alternative method if you don't want to supply the conversion factor via JSON
       // files.
       // swerveDrive = new SwerveParser(directory).createSwerveDrive(maximumSpeed,
@@ -107,7 +102,7 @@ public class SwerveSubsystem extends SubsystemBase {
    * @param controllerCfg Swerve Controller.
    */
   public SwerveSubsystem(SwerveDriveConfiguration driveCfg, SwerveControllerConfiguration controllerCfg) {
-    swerveDrive = new SwerveDrive(driveCfg, controllerCfg, maximumSpeed);
+    swerveDrive = new SwerveDrive(driveCfg, controllerCfg, Constants.ROBOT_MAX_SPEED);
   }
 
   /**
@@ -322,31 +317,34 @@ public class SwerveSubsystem extends SubsystemBase {
 
       //Currently comment out auto vision tracking.  We can probably put this back in place
       //Will want to check poseAmbiguity and if less than 0.21 then update, otherwise ignore vision pose
-      if (1==0){
-      PhotonTrackedTarget target = RobotContainer.robotVision.getTarget();
+      if (Constants.VisionConstants.autoUpdatePose){
+        
+      PhotonTrackedTarget target = RobotContainer.getRobotVision().getTarget();
       if (target != null) {
         int id = target.getFiducialId();
-        Optional<Pose3d> hasTargetPose = RobotContainer.robotVision.getAprilTagPose(id);
+        Optional<Pose3d> hasTargetPose = RobotContainer.getRobotVision().getAprilTagPose(id);
         if (hasTargetPose.isPresent()) {
           Pose3d targetPose = hasTargetPose.get();
-          // System.out.println("targetPose X/Y: " + targetPose.getX() + " / " +
-          // targetPose.getY());
 
-          Optional<EstimatedRobotPose> opRobotPose = RobotContainer.robotVision.getEstimatedGlobalPose();
+          if(target.getPoseAmbiguity() >= Constants.VisionConstants.acceptibleAmbiguity)
+             return;
+          Optional<EstimatedRobotPose> opRobotPose = RobotContainer.getRobotVision().getEstimatedGlobalPose();
 
           if (opRobotPose != null) {
             if (isLogging)
-              logOutput.append("\r\nGot New Position from April tag id: " + id);
+              //logOutput.append("\r\nGot New Position from April tag id: " + id);
             if (opRobotPose.isPresent()) {
               EstimatedRobotPose estimatedRobotPose = opRobotPose.get();
-              if (isLogging)
-                logOutput.append("\r\nestimatedRobotPose X/Y: " + estimatedRobotPose.estimatedPose.getX() + " / "
+              if (isLogging) {
+                logOutput.append("\nestimatedRobotPose X/Y: " + estimatedRobotPose.estimatedPose.getX() + " / "
                     + estimatedRobotPose.estimatedPose.getY());
-              addVisionMeasurement(estimatedRobotPose.estimatedPose.toPose2d(), estimatedRobotPose.timestampSeconds);
+                logOutput.append("\nPose Ambiguity: " + target.getPoseAmbiguity());
+              }
+              swerveDrive.resetOdometry(estimatedRobotPose.estimatedPose.toPose2d());
             }
           } else {
             if (isLogging)
-              logOutput.append("\r\nApril Tag seen with no POSE NOT PRESENT!!");
+              logOutput.append("\nApril Tag seen with no POSE NOT PRESENT!!");
           }
         }
 
@@ -355,7 +353,7 @@ public class SwerveSubsystem extends SubsystemBase {
           System.out.println(logOutput.toString());
 
       }
-    }//enmd if 1==0
+    }// end if autoUpdate vision = true
     }
 
   }
@@ -493,7 +491,7 @@ public class SwerveSubsystem extends SubsystemBase {
         headingX,
         headingY,
         getHeading().getRadians(),
-        maximumSpeed);
+        Constants.ROBOT_MAX_SPEED);
   }
 
   /**
@@ -513,7 +511,7 @@ public class SwerveSubsystem extends SubsystemBase {
         yInput,
         angle.getRadians(),
         getHeading().getRadians(),
-        maximumSpeed);
+        Constants.ROBOT_MAX_SPEED);
   }
 
   /**
@@ -580,10 +578,10 @@ public class SwerveSubsystem extends SubsystemBase {
    */
   public void visionPose() {
     long currentTimeMillis = System.currentTimeMillis();
-    Pose2d debugTarget = RobotContainer.robotVision.debugClosestTarget();
+    Pose2d debugTarget = RobotContainer.getRobotVision().debugClosestTarget();
     if(debugTarget != null){
     //  swerveDrive.addVisionMeasurement(debugTarget, currentTimeMillis);
-    swerveDrive.resetOdometry(debugTarget);
+      swerveDrive.resetOdometry(debugTarget);
     }
   }
 
@@ -629,6 +627,16 @@ public class SwerveSubsystem extends SubsystemBase {
                               Rotation2d.fromDegrees(target.getYaw()))); // Not sure if this will work, more math may be required.
       }
     });
+  }
+
+  public Command sysIdDriveMotorCommand() {
+    return SwerveDriveTest.generateSysIdCommand(
+        SwerveDriveTest.setDriveSysIdRoutine(new Config(), this, swerveDrive, 12), 3.0, 5.0, 3.0);
+  }
+
+  public Command sysIdAngleMotorCommand() {
+    return SwerveDriveTest.generateSysIdCommand(
+        SwerveDriveTest.setAngleSysIdRoutine(new Config(), this, swerveDrive), 3.0, 5.0, 3.0);
   }
 
 }

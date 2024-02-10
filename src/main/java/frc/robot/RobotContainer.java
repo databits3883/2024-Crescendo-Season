@@ -21,12 +21,12 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.WidgetType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Commands.AimAndLaunch;
-import frc.robot.Commands.ClimbAndBalance;
-import frc.robot.Commands.Intake;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.OperatorConstants;
@@ -55,7 +55,10 @@ public class RobotContainer {
   private final ScoringArm m_ScoringArm = new ScoringArm();
   private final SwerveSubsystem drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),"swerve/sparkflex"));
 
-    public static VisionSubsystem robotVision = new VisionSubsystem(Constants.VisionConstants.cameraY, Constants.VisionConstants.cameraX, Constants.VisionConstants.cameraZ, Constants.VisionConstants.cameraName);
+  private static VisionSubsystem m_robotVision = new VisionSubsystem();
+
+  SendableChooser<Command> m_autoChooser = AutoBuilder.buildAutoChooser();
+
 
 
   // The driver's controller
@@ -77,17 +80,17 @@ public class RobotContainer {
   JoystickButton m_incLauncherRPM = new JoystickButton(m_copilotController, 4);
   JoystickButton m_decLauncherRPM = new JoystickButton(m_copilotController, 5);
 
-  JoystickButton m_climbButton = new JoystickButton(m_copilotController, 2);
+  JoystickButton m_climbPrepButton = new JoystickButton(m_copilotController, 8);
+  JoystickButton m_climbFinishButton = new JoystickButton(m_copilotController, 9);
 
   JoystickButton m_intakeButton = new JoystickButton(m_copilotController, 3);
-  //JoystickButton m_outtakeButton = new JoystickButton(m_copilotController, 5);
+  JoystickButton m_outtakeButton = new JoystickButton(m_copilotController, 2);
 
   JoystickButton m_launchButton = new JoystickButton(m_copilotController, 1);
 
   JoystickButton m_flapTestOpen = new JoystickButton(m_copilotController, 6);
   JoystickButton m_flapTestClosed = new JoystickButton(m_copilotController, 7);
-  JoystickButton m_intakeTest = new JoystickButton(m_copilotController, 8);
-  JoystickButton m_outtakeTest = new JoystickButton(m_copilotController, 9);
+  
 
 
   //Face forward
@@ -134,7 +137,11 @@ public class RobotContainer {
   }
 
   public void robotInit(){
-    
+    Shuffleboard.getTab("Game HUD").addDouble("Robot Pitch", (()-> drivebase.getPitch().getDegrees())).withWidget(BuiltInWidgets.kEncoder);
+    Shuffleboard.getTab("Game HUD").addDouble("Arm Angle", m_ScoringArm::GetArmAngle);
+  
+    SmartDashboard.putData("Auto Chooser", m_autoChooser);    
+
   }
 
   public static DriverStation.Alliance allianceColor = DriverStation.Alliance.Blue;
@@ -159,6 +166,13 @@ public class RobotContainer {
     }
   }
 
+  public static VisionSubsystem getRobotVision() {
+    return m_robotVision;
+  }
+  public static void setRobotVision(VisionSubsystem robotVision) {
+    m_robotVision = robotVision;
+  }
+
 
   /**
    * Use this method to define your button->command mappings. Buttons can be created by
@@ -176,15 +190,15 @@ public class RobotContainer {
     m_incLauncherRPM.onTrue(new InstantCommand(() -> m_ScoringArm.ChangeLaunchSpeed(5), m_ScoringArm));
     m_decLauncherRPM.onTrue(new InstantCommand(() -> m_ScoringArm.ChangeLaunchSpeed(-5), m_ScoringArm));
 
-    m_intakeButton.whileTrue(new Intake(m_ScoringArm));
+    
     m_launchButton.whileTrue(new AimAndLaunch(m_ScoringArm));
-    m_climbButton.whileTrue(new ClimbAndBalance());
+    m_climbPrepButton.onTrue(new InstantCommand(m_ScoringArm::PrepareClimb, m_ScoringArm));
 
     m_flapTestClosed.onTrue(new InstantCommand(() -> m_ScoringArm.SetFlap(1)));
     m_flapTestOpen.onTrue(new InstantCommand(() -> m_ScoringArm.SetFlap(0)));
 
-    m_intakeTest.onTrue(new StartEndCommand(() ->m_ScoringArm.Intake() , () -> m_ScoringArm.StopIntake()));
-    m_outtakeTest.onTrue(new StartEndCommand(() ->m_ScoringArm.Outtake() , () -> m_ScoringArm.StopIntake()));
+    m_intakeButton.onTrue(new StartEndCommand(() ->m_ScoringArm.Intake() , () -> m_ScoringArm.StopIntake()));
+    m_outtakeButton.onTrue(new StartEndCommand(() ->m_ScoringArm.Outtake() , () -> m_ScoringArm.StopIntake()));
   }
 
   /**
@@ -212,8 +226,10 @@ public class RobotContainer {
     //FollowTrajectory trajectoryDrive = new FollowTrajectory(exampleTrajectory, m_robotDrive, true, true);
     
     // Run path following command, then stop at the end.
-    return drivebase.getAutonomousCommand("crazy", true);
-   //m_robotDrive.setDisplayTrajectory(exampleTrajectory);
+    
+    return m_autoChooser.getSelected();
+    
+     //m_robotDrive.setDisplayTrajectory(exampleTrajectory);
    //return new PrintCommand("not doing anything in autonomous");
   }
 

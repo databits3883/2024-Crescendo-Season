@@ -22,7 +22,8 @@ import frc.robot.Constants.ScoringArmConstants;
 public class ScoringArm extends SubsystemBase {
 
   public CANSparkMax intakeMotor;
-  public Servo flapServo = new Servo(ScoringArmConstants.kFlapServo1Channel);
+  public Servo flapServo = new Servo(ScoringArmConstants.kFlapServoChannel);
+  public Servo climbLockServo = new Servo(ScoringArmConstants.kClimbLockServoChannel);
 
   public CANSparkMax launchMotorLeader;
   public CANSparkMax launchMotorFollower;
@@ -32,14 +33,35 @@ public class ScoringArm extends SubsystemBase {
   public SparkPIDController launchSpeedFollowerPIDController;
   public double launchSpeedSetpoint = 0;
 
+  
+  public CANSparkMax armAngleLeaderMotor;
+  public CANSparkMax armAngleFollowerMotor1i;
+  public CANSparkMax armAngleFollowerMotor2;
+  public CANSparkMax armAngleFollowerMotor3i;
+
   public AbsoluteEncoder absArmAngleEncoder;
-  public CANSparkMax armAngleMotorLeader;
   public PIDController anglePIDController = new PIDController(ScoringArmConstants.kAngleP, ScoringArmConstants.kAngleI, ScoringArmConstants.kAngleD);
+
+  enum ArmStates {
+    PICKUP,
+    AMP,
+    STATICSPEAKER,
+    DYNAMICSPEAKER,
+    PREPCLIMB,
+    DONECLIMB
+  }
 
   /** Creates a new ScoringArm. */
   public ScoringArm() {
 
-    armAngleMotorLeader = new CANSparkMax(ScoringArmConstants.kArmAngleMotorLeader, MotorType.kBrushless);
+    armAngleLeaderMotor = new CANSparkMax(ScoringArmConstants.kArmAngleMotor1iID, MotorType.kBrushless);
+    //armAngleFollowerMotor1i = new CANSparkMax(ScoringArmConstants.kArmAngleMotor2ID, MotorType.kBrushless);
+    //armAngleFollowerMotor2 = new CANSparkMax(ScoringArmConstants.kArmAngleMotor3iID, MotorType.kBrushless);
+    //armAngleFollowerMotor3i = new CANSparkMax(ScoringArmConstants.kArmAngleMotor4ID, MotorType.kBrushless);
+
+    //armAngleFollowerMotor1i.follow(armAngleLeaderMotor, true);
+    //armAngleFollowerMotor2.follow(armAngleLeaderMotor, false);
+    //armAngleFollowerMotor3i.follow(armAngleLeaderMotor, true);
 
     launchMotorLeader = new CANSparkMax(ScoringArmConstants.kLaunchMotorLeaderID, MotorType.kBrushless);
     launchMotorFollower = new CANSparkMax(ScoringArmConstants.kLaunchMotorFollowerID, MotorType.kBrushless);
@@ -48,9 +70,9 @@ public class ScoringArm extends SubsystemBase {
     
     intakeMotor = new CANSparkMax(ScoringArmConstants.kIntakeMotorID, MotorType.kBrushless);
 
-    absArmAngleEncoder = armAngleMotorLeader.getAbsoluteEncoder(SparkAbsoluteEncoder.Type.kDutyCycle);
-    absArmAngleEncoder.setPositionConversionFactor(1);
-    absArmAngleEncoder.setVelocityConversionFactor(1);//degrees per second
+    absArmAngleEncoder = armAngleLeaderMotor.getAbsoluteEncoder(SparkAbsoluteEncoder.Type.kDutyCycle);
+    absArmAngleEncoder.setPositionConversionFactor((1/64)*360);
+    absArmAngleEncoder.setVelocityConversionFactor((1/64)*360 * 60);//degrees per second
 
 
     anglePIDController.setP(ScoringArmConstants.kAngleP);
@@ -97,10 +119,10 @@ public class ScoringArm extends SubsystemBase {
     // This method will be called once per scheduler run
 
     if (!anglePIDController.atSetpoint()) {
-      RunAnglePIDControl();//runs PID control if the motor is not at the setpoint
+      RunAnglePIDControl();//runs PID control if the arm is not at the setpoint
     }
     else{
-      armAngleMotorLeader.set(0);//stops the motor if you are at the setpoint
+      SetArmAngleMotors(0);//stops the motor if you are at the setpoint
     }
 
     
@@ -110,7 +132,11 @@ public class ScoringArm extends SubsystemBase {
   }
 
   public void RunAnglePIDControl(){
-    armAngleMotorLeader.set(anglePIDController.calculate(absArmAngleEncoder.getPosition()));
+    SetArmAngleMotors(anglePIDController.calculate(absArmAngleEncoder.getPosition()));
+  }
+
+  public void SetArmAngleMotors(double fraction){
+    armAngleLeaderMotor.set(fraction);
   }
 
   public void SetArmAngle(double armDeg){
@@ -119,6 +145,10 @@ public class ScoringArm extends SubsystemBase {
 
   public void ChangeArmAngle(double deg){
     SetArmAngle(absArmAngleEncoder.getPosition() + deg);
+  }
+
+  public double GetArmAngle(){
+    return absArmAngleEncoder.getPosition();
   }
 
   public void RunLaunchSpeedPIDControl(){
@@ -146,7 +176,7 @@ public class ScoringArm extends SubsystemBase {
 
   public void Launch(){
     SetFlap(0.1);
-    intakeMotor.set(0.1);
+    intakeMotor.set(1);
   }
 
   public void SetFlap(double pos){
@@ -157,7 +187,29 @@ public void StopIntake() {
     intakeMotor.set(0);
 }
 
-public boolean atLaunchSetpoint() {
-  return (Math.abs(launchSpeedSetpoint-launchSpeedLeaderEncoder.getVelocity()) < 1);
-}
+  public boolean atLaunchSetpoint() {
+    return (Math.abs(launchSpeedSetpoint-launchSpeedLeaderEncoder.getVelocity()) < 5);
+  }
+
+  public void UnlatchClimb(){
+    climbLockServo.set(0);
+  }
+
+  public void LatchClimb(){
+    climbLockServo.set(1);
+  }
+
+  public void PrepareClimb(){
+    UnlatchClimb();
+    SetArmAngle(ScoringArmConstants.kArmPosClimbPrep);
+  }
+
+  public void Climb(){
+    SetArmAngle(ScoringArmConstants.kArmPosClimbFinish);
+  }
+
+  public void GoToPickupPos(){
+    SetArmAngle(ScoringArmConstants.kArmPosPickup);
+  }
+
 }

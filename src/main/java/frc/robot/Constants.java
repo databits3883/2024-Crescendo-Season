@@ -5,6 +5,8 @@
 package frc.robot;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -26,10 +28,14 @@ public final class Constants {
 
   public static final class ScoringArmConstants {
     public static final int kIntakeMotorID = 13;
+
     public static final int kLaunchMotorLeaderID = 15;
     public static final int kLaunchMotorFollowerID = 16;
-    public static final int kArmAngleMotorLeader = 17;
-    //public static final int kArmAngleMotorFollower = 29;
+
+    public static final int kArmAngleMotor1iID = 17;
+    public static final int kArmAngleMotor2ID = 29;
+    public static final int kArmAngleMotor3iID = 29;
+    public static final int kArmAngleMotor4ID = 29;
 
 
     public static final double kAngleP = 0.0;
@@ -46,25 +52,27 @@ public final class Constants {
     public static final double kLaunchSpeedFF = 0.001;
     public static final double kLaunchSpeedPosTolerance = 0;
     public static final double kLaunchSpeedVelTolerance = 0;
-    public static int kFlapServo1Channel=0;
-    public static int kFlapServo2Channel=1;
+    public static int kFlapServoChannel=0;
+    public static int kClimbLockServoChannel=1;
     public static double kLaunchSpeedIZone = 0;
 
     public static final double kSpeakerHeight = 2.0;
 
+    public static final double kArmPosStaticLaunch = 0;
+    public static final double kArmPosDynamicLaunch = 0;
+    public static final double kArmPosPickup = 0;
+    public static final double kArmPosClimbPrep = 0;
+    public static final double kArmPosClimbFinish = 0;
+
   }
 
-  public static final class ClimbConstants{
-
-    public static final int kLeftArmMotorChannel = 0;
-    public static final int kRightArmMotorChannel = 0;
-
-  }
-
-  public static final double ROBOT_MASS = (148 - 20.3) * 0.453592; // 32lbs * kg per pound
+   public static final double ROBOT_MASS = (148 - 20.3) * 0.453592; // 32lbs * kg per pound
   public static final Matter CHASSIS    = new Matter(new Translation3d(0, 0, Units.inchesToMeters(8)), ROBOT_MASS);
+  public static final double ROBOT_MAX_SPEED = Units.feetToMeters(19.3);
   public static final double LOOP_TIME  = 0.13; //s, 20ms + 110ms sprk max velocity lag
   public static final double FIELD_WIDTH = Units.inchesToMeters(653.2);  // (76.1 + 250.5 ) * 2 = 653.2 inches
+
+  public static final String ROBOT_FROGGY_CONFIG_LOCATION = "swerve/neo";
 
   public static final class Auton
   {
@@ -95,8 +103,8 @@ public final class Constants {
   public static final class OIConstants 
   {
     public static final int kDriverControllerPort = 0;  
+    public static final int kCopilotControllerPort = 1;
     public static final double kDriveStickPower = 2;
-    public static int kCopilotControllerPort = 1;
   }
 
   public static final class DriveConstants 
@@ -107,12 +115,38 @@ public final class Constants {
 
   public static final class VisionConstants
   {
+    public static final boolean hasCamera = true;
+    //Camera name in network tables
+    public static final String cameraName = "Camera_Module_v1";
     //Position of the camera from center of the robot in meters
-    public static final double cameraZ = Units.inchesToMeters(12.5);
+    public static final double cameraZ = Units.inchesToMeters(14.25);
     public static final double cameraX = Units.inchesToMeters(1);
     public static final double cameraY = Units.inchesToMeters(10);
+    //Pipeline name in network tables
     public static final String pipelineName = "apriltag";
-    public static final String cameraName = "Camera_Module_v1";
 
+    //How accurate the bot needs the estimated position to be to update field pos (lower = better)
+    public static final double acceptibleAmbiguity = 0.25;
+
+    //If false, will not automatically update our pose
+    public static final boolean autoUpdatePose = true;
   }
+
+  public static final class PoseConstants
+  {
+    public static final Pose2d chainID15 = new Pose2d(4.45, 4.94, Rotation2d.fromDegrees(-60));
+    public static final Pose2d chainID14 = new Pose2d(5.86, 4.11, Rotation2d.fromDegrees(180));
+    public static final Pose2d chainID16 = new Pose2d(4.45, 3.27, Rotation2d.fromDegrees(60));
+
+    public static final Pose2d blueOnePose = new Pose2d(0.70,6.69,Rotation2d.fromDegrees(-120));
+    public static final Pose2d redOnePose = new Pose2d(Constants.FIELD_WIDTH - blueOnePose.getX(), blueOnePose.getY(), Rotation2d.fromDegrees(180 - Units.rotationsToDegrees(blueOnePose.getRotation().getRotations())));
+    public static final Pose2d blueTwoPose = new Pose2d(1.39,5.54,Rotation2d.fromDegrees(180));
+    public static final Pose2d redTwoPose = new Pose2d(Constants.FIELD_WIDTH - blueTwoPose.getX(), blueTwoPose.getY(), Rotation2d.fromDegrees(180 - Units.rotationsToDegrees(blueTwoPose.getRotation().getRotations())));
+    public static final Pose2d blueThreePose = new Pose2d(0.70,4.38,Rotation2d.fromDegrees(120));
+    public static final Pose2d redThreePose = new Pose2d(Constants.FIELD_WIDTH - blueThreePose.getX(), blueThreePose.getY(), Rotation2d.fromDegrees(180 - Units.rotationsToDegrees(blueThreePose.getRotation().getRotations())));
+    public static final Pose2d[] initRobotPoses = {blueOnePose, blueTwoPose, blueThreePose, redOnePose, redTwoPose, redThreePose};
+  
+    public static final Pose2d autoEndPose = new Pose2d(5.891426328307202, 6.045027362781998, Rotation2d.fromDegrees(90));
+  }
+
 }
