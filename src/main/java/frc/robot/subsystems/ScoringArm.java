@@ -54,14 +54,15 @@ public class ScoringArm extends SubsystemBase {
   /** Creates a new ScoringArm. */
   public ScoringArm() {
 
-    armAngleLeaderMotor = new CANSparkMax(ScoringArmConstants.kArmAngleMotor1iID, MotorType.kBrushless);
-    //armAngleFollowerMotor1i = new CANSparkMax(ScoringArmConstants.kArmAngleMotor2ID, MotorType.kBrushless);
-    //armAngleFollowerMotor2 = new CANSparkMax(ScoringArmConstants.kArmAngleMotor3iID, MotorType.kBrushless);
-    //armAngleFollowerMotor3i = new CANSparkMax(ScoringArmConstants.kArmAngleMotor4ID, MotorType.kBrushless);
+    armAngleLeaderMotor = new CANSparkMax(ScoringArmConstants.kArmAngleMotor1ID, MotorType.kBrushless);
+    //armAngleFollowerMotor1 = new CANSparkMax(ScoringArmConstants.kArmAngleMotor2ID, MotorType.kBrushless);
+    //armAngleFollowerMotor2i = new CANSparkMax(ScoringArmConstants.kArmAngleMotor3iID, MotorType.kBrushless);
+    //armAngleFollowerMotor3i = new CANSparkMax(ScoringArmConstants.kArmAngleMotor4iID, MotorType.kBrushless);
 
-    //armAngleFollowerMotor1i.follow(armAngleLeaderMotor, true);
-    //armAngleFollowerMotor2.follow(armAngleLeaderMotor, false);
-    //armAngleFollowerMotor3i.follow(armAngleLeaderMotor, true);
+    armAngleLeaderMotor.setInverted(true);
+    //armAngleFollowerMotor1.follow(armAngleLeaderMotor, true);
+    //armAngleFollowerMotor2i.follow(armAngleLeaderMotor, false);
+    //armAngleFollowerMotor3i.follow(armAngleLeaderMotor, false);
 
     launchMotorLeader = new CANSparkMax(ScoringArmConstants.kLaunchMotorLeaderID, MotorType.kBrushless);
     launchMotorFollower = new CANSparkMax(ScoringArmConstants.kLaunchMotorFollowerID, MotorType.kBrushless);
@@ -81,6 +82,8 @@ public class ScoringArm extends SubsystemBase {
     anglePIDController.setIZone(ScoringArmConstants.kAngleIZone);
     anglePIDController.setTolerance(ScoringArmConstants.kAnglePosTolerance,ScoringArmConstants.kAngleVelTolerance);
     anglePIDController.setSetpoint(absArmAngleEncoder.getPosition());
+    anglePIDController.enableContinuousInput(0, 360);
+    
 
     launchSpeedLeaderPIDController = launchMotorLeader.getPIDController();
     launchSpeedFollowerPIDController = launchMotorFollower.getPIDController();
@@ -109,6 +112,8 @@ public class ScoringArm extends SubsystemBase {
     Shuffleboard.getTab("Arm Debug").addDouble("Launch Vel Encoder", launchSpeedLeaderEncoder::getVelocity);
     //Shuffleboard.getTab("Arm Debug").addDouble("Launch Vel Output", () -> launchSpeedPIDController.calculate(10));
 
+    Shuffleboard.getTab("Arm Debug").addDouble("Arm SP", anglePIDController::getSetpoint);
+
     SetLaunchSpeed(0);//theoretical max of 622.9 meters per second
     
   }
@@ -118,12 +123,7 @@ public class ScoringArm extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
 
-    if (!anglePIDController.atSetpoint()) {
-      RunAnglePIDControl();//runs PID control if the arm is not at the setpoint
-    }
-    else{
-      SetArmAngleMotors(0);//stops the motor if you are at the setpoint
-    }
+    RunAnglePIDControl();
 
     
     RunLaunchSpeedPIDControl();
@@ -140,11 +140,11 @@ public class ScoringArm extends SubsystemBase {
   }
 
   public void SetArmAngle(double armDeg){
-    anglePIDController.setSetpoint(armDeg);
+    anglePIDController.setSetpoint(armDeg%360);
   }
 
   public void ChangeArmAngle(double deg){
-    SetArmAngle(absArmAngleEncoder.getPosition() + deg);
+    SetArmAngle(anglePIDController.getSetpoint() + deg);
   }
 
   public double GetArmAngle(){
@@ -154,7 +154,7 @@ public class ScoringArm extends SubsystemBase {
   public void RunLaunchSpeedPIDControl(){
     //launchMotorLeader.set(launchSpeedPIDController.calculate(launchSpeedEncoder.getVelocity()));
     launchSpeedLeaderPIDController.setReference(launchSpeedSetpoint, ControlType.kVelocity);
-    launchSpeedFollowerPIDController.setReference(launchSpeedSetpoint, ControlType.kVelocity);
+    launchSpeedFollowerPIDController.setReference(-1 * launchSpeedSetpoint, ControlType.kVelocity);
   }
 
   public void SetLaunchSpeed(double launchRPM){

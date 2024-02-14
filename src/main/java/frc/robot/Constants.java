@@ -22,18 +22,18 @@ import swervelib.parser.PIDFConfig;
 public final class Constants {
 
   public static final class ScoringArmConstants {
-    public static final int kIntakeMotorID = 13;
+    public static final int kIntakeMotorID = 18;
 
-    public static final int kLaunchMotorLeaderID = 15;
-    public static final int kLaunchMotorFollowerID = 16;
+    public static final int kLaunchMotorLeaderID = 19;
+    public static final int kLaunchMotorFollowerID = 20;
 
-    public static final int kArmAngleMotor1iID = 17;
-    public static final int kArmAngleMotor2ID = 29;
-    public static final int kArmAngleMotor3iID = 29;
-    public static final int kArmAngleMotor4ID = 29;
+    public static final int kArmAngleMotor1ID = 14;
+    public static final int kArmAngleMotor2ID = 15;
+    public static final int kArmAngleMotor3iID = 16;
+    public static final int kArmAngleMotor4iID = 17;
 
 
-    public static final double kAngleP = 0.01;
+    public static final double kAngleP = 0.002;
     public static final double kAngleI = 0;
     public static final double kAngleD = 0;
     public static final double kAngleVelTolerance = 0;
@@ -53,11 +53,11 @@ public final class Constants {
 
     public static final double kSpeakerHeight = 2.0;
 
-    public static final double kArmPosStaticLaunch = 0;
-    public static final double kArmPosDynamicLaunch = 0;
+    public static final double kArmPosStaticLaunch = 5;
     public static final double kArmPosPickup = 0;
-    public static final double kArmPosClimbPrep = 0;
-    public static final double kArmPosClimbFinish = 0;
+    public static final double kArmPosAmp = 60;
+    public static final double kArmPosClimbPrep = 90;
+    public static final double kArmPosClimbFinish = 5;
 
   }
 
