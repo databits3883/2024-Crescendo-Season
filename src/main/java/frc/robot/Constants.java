@@ -133,11 +133,11 @@ public final class Constants {
     public static final Pose2d chainID14 = new Pose2d(5.86, 4.11, Rotation2d.fromDegrees(180));
     public static final Pose2d chainID16 = new Pose2d(4.45, 3.27, Rotation2d.fromDegrees(60));
 
-    public static final Pose2d blueOnePose = new Pose2d(0.70,6.69,Rotation2d.fromDegrees(-120));
+    public static final Pose2d blueOnePose = new Pose2d(0.70,6.69,Rotation2d.fromDegrees(60));
     public static final Pose2d redOnePose = new Pose2d(Constants.FIELD_WIDTH - blueOnePose.getX(), blueOnePose.getY(), Rotation2d.fromDegrees(180 - Units.rotationsToDegrees(blueOnePose.getRotation().getRotations())));
-    public static final Pose2d blueTwoPose = new Pose2d(1.39,5.54,Rotation2d.fromDegrees(180));
+    public static final Pose2d blueTwoPose = new Pose2d(1.39,5.54,Rotation2d.fromDegrees(0));
     public static final Pose2d redTwoPose = new Pose2d(Constants.FIELD_WIDTH - blueTwoPose.getX(), blueTwoPose.getY(), Rotation2d.fromDegrees(180 - Units.rotationsToDegrees(blueTwoPose.getRotation().getRotations())));
-    public static final Pose2d blueThreePose = new Pose2d(0.70,4.38,Rotation2d.fromDegrees(120));
+    public static final Pose2d blueThreePose = new Pose2d(0.70,4.38,Rotation2d.fromDegrees(300));
     public static final Pose2d redThreePose = new Pose2d(Constants.FIELD_WIDTH - blueThreePose.getX(), blueThreePose.getY(), Rotation2d.fromDegrees(180 - Units.rotationsToDegrees(blueThreePose.getRotation().getRotations())));
     public static final Pose2d[] initRobotPoses = {blueOnePose, blueTwoPose, blueThreePose, redOnePose, redTwoPose, redThreePose};
   

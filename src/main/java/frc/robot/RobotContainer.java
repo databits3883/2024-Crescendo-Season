@@ -93,6 +93,8 @@ public class RobotContainer {
   //PathPlannerTrajectory path = PathPlannerPath.loadPath("Froggy Demo Path", 1, 1);
   PathPlannerPath path = PathPlannerPath.fromPathFile("Example Path");
   public String myAlliance = DriverStation.getAlliance().toString();
+
+  public boolean driveBrakeMode;
   
   public AutoBuilder autoBuilder = new AutoBuilder();
   public SendableChooser<Command> autoChooser;
@@ -135,8 +137,8 @@ public class RobotContainer {
   public void robotInit(){
     Shuffleboard.getTab("Game HUD").addDouble("Robot Pitch", (()-> drivebase.getPitch().getDegrees())).withWidget(BuiltInWidgets.kDial);
     Shuffleboard.getTab("Game HUD").addDouble("Arm Angle", m_ScoringArm::GetArmAngle);
-  
-    SmartDashboard.putData("Auto Chooser", m_autoChooser);    
+    Shuffleboard.getTab("Game HUD").add(autoChooser).withSize(2,1);
+      
 
   }
 
@@ -259,7 +261,12 @@ public class RobotContainer {
   
   public void setMotorBrake(boolean brake)
   {
-    drivebase.setMotorBrake(brake);
+
+    if (brake != driveBrakeMode) {
+      drivebase.setMotorBrake(brake);
+      driveBrakeMode = brake;
+    }
+    
   }
 
 
