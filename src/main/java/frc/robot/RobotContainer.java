@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Commands.AimAndLaunch;
+import frc.robot.Commands.StaticLaunch;
 import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.ScoringArmConstants;
@@ -99,6 +100,12 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+
+    if (Constants.VisionConstants.hasCamera)
+    {
+      RobotContainer.setRobotVision(new VisionSubsystem(Constants.VisionConstants.cameraY, Constants.VisionConstants.cameraX, Constants.VisionConstants.cameraZ, Constants.VisionConstants.cameraName));
+    } 
+
     // Configure the button bindings
     configureButtonBindings();
 
@@ -177,14 +184,19 @@ public class RobotContainer {
 
     m_visionLaunchButton.whileTrue(new AimAndLaunch(m_ScoringArm));
 
-    m_intakeButton.onTrue(new StartEndCommand(() ->m_ScoringArm.Intake() , () -> m_ScoringArm.StopIntake()));
-    m_outtakeButton.onTrue(new StartEndCommand(() ->m_ScoringArm.Outtake() , () -> m_ScoringArm.StopIntake()));
+    m_intakeButton.whileTrue(new StartEndCommand(() ->m_ScoringArm.Intake() , () -> m_ScoringArm.StopIntake()));
+    m_outtakeButton.whileTrue(new StartEndCommand(() ->m_ScoringArm.Outtake() , () -> m_ScoringArm.StopIntake()));
 
     
     m_climbPrepArmPosButton.onTrue(new InstantCommand(() -> m_ScoringArm.SetArmAngle(ScoringArmConstants.kArmPosClimbPrep)));
     m_climbFinishArmPosButton.onTrue(new InstantCommand(() -> m_ScoringArm.SetArmAngle(ScoringArmConstants.kArmPosClimbFinish)));
     m_setLaunchArmPosButton.onTrue(new InstantCommand(() -> m_ScoringArm.SetArmAngle(ScoringArmConstants.kArmPosStaticLaunch)));
     m_ampArmPosButton.onTrue(new InstantCommand(() -> m_ScoringArm.SetArmAngle(ScoringArmConstants.kArmPosAmp)));
+
+    new JoystickButton(m_driverController, 14).onTrue(new InstantCommand(drivebase::visionPose));
+
+    new JoystickButton(m_driverController, 1).onTrue(new StaticLaunch(m_ScoringArm));
+    
   }
 
   /**

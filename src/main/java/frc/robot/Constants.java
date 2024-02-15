@@ -33,7 +33,7 @@ public final class Constants {
     public static final int kArmAngleMotor4iID = 17;
 
 
-    public static final double kAngleP = 0.002;
+    public static final double kAngleP = 0.001;
     public static final double kAngleI = 0;
     public static final double kAngleD = 0;
     public static final double kAngleVelTolerance = 0;
@@ -41,7 +41,7 @@ public final class Constants {
     public static final double kAngleIZone = Double.POSITIVE_INFINITY;
 
 
-    public static final double kLaunchSpeedP = 0.0045;
+    public static final double kLaunchSpeedP = 0.002;
     public static final double kLaunchSpeedI = 0;
     public static final double kLaunchSpeedD = 0.04;
     public static final double kLaunchSpeedFF = 0.001;

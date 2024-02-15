@@ -188,7 +188,7 @@ public void StopIntake() {
 }
 
   public boolean atLaunchSetpoint() {
-    return (Math.abs(launchSpeedSetpoint-launchSpeedLeaderEncoder.getVelocity()) < 5);
+    return (Math.abs(launchSpeedSetpoint-launchSpeedLeaderEncoder.getVelocity()) < 10);
   }
 
   public void UnlatchClimb(){
