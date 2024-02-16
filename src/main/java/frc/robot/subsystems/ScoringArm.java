@@ -175,7 +175,7 @@ public class ScoringArm extends SubsystemBase {
   }
 
   public void Launch(){
-    SetFlap(0.1);
+    SetFlap(1);
     intakeMotor.set(1);
   }
 
