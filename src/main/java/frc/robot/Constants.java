@@ -33,31 +33,36 @@ public final class Constants {
     public static final int kArmAngleMotor4iID = 17;
 
 
-    public static final double kAngleP = 0.001;
-    public static final double kAngleI = 0;
+    public static final double kAngleP = 0.01;
+    public static final double kAngleI = 0.001;
     public static final double kAngleD = 0;
     public static final double kAngleVelTolerance = 0;
     public static final double kAnglePosTolerance = 0;
     public static final double kAngleIZone = Double.POSITIVE_INFINITY;
 
 
-    public static final double kLaunchSpeedP = 0.002;
+    public static final double kLaunchSpeedP = 0.021;
     public static final double kLaunchSpeedI = 0;
     public static final double kLaunchSpeedD = 0.04;
-    public static final double kLaunchSpeedFF = 0.001;
+    public static final double kLaunchSpeedFF = 0.003;
     public static final double kLaunchSpeedPosTolerance = 0;
     public static final double kLaunchSpeedVelTolerance = 0;
-    public static int kFlapServoChannel=0;
-    public static int kClimbLockServoChannel=1;
+
+    public static final int kFlapServoChannel = 1;
+    public static final int kClimbLockServoChannel = 2;
     public static double kLaunchSpeedIZone = 0;
 
     public static final double kSpeakerHeight = 2.0;
 
-    public static final double kArmPosStaticLaunch = 5;
-    public static final double kArmPosPickup = 0;
-    public static final double kArmPosAmp = 60;
+    public static final double kArmPosNearStaticLaunch = 10;
+    public static final double kArmPosFarStaticLaunch = 30;
+    public static final double kArmPosPickup = -1;
+    public static final double kArmPosAmp = 140;
     public static final double kArmPosClimbPrep = 90;
-    public static final double kArmPosClimbFinish = 5;
+    public static final double kArmPosClimbFinish = 25;
+
+    public static final double kFlapServoOpenPos = 0.4;
+    public static final double kFlapServoClosedPos = 1.0;
 
   }
 
@@ -67,7 +72,7 @@ public final class Constants {
   public static final double LOOP_TIME  = 0.13; //s, 20ms + 110ms sprk max velocity lag
   public static final double FIELD_WIDTH = Units.inchesToMeters(653.2);  // (76.1 + 250.5 ) * 2 = 653.2 inches
 
-  public static final String ROBOT_LONGCLAW_CONFIG_LOCATION = "swerve/sparkflex";
+  public static final String ROBOT_SUPERSONIC_CONFIG_LOCATION = "swerve/sonicsparkflex";
 
   public static final class Auton
   {
@@ -110,7 +115,7 @@ public final class Constants {
 
   public static final class VisionConstants
   {
-    public static final boolean hasCamera = true;
+    public static final boolean hasCamera = false;
     //Camera name in network tables
     public static final String cameraName = "Camera_Module_v1";
     //Position of the camera from center of the robot in meters
@@ -129,15 +134,15 @@ public final class Constants {
 
   public static final class PoseConstants
   {
-    public static final Pose2d chainID15 = new Pose2d(4.45, 4.94, Rotation2d.fromDegrees(-60));
-    public static final Pose2d chainID14 = new Pose2d(5.86, 4.11, Rotation2d.fromDegrees(180));
-    public static final Pose2d chainID16 = new Pose2d(4.45, 3.27, Rotation2d.fromDegrees(60));
+    public static final Pose2d chainID15 = new Pose2d(4.45, 4.94, Rotation2d.fromDegrees(-0));
+    public static final Pose2d chainID14 = new Pose2d(5.86, 4.11, Rotation2d.fromDegrees(0));
+    public static final Pose2d chainID16 = new Pose2d(4.45, 3.27, Rotation2d.fromDegrees(0));
 
-    public static final Pose2d blueOnePose = new Pose2d(0.70,6.69,Rotation2d.fromDegrees(60));
+    public static final Pose2d blueOnePose = new Pose2d(0.70,6.69,Rotation2d.fromDegrees(0));
     public static final Pose2d redOnePose = new Pose2d(Constants.FIELD_WIDTH - blueOnePose.getX(), blueOnePose.getY(), Rotation2d.fromDegrees(180 - Units.rotationsToDegrees(blueOnePose.getRotation().getRotations())));
     public static final Pose2d blueTwoPose = new Pose2d(1.39,5.54,Rotation2d.fromDegrees(0));
     public static final Pose2d redTwoPose = new Pose2d(Constants.FIELD_WIDTH - blueTwoPose.getX(), blueTwoPose.getY(), Rotation2d.fromDegrees(180 - Units.rotationsToDegrees(blueTwoPose.getRotation().getRotations())));
-    public static final Pose2d blueThreePose = new Pose2d(0.70,4.38,Rotation2d.fromDegrees(300));
+    public static final Pose2d blueThreePose = new Pose2d(0.70,4.38,Rotation2d.fromDegrees(0));
     public static final Pose2d redThreePose = new Pose2d(Constants.FIELD_WIDTH - blueThreePose.getX(), blueThreePose.getY(), Rotation2d.fromDegrees(180 - Units.rotationsToDegrees(blueThreePose.getRotation().getRotations())));
     public static final Pose2d[] initRobotPoses = {blueOnePose, blueTwoPose, blueThreePose, redOnePose, redTwoPose, redThreePose};
   

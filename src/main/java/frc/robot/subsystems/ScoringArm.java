@@ -8,12 +8,15 @@ import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkAbsoluteEncoder;
+import com.revrobotics.SparkLimitSwitch;
 import com.revrobotics.SparkPIDController;
 import com.revrobotics.CANSparkBase.ControlType;
 import com.revrobotics.CANSparkLowLevel.MotorType;
+import com.revrobotics.SparkLimitSwitch.Type;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -24,6 +27,8 @@ public class ScoringArm extends SubsystemBase {
   public CANSparkMax intakeMotor;
   public Servo flapServo = new Servo(ScoringArmConstants.kFlapServoChannel);
   public Servo climbLockServo = new Servo(ScoringArmConstants.kClimbLockServoChannel);
+
+  public SparkLimitSwitch intakeSensor;
 
   public CANSparkMax launchMotorLeader;
   public CANSparkMax launchMotorFollower;
@@ -55,21 +60,25 @@ public class ScoringArm extends SubsystemBase {
   public ScoringArm() {
 
     armAngleLeaderMotor = new CANSparkMax(ScoringArmConstants.kArmAngleMotor1ID, MotorType.kBrushless);
-    //armAngleFollowerMotor1 = new CANSparkMax(ScoringArmConstants.kArmAngleMotor2ID, MotorType.kBrushless);
-    //armAngleFollowerMotor2i = new CANSparkMax(ScoringArmConstants.kArmAngleMotor3iID, MotorType.kBrushless);
-    //armAngleFollowerMotor3i = new CANSparkMax(ScoringArmConstants.kArmAngleMotor4iID, MotorType.kBrushless);
+    armAngleFollowerMotor1i = new CANSparkMax(ScoringArmConstants.kArmAngleMotor2ID, MotorType.kBrushless);
+    armAngleFollowerMotor2 = new CANSparkMax(ScoringArmConstants.kArmAngleMotor3iID, MotorType.kBrushless);
+    armAngleFollowerMotor3i = new CANSparkMax(ScoringArmConstants.kArmAngleMotor4iID, MotorType.kBrushless);
 
     armAngleLeaderMotor.setInverted(true);
-    //armAngleFollowerMotor1.follow(armAngleLeaderMotor, true);
-    //armAngleFollowerMotor2i.follow(armAngleLeaderMotor, false);
-    //armAngleFollowerMotor3i.follow(armAngleLeaderMotor, false);
+    armAngleFollowerMotor1i.follow(armAngleLeaderMotor, true);
+    armAngleFollowerMotor2.follow(armAngleLeaderMotor, false);
+    armAngleFollowerMotor3i.follow(armAngleLeaderMotor, false);
 
     launchMotorLeader = new CANSparkMax(ScoringArmConstants.kLaunchMotorLeaderID, MotorType.kBrushless);
     launchMotorFollower = new CANSparkMax(ScoringArmConstants.kLaunchMotorFollowerID, MotorType.kBrushless);
+    launchMotorLeader.setInverted(true);
+    launchMotorFollower.setInverted(false);
     launchSpeedLeaderEncoder = launchMotorLeader.getEncoder();
     launchSpeedFollowerEncoder = launchMotorFollower.getEncoder();
     
     intakeMotor = new CANSparkMax(ScoringArmConstants.kIntakeMotorID, MotorType.kBrushless);
+    
+    intakeSensor = intakeMotor.getForwardLimitSwitch(Type.kNormallyOpen);
 
     absArmAngleEncoder = armAngleLeaderMotor.getAbsoluteEncoder(SparkAbsoluteEncoder.Type.kDutyCycle);
     absArmAngleEncoder.setPositionConversionFactor(360);
@@ -83,6 +92,7 @@ public class ScoringArm extends SubsystemBase {
     anglePIDController.setTolerance(ScoringArmConstants.kAnglePosTolerance,ScoringArmConstants.kAngleVelTolerance);
     anglePIDController.setSetpoint(absArmAngleEncoder.getPosition());
     anglePIDController.enableContinuousInput(0, 360);
+    anglePIDController.setIntegratorRange(-0.1, 0.1);
     
 
     launchSpeedLeaderPIDController = launchMotorLeader.getPIDController();
@@ -136,7 +146,7 @@ public class ScoringArm extends SubsystemBase {
   }
 
   public void SetArmAngleMotors(double fraction){
-    armAngleLeaderMotor.set(fraction);
+    armAngleLeaderMotor.set(-1 * fraction);
   }
 
   public void SetArmAngle(double armDeg){
@@ -153,7 +163,7 @@ public class ScoringArm extends SubsystemBase {
 
   public void RunLaunchSpeedPIDControl(){
     //launchMotorLeader.set(launchSpeedPIDController.calculate(launchSpeedEncoder.getVelocity()));
-    launchSpeedLeaderPIDController.setReference(launchSpeedSetpoint, ControlType.kVelocity);
+    launchSpeedLeaderPIDController.setReference(1 * launchSpeedSetpoint, ControlType.kVelocity);
     launchSpeedFollowerPIDController.setReference(-1 * launchSpeedSetpoint, ControlType.kVelocity);
   }
 
@@ -166,29 +176,46 @@ public class ScoringArm extends SubsystemBase {
   }
 
   public void Intake(){
-    SetFlap(0);
-    intakeMotor.set(0.1);
+    SetFlap(false);
+    intakeMotor.set(-0.5);
   }
 
   public void Outtake(){
-    intakeMotor.set(-0.1);
+    intakeMotor.set(0.5);
   }
 
   public void Launch(){
-    SetFlap(1);
-    intakeMotor.set(1);
+    intakeMotor.set(-1.0);
+    SetFlap(true);
+    
   }
 
-  public void SetFlap(double pos){
-    flapServo.set(pos);
+  public void resetSetpoints(){
+
+    SetLaunchSpeed(0);//theoretical max of 622.9 meters per second
+    anglePIDController.setSetpoint(absArmAngleEncoder.getPosition());
+
+  }
+
+  public void SetFlap(boolean isOpen){
+    if (isOpen) {
+      flapServo.set(ScoringArmConstants.kFlapServoOpenPos);
+    }
+    else{
+      flapServo.set(ScoringArmConstants.kFlapServoClosedPos);
+    }
+    
   }
 
 public void StopIntake() {
     intakeMotor.set(0);
+    SetFlap(false);
 }
 
   public boolean atLaunchSetpoint() {
-    return (Math.abs(launchSpeedSetpoint-launchSpeedLeaderEncoder.getVelocity()) < 10);
+    boolean atSP = (Math.abs(launchSpeedSetpoint-launchSpeedLeaderEncoder.getVelocity()) < 10);
+    System.out.println("At sp "+ atSP);
+    return atSP;
   }
 
   public void UnlatchClimb(){
@@ -210,6 +237,11 @@ public void StopIntake() {
 
   public void GoToPickupPos(){
     SetArmAngle(ScoringArmConstants.kArmPosPickup);
+  }
+
+
+  public boolean IntakeSensorBlocked() {
+    return intakeSensor.isPressed();
   }
 
 }

@@ -54,7 +54,7 @@ public class FieldDriverStick {
     public double getZ(){
         double output = m_Joystick.getTwist();
         //output = Math.pow(output, OIConstants.kDriveStickPower) * Math.signum(output);
-        output *= -1;
+        output *= -0.85;
         if(Math.abs(output) < 0.05){
             output = 0;
         }

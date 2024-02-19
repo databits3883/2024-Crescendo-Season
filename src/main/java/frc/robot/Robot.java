@@ -67,6 +67,7 @@ public class Robot extends TimedRobot {
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
   public void disabledInit() {
+    m_robotContainer.m_ScoringArm.resetSetpoints();
     m_robotContainer.setMotorBrake(true);
 
     disabledTimer.reset();
@@ -85,6 +86,7 @@ public class Robot extends TimedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
+    m_robotContainer.m_ScoringArm.resetSetpoints();
     didAutoRun = true;
     m_robotContainer.setMotorBrake(true);
 
@@ -106,6 +108,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
+    m_robotContainer.m_ScoringArm.resetSetpoints();
     if (m_autonomousCommand != null)
     {
       m_autonomousCommand.cancel();
@@ -126,10 +129,11 @@ public class Robot extends TimedRobot {
 
   @Override
   public void testInit() {
+    m_robotContainer.m_ScoringArm.resetSetpoints();
      CommandScheduler.getInstance().cancelAll();
     try
     {
-      new SwerveParser(new File(Filesystem.getDeployDirectory(), Constants.ROBOT_LONGCLAW_CONFIG_LOCATION));
+      new SwerveParser(new File(Filesystem.getDeployDirectory(), Constants.ROBOT_SUPERSONIC_CONFIG_LOCATION));
     } catch (IOException e)
     {
       throw new RuntimeException(e);
