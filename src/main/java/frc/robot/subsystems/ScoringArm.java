@@ -19,6 +19,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ScoringArmConstants;
 
@@ -46,15 +47,9 @@ public class ScoringArm extends SubsystemBase {
 
   public AbsoluteEncoder absArmAngleEncoder;
   public PIDController anglePIDController = new PIDController(ScoringArmConstants.kAngleP, ScoringArmConstants.kAngleI, ScoringArmConstants.kAngleD);
+  private boolean strongAngleControlMode = false;
 
-  enum ArmStates {
-    PICKUP,
-    AMP,
-    STATICSPEAKER,
-    DYNAMICSPEAKER,
-    PREPCLIMB,
-    DONECLIMB
-  }
+  
 
   /** Creates a new ScoringArm. */
   public ScoringArm() {
@@ -65,9 +60,12 @@ public class ScoringArm extends SubsystemBase {
     armAngleFollowerMotor3i = new CANSparkMax(ScoringArmConstants.kArmAngleMotor4iID, MotorType.kBrushless);
 
     armAngleLeaderMotor.setInverted(true);
-    armAngleFollowerMotor1i.follow(armAngleLeaderMotor, true);
-    armAngleFollowerMotor2.follow(armAngleLeaderMotor, false);
-    armAngleFollowerMotor3i.follow(armAngleLeaderMotor, false);
+    //armAngleFollowerMotor1i.(armAngleLeaderMotor, false);
+    armAngleFollowerMotor1i.setInverted(true);
+    //armAngleFollowerMotor2.follow(armAngleLeaderMotor, false);
+    armAngleFollowerMotor2.setInverted(false);
+    //armAngleFollowerMotor3i.follow(armAngleLeaderMotor, false);
+    armAngleFollowerMotor3i.setInverted(false);
 
     launchMotorLeader = new CANSparkMax(ScoringArmConstants.kLaunchMotorLeaderID, MotorType.kBrushless);
     launchMotorFollower = new CANSparkMax(ScoringArmConstants.kLaunchMotorFollowerID, MotorType.kBrushless);
@@ -92,7 +90,7 @@ public class ScoringArm extends SubsystemBase {
     anglePIDController.setTolerance(ScoringArmConstants.kAnglePosTolerance,ScoringArmConstants.kAngleVelTolerance);
     anglePIDController.setSetpoint(absArmAngleEncoder.getPosition());
     anglePIDController.enableContinuousInput(0, 360);
-    anglePIDController.setIntegratorRange(-0.1, 0.1);
+    anglePIDController.setIntegratorRange(-0.05, 0.05);
     
 
     launchSpeedLeaderPIDController = launchMotorLeader.getPIDController();
@@ -125,7 +123,7 @@ public class ScoringArm extends SubsystemBase {
     Shuffleboard.getTab("Arm Debug").addDouble("Arm SP", anglePIDController::getSetpoint);
 
     SetLaunchSpeed(0);//theoretical max of 622.9 meters per second
-    
+    EnableStrongAngleControl(false); 
   }
 
 
@@ -133,7 +131,14 @@ public class ScoringArm extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
 
-    RunAnglePIDControl();
+    if(!strongAngleControlMode){
+      RunAnglePIDControl();
+
+    }
+    else{
+      RunStrongAngleControl();
+    }
+    
 
     
     RunLaunchSpeedPIDControl();
@@ -145,20 +150,42 @@ public class ScoringArm extends SubsystemBase {
     SetArmAngleMotors(anglePIDController.calculate(absArmAngleEncoder.getPosition()));
   }
 
-  public void SetArmAngleMotors(double fraction){
-    armAngleLeaderMotor.set(-1 * fraction);
+  public void  RunStrongAngleControl(){
+    double error = anglePIDController.getSetpoint() - absArmAngleEncoder.getPosition();
+    if (Math.abs(error) > 10) {
+      SetArmAngleMotors(Math.copySign(0.1, error ));
+    }
+    else{
+      SetArmAngleMotors(0);
+    }
   }
 
-  public void SetArmAngle(double armDeg){
+  public void EnableStrongAngleControl(boolean enabled){
+    strongAngleControlMode = enabled;
+  }
+
+  public void SetArmAngleMotors(double fraction){
+    armAngleLeaderMotor.set(fraction);
+    armAngleFollowerMotor1i.set(fraction);
+    armAngleFollowerMotor2.set(fraction);
+    armAngleFollowerMotor3i.set(fraction);
+  }
+
+  public void SetArmAngle(double armDeg, boolean runStrongControl){
+    EnableStrongAngleControl(runStrongControl);
     anglePIDController.setSetpoint(armDeg%360);
   }
 
   public void ChangeArmAngle(double deg){
-    SetArmAngle(anglePIDController.getSetpoint() + deg);
+    SetArmAngle(anglePIDController.getSetpoint() + deg,false);
   }
 
   public double GetArmAngle(){
     return absArmAngleEncoder.getPosition();
+  }
+
+  public void SetArmAngleToSDBValue(){
+    SetArmAngle(SmartDashboard.getNumber("ArmAngleSlider", 5), false);
   }
 
   public void RunLaunchSpeedPIDControl(){
@@ -194,6 +221,7 @@ public class ScoringArm extends SubsystemBase {
 
     SetLaunchSpeed(0);//theoretical max of 622.9 meters per second
     anglePIDController.setSetpoint(absArmAngleEncoder.getPosition());
+    EnableStrongAngleControl(false);
 
   }
 
@@ -228,15 +256,16 @@ public void StopIntake() {
 
   public void PrepareClimb(){
     UnlatchClimb();
-    SetArmAngle(ScoringArmConstants.kArmPosClimbPrep);
+    SetArmAngle(ScoringArmConstants.kArmPosClimbPrep, false);
   }
 
   public void Climb(){
-    SetArmAngle(ScoringArmConstants.kArmPosClimbFinish);
+    SetArmAngle(ScoringArmConstants.kArmPosClimbFinish, true);
+    EnableStrongAngleControl(true);
   }
 
   public void GoToPickupPos(){
-    SetArmAngle(ScoringArmConstants.kArmPosPickup);
+    SetArmAngle(ScoringArmConstants.kArmPosPickup, false);
   }
 
 

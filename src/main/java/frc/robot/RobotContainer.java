@@ -135,7 +135,7 @@ public class RobotContainer {
     //Set default to robot on field position
     drivebase.resetOdometry(defaultZeroPosition);
     SmartDashboard.putData("Auto Chooser", m_autoChooser);
-
+    SmartDashboard.putNumber("ArmAngleSlider", 10);
   }
 
   public void robotInit(){
@@ -193,19 +193,19 @@ public class RobotContainer {
     new JoystickButton(m_copilotController, 9).whileTrue(new StartEndCommand(() ->m_ScoringArm.Outtake() , () -> m_ScoringArm.StopIntake()));
 
     
-    new JoystickButton(m_copilotController, 5).onTrue(new InstantCommand(() -> m_ScoringArm.SetArmAngle(ScoringArmConstants.kArmPosClimbPrep)));
-    new JoystickButton(m_copilotController, 6).onTrue(new InstantCommand(() -> m_ScoringArm.SetArmAngle(ScoringArmConstants.kArmPosClimbFinish)));
-    new JoystickButton(m_copilotController, 3).onTrue(new InstantCommand(() -> m_ScoringArm.SetArmAngle(ScoringArmConstants.kArmPosNearStaticLaunch)));
-    new JoystickButton(m_copilotController, 2).onTrue(new InstantCommand(() -> m_ScoringArm.SetArmAngle(ScoringArmConstants.kArmPosFarStaticLaunch)));
-    new JoystickButton(m_copilotController, 1).onTrue(new InstantCommand(() -> m_ScoringArm.SetArmAngle(ScoringArmConstants.kArmPosAmp)));
-    new JoystickButton(m_copilotController, 4).onTrue(new InstantCommand(() -> m_ScoringArm.SetArmAngle(ScoringArmConstants.kArmPosPickup)));
+    new JoystickButton(m_copilotController, 5).onTrue(new InstantCommand(() -> m_ScoringArm.SetArmAngle(ScoringArmConstants.kArmPosClimbPrep,false)));
+    new JoystickButton(m_copilotController, 6).onTrue(new InstantCommand(() -> m_ScoringArm.Climb()));
+    new JoystickButton(m_copilotController, 3).onTrue(new InstantCommand(() -> m_ScoringArm.SetArmAngle(ScoringArmConstants.kArmPosNearStaticLaunch,false)));
+    new JoystickButton(m_copilotController, 2).onTrue(new InstantCommand(() -> m_ScoringArm.SetArmAngle(ScoringArmConstants.kArmPosFarStaticLaunch,false)));
+    new JoystickButton(m_copilotController, 1).onTrue(new InstantCommand(() -> m_ScoringArm.SetArmAngle(ScoringArmConstants.kArmPosAmp,false)));
+    new JoystickButton(m_copilotController, 4).onTrue(new InstantCommand(() -> m_ScoringArm.SetArmAngle(ScoringArmConstants.kArmPosPickup,false)));
 
 
     //new JoystickButton(m_driverController, 14).onTrue(new InstantCommand(drivebase::visionPose));
 
     new JoystickButton(m_copilotController, 7).whileTrue(new StartEndCommand(() -> m_ScoringArm.Launch(), ()-> m_ScoringArm.StopIntake()));
     new JoystickButton(m_copilotController, 10).whileTrue(new StartEndCommand(() -> m_ScoringArm.SetLaunchSpeed(200), () -> m_ScoringArm.SetLaunchSpeed(0)));
-
+    new JoystickButton(m_copilotController, 11).onTrue(new InstantCommand(()-> m_ScoringArm.SetArmAngleToSDBValue()));
     //new JoystickButton(m_copilotController, 7).onTrue(new StaticLaunch(m_ScoringArm));
 
     // new JoystickButton(m_driverController, 3).onTrue(new InstantCommand( ()-> m_ScoringArm.LatchClimb() ) );
