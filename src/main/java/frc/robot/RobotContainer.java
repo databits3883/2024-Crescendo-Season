@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.OptionalInt;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -23,12 +24,13 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Commands.AimAndLaunch;
+import frc.robot.Commands.RunIntakeSmart;
 import frc.robot.Commands.StaticLaunch;
 import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.ScoringArmConstants;
+import frc.robot.subsystems.FieldDriverStick;
 import frc.robot.subsystems.ScoringArm;
-import frc.robot.subsystems.drive.FieldDriverStick;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -133,7 +135,6 @@ public class RobotContainer {
 
 
     //Set default to robot on field position
-    drivebase.resetOdometry(defaultZeroPosition);
     SmartDashboard.putData("Auto Chooser", m_autoChooser);
     SmartDashboard.putNumber("ArmAngleSlider", 10);
   }
@@ -142,6 +143,14 @@ public class RobotContainer {
     Shuffleboard.getTab("Game HUD").addDouble("Robot Pitch", (()-> drivebase.getPitch().getDegrees())).withWidget(BuiltInWidgets.kDial);
     Shuffleboard.getTab("Game HUD").addDouble("Arm Angle", m_ScoringArm::GetArmAngle);
     //Shuffleboard.getTab("Game HUD").add(autoChooser).withSize(2,1);
+    configureAutoNamedCommands();
+
+  }
+
+  public void configureAutoNamedCommands(){
+    
+    NamedCommands.registerCommand("Smart Intake", new RunIntakeSmart(m_ScoringArm));
+    NamedCommands.registerCommand("Near Static Launch", new StaticLaunch(m_ScoringArm, 150));
 
   }
 

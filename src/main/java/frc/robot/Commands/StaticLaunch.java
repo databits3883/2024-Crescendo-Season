@@ -5,21 +5,25 @@
 package frc.robot.Commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants.ScoringArmConstants;
 import frc.robot.subsystems.ScoringArm;
 
 public class StaticLaunch extends Command {
   ScoringArm m_ScoringArm;
+  double launchSpeed;
 
   /** Creates a new StaticLaunch. */
-  public StaticLaunch(ScoringArm arm) {
+  public StaticLaunch(ScoringArm arm,double speed) {
     // Use addRequirements() here to declare subsystem dependencies.
     m_ScoringArm = arm;
+    launchSpeed = speed;
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_ScoringArm.SetLaunchSpeed(150);
+    m_ScoringArm.SetArmAngle(ScoringArmConstants.kArmPosNearStaticLaunch);
+    m_ScoringArm.SetLaunchSpeed(launchSpeed);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -36,6 +40,6 @@ public class StaticLaunch extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return m_ScoringArm.atLaunchSetpoint();
+    return m_ScoringArm.atLaunchSetpoint() && (m_ScoringArm.anglePIDController.getPositionError() < 5);
   }
 }
