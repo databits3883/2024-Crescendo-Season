@@ -168,7 +168,7 @@ public class ScoringArm extends SubsystemBase {
   }
 
   public void ChangeArmAngle(double deg){
-    SetArmAngle(anglePIDController.getSetpoint() + deg,false);
+    SetArmAngle(anglePIDController.getSetpoint() + deg);
   }
 
   public double GetArmAngle(){
@@ -176,7 +176,7 @@ public class ScoringArm extends SubsystemBase {
   }
 
   public void SetArmAngleToSDBValue(){
-    SetArmAngle(SmartDashboard.getNumber("ArmAngleSlider", 5), false);
+    SetArmAngle(SmartDashboard.getNumber("ArmAngleSlider", 5));
   }
 
   public void RunLaunchSpeedPIDControl(){
