@@ -22,7 +22,8 @@ import swervelib.parser.PIDFConfig;
 public final class Constants {
 
   public static final class ScoringArmConstants {
-    public static final int kIntakeMotorID = 18;
+    public static final int kTopIntakeMotorID = 18;
+    public static final int kBottomIntakeMotorID = 21;
 
     public static final int kLaunchMotorLeaderID = 19;
     public static final int kLaunchMotorFollowerID = 20;
@@ -41,10 +42,10 @@ public final class Constants {
     public static final double kAngleIZone = Double.POSITIVE_INFINITY;
 
 
-    public static final double kLaunchSpeedP = 0.021;
-    public static final double kLaunchSpeedI = 0;
-    public static final double kLaunchSpeedD = 0.04;
-    public static final double kLaunchSpeedFF = 0.003;
+    public static final double kLaunchSpeedP = 0.001;//0.021
+    public static final double kLaunchSpeedI = 0;//0
+    public static final double kLaunchSpeedD = 0.0;//0.04
+    public static final double kLaunchSpeedFF = 0.003;//0.003
     public static final double kLaunchSpeedPosTolerance = 0;
     public static final double kLaunchSpeedVelTolerance = 0;
 
