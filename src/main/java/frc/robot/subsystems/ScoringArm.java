@@ -47,7 +47,7 @@ public class ScoringArm extends SubsystemBase {
 
   public AbsoluteEncoder absArmAngleEncoder;
   public PIDController anglePIDController = new PIDController(ScoringArmConstants.kAngleP, ScoringArmConstants.kAngleI, ScoringArmConstants.kAngleD);
-  private boolean strongAngleControlMode = false;
+  private boolean armControlEnabled = false;
 
   
 
@@ -123,7 +123,7 @@ public class ScoringArm extends SubsystemBase {
     Shuffleboard.getTab("Arm Debug").addDouble("Arm SP", anglePIDController::getSetpoint);
 
     SetLaunchSpeed(0);//theoretical max of 622.9 meters per second
-    EnableStrongAngleControl(false); 
+    EnableArmAngleControl(false); 
   }
 
 
@@ -131,14 +131,12 @@ public class ScoringArm extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
 
-    if(!strongAngleControlMode){
+    if(armControlEnabled){
       RunAnglePIDControl();
-
     }
     else{
-      RunStrongAngleControl();
+      SetArmAngleMotors(0);
     }
-    
 
     
     RunLaunchSpeedPIDControl();
@@ -150,18 +148,8 @@ public class ScoringArm extends SubsystemBase {
     SetArmAngleMotors(anglePIDController.calculate(absArmAngleEncoder.getPosition()));
   }
 
-  public void  RunStrongAngleControl(){
-    double error = anglePIDController.getSetpoint() - absArmAngleEncoder.getPosition();
-    if (Math.abs(error) > 10) {
-      SetArmAngleMotors(Math.copySign(0.1, error ));
-    }
-    else{
-      SetArmAngleMotors(0);
-    }
-  }
-
-  public void EnableStrongAngleControl(boolean enabled){
-    strongAngleControlMode = enabled;
+  public void EnableArmAngleControl(boolean enabled){
+    armControlEnabled = enabled;
   }
 
   public void SetArmAngleMotors(double fraction){
@@ -171,9 +159,10 @@ public class ScoringArm extends SubsystemBase {
     armAngleFollowerMotor3i.set(fraction);
   }
 
-  public void SetArmAngle(double armDeg, boolean runStrongControl){
-    EnableStrongAngleControl(runStrongControl);
+  public void SetArmAngle(double armDeg){
+    EnableArmAngleControl(true);
     anglePIDController.setSetpoint(armDeg%360);
+    
   }
 
   public void ChangeArmAngle(double deg){
@@ -221,7 +210,7 @@ public class ScoringArm extends SubsystemBase {
 
     SetLaunchSpeed(0);//theoretical max of 622.9 meters per second
     anglePIDController.setSetpoint(absArmAngleEncoder.getPosition());
-    EnableStrongAngleControl(false);
+    EnableArmAngleControl(false);
 
   }
 
@@ -256,16 +245,15 @@ public void StopIntake() {
 
   public void PrepareClimb(){
     UnlatchClimb();
-    SetArmAngle(ScoringArmConstants.kArmPosClimbPrep, false);
+    SetArmAngle(ScoringArmConstants.kArmPosClimbPrep);
   }
 
   public void Climb(){
-    SetArmAngle(ScoringArmConstants.kArmPosClimbFinish, true);
-    EnableStrongAngleControl(true);
+    SetArmAngle(ScoringArmConstants.kArmPosClimbFinish);
   }
 
   public void GoToPickupPos(){
-    SetArmAngle(ScoringArmConstants.kArmPosPickup, false);
+    SetArmAngle(ScoringArmConstants.kArmPosPickup);
   }
 
 
