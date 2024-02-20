@@ -4,11 +4,12 @@
 
 package frc.robot;
 
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.trajectory.TrajectoryConfig;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.util.Units;
+import swervelib.math.Matter;
+import swervelib.parser.PIDFConfig;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -21,159 +22,132 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 public final class Constants {
 
   public static final class ScoringArmConstants {
-    public static final int kIntakeMotorID = 25;
-    public static final int kLaunchMotorLeaderID = 26;
-    public static final int kLaunchMotorFollowerID = 27;
-    public static final int kArmAngleMotorLeader = 28;
-    public static final int kArmAngleMotorFollower = 29;
+    public static final int kTopIntakeMotorID = 18;
+    public static final int kBottomIntakeMotorID = 21;
+
+    public static final int kLaunchMotorLeaderID = 19;
+    public static final int kLaunchMotorFollowerID = 20;
+
+    public static final int kArmAngleMotor1ID = 14;
+    public static final int kArmAngleMotor2ID = 15;
+    public static final int kArmAngleMotor3iID = 16;
+    public static final int kArmAngleMotor4iID = 17;
 
 
-    public static final double kAngleP = 0;
-    public static final double kAngleI = 0;
+    public static final double kAngleP = 0.003;
+    public static final double kAngleI = 0.00325;
     public static final double kAngleD = 0;
     public static final double kAngleVelTolerance = 0;
     public static final double kAnglePosTolerance = 0;
-    public static final double kAngleIZone = 0;
+    public static final double kAngleIZone = Double.POSITIVE_INFINITY;
 
 
-    public static final double kLaunchSpeedP = 0;
-    public static final double kLaunchSpeedI = 0;
-    public static final double kLaunchSpeedD = 0;
-    public static final double kLaunchSpeedIZone = 0;
+    public static final double kLaunchSpeedP = 0.001;//0.021
+    public static final double kLaunchSpeedI = 0;//0
+    public static final double kLaunchSpeedD = 0.0;//0.04
+    public static final double kLaunchSpeedFF = 0.003;//0.003
     public static final double kLaunchSpeedPosTolerance = 0;
     public static final double kLaunchSpeedVelTolerance = 0;
 
+    public static final int kFlapServoChannel = 1;
+    public static final int kClimbLockServoChannel = 2;
+    public static double kLaunchSpeedIZone = 0;
+
+    public static final double kSpeakerHeight = 2.0;
+
+    public static final double kArmPosNearStaticLaunch = 20;
+    public static final double kArmPosFarStaticLaunch = 30;
+    public static final double kArmPosPickup = -1;
+    public static final double kArmPosAmp = 140;
+    public static final double kArmPosClimbPrep = 90;
+    public static final double kArmPosClimbFinish = 25;
+
+    public static final double kFlapServoOpenPos = 0.4;
+    public static final double kFlapServoClosedPos = 1.0;
+
   }
 
-  public static final class ClimbConstants{
+   public static final double ROBOT_MASS = (148 - 20.3) * 0.453592; // 32lbs * kg per pound
+  public static final Matter CHASSIS    = new Matter(new Translation3d(0, 0, Units.inchesToMeters(8)), ROBOT_MASS);
+  public static final double ROBOT_MAX_SPEED = Units.feetToMeters(19.3);
+  public static final double LOOP_TIME  = 0.13; //s, 20ms + 110ms sprk max velocity lag
+  public static final double FIELD_WIDTH = Units.inchesToMeters(653.2);  // (76.1 + 250.5 ) * 2 = 653.2 inches
 
-    public static final int kLeftArmMotorChannel = 0;
-    public static final int kRightArmMotorChannel = 0;
+  public static final String ROBOT_SUPERSONIC_CONFIG_LOCATION = "swerve/sonicsparkflex";
 
+  public static final class Auton
+  {
+
+    public static final PIDFConfig TranslationPID = new PIDFConfig(0.7, 0, 0);
+    public static final PIDFConfig angleAutoPID   = new PIDFConfig(0.4, 0, 0.01);
+
+    public static final double MAX_ACCELERATION = 2;
   }
 
-  public static final class DriveConstants {
-    public static final int kGyroPort = 14;
-    public static final double kGyroFront = 0;
+  public static final class Drivebase
+  {
 
-    public static final int kFrontLeftDriveMotorPort = 4;
-    public static final int kRearLeftDriveMotorPort = 6;
-    public static final int kFrontRightDriveMotorPort = 2;
-    public static final int kRearRightDriveMotorPort = 8;
-
-    public static final int kFrontLeftTurningMotorPort = 3;
-    public static final int kRearLeftTurningMotorPort = 5;
-    public static final int kFrontRightTurningMotorPort = 1;
-    public static final int kRearRightTurningMotorPort = 7;
-
-    public static final int kFrontLeftCANCoderPort = 10;
-    public static final int kRearLeftCANCoderPort = 11;
-    public static final int kFrontRightCANCoderPort = 9;
-    public static final int kRearRightCANCoderPort = 12;
-
-    public static final boolean kFrontLeftTurningEncoderReversed = false;
-    public static final boolean kRearLeftTurningEncoderReversed = true;
-    public static final boolean kFrontRightTurningEncoderReversed = false;
-    public static final boolean kRearRightTurningEncoderReversed = true;
-
-    public static final boolean kFrontLeftDriveEncoderReversed = false;
-    public static final boolean kRearLeftDriveEncoderReversed = true;
-    public static final boolean kFrontRightDriveEncoderReversed = false;
-    public static final boolean kRearRightDriveEncoderReversed = true;
-
-    public static final double kTrackWidth = 0.508;
-    // Distance between centers of right and left wheels on robot
-    public static final double kWheelBase = 0.6508;
-    // Distance between front and back wheels on robot
-
-    public static final double kMaxSpeedMetersPerSecond = 4.267;
-    public static final double kRobotDriveRadius = 1;//idk what this means, it probably needs to change
-    public static final double kMaxAccelerationMetersPerSecondSquared = 3;
-    public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
-    public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI;
-
-    public static final SwerveDriveKinematics kDriveKinematics =
-        new SwerveDriveKinematics(
-            new Translation2d(kWheelBase / 2, kTrackWidth / 2),
-            new Translation2d(kWheelBase / 2, -kTrackWidth / 2),
-            new Translation2d(-kWheelBase / 2, kTrackWidth / 2),
-            new Translation2d(-kWheelBase / 2, -kTrackWidth / 2));
-
-    public static final boolean kGyroReversed = false;
-
-    // Constraint for the motion profiled robot angle controller
-    public static final TrapezoidProfile.Constraints kThetaControllerConstraints =
-        new TrapezoidProfile.Constraints(
-            kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
-
-    public static final PIDController kXController = new PIDController(0, 0, 0);
-    public static final PIDController kYController = new PIDController(0, 0, 0);
-    public static final PIDController kThetaController =
-        new PIDController(
-            0.47, 0, 0);
-
-        
-            //0.47
-    //thetaController.enableContinuousInput(-180, 180);
-
-    //public static final HolonomicDriveController kSwerveDriveController = new HolonomicDriveController(kXController, kYController, kThetaController);
-
-    // These are example values only - DO NOT USE THESE FOR YOUR OWN ROBOT!
-    // These characterization values MUST be determined either experimentally or theoretically
-    // for *your* robot's drive.
-    // The SysId tool provides a convenient method for obtaining these values for your robot.
-    //public static final double ksVolts = 1;
-    //public static final double kvVoltSecondsPerMeter = 0.8;
-    //public static final double kaVoltSecondsSquaredPerMeter = 0.15;
-
-    
+    // Hold time on motor brakes when disabled
+    public static final double WHEEL_LOCK_TIME = 10; // seconds
   }
 
-  public static final class ModuleConstants {
-    public static final double kMaxModuleAngularSpeedRadiansPerSecond = 2 * Math.PI;
-    public static final double kMaxModuleAngularAccelerationRadiansPerSecondSquared = 2 * Math.PI;
+  public static class OperatorConstants
+  {
 
-    public static final int kEncoderCPR = 1;
-    public static final double kDriveGearRatio = 1/6.75;
-    public static final double kTurningGearRatio = 1/12.8;
-    public static final double kWheelDiameterMeters = 4*2.54*0.01;//0.1 for black tread, and 0.0985 for blue worn tread
-    public static final double kWheelCircumferenceMeters = Math.PI * kWheelDiameterMeters;
-    public static final double kDriveConversionFactor =
-        // Assumes the encoders are directly mounted on the wheel shafts
-        (kWheelCircumferenceMeters * (kDriveGearRatio));
-        
-
-    public static final double kTurningEncoderDistancePerPulse =
-        // Assumes the encoders are on a 1:1 reduction with the module shaft.
-        (kTurningGearRatio);
-
-    public static final double kPModuleTurningController = 1.2;
-    public static final double kIModuleTurningController = 0.0;
-    public static final double kDModuleTurningController = 0.0;
-
-    public static final double kPModuleDriveController = 0.22;
-    public static final double kIModuleDriveController = 0.0;
-    public static final double kDModuleDriveController = 1.2;
-    public static final double kFFModuleDriveController = 0.23;
-    
+    // Joystick Deadband
+    public static final double LEFT_X_DEADBAND  = 0.01;
+    public static final double LEFT_Y_DEADBAND  = 0.01;
+    public static final double RIGHT_X_DEADBAND = 0.01;
+    public static final double TURN_CONSTANT    = 6;
   }
 
-  public static final class OIConstants {
-    public static final int kDriverControllerPort = 0;
+  public static final class OIConstants 
+  {
+    public static final int kDriverControllerPort = 0;  
+    public static final int kCopilotControllerPort = 1;
     public static final double kDriveStickPower = 2;
-    public static int kCopilotControllerPort;
   }
 
-  public static final class AutoConstants {
+  public static final class DriveConstants 
+  {
+    public static final double kMaxSpeedMetersPerSecond = 4.267;
+    public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
+  }
 
+  public static final class VisionConstants
+  {
+    public static final boolean hasCamera = false;
+    //Camera name in network tables
+    public static final String cameraName = "Camera_Module_v1";
+    //Position of the camera from center of the robot in meters
+    public static final double cameraZ = Units.inchesToMeters(14.25);
+    public static final double cameraX = Units.inchesToMeters(1);
+    public static final double cameraY = Units.inchesToMeters(10);
+    //Pipeline name in network tables
+    public static final String pipelineName = "apriltag";
 
-    //public static final double kPThetaController = 0.1;
+    //How accurate the bot needs the estimated position to be to update field pos (lower = better)
+    public static final double acceptibleAmbiguity = 0.25;
 
-    public static final TrajectoryConfig kMaxSpeedTrajectoryConfig = new TrajectoryConfig(
-      DriveConstants.kMaxSpeedMetersPerSecond,
-      DriveConstants.kMaxAccelerationMetersPerSecondSquared)
-      // Add kinematics to ensure max speed is actually obeyed
-      .setKinematics(DriveConstants.kDriveKinematics);
+    //If false, will not automatically update our pose
+    public static final boolean autoUpdatePose = true;
+  }
+
+  public static final class PoseConstants
+  {
+    public static final Pose2d chainID15 = new Pose2d(4.45, 4.94, Rotation2d.fromDegrees(-0));
+    public static final Pose2d chainID14 = new Pose2d(5.86, 4.11, Rotation2d.fromDegrees(0));
+    public static final Pose2d chainID16 = new Pose2d(4.45, 3.27, Rotation2d.fromDegrees(0));
+
+    public static final Pose2d blueOnePose = new Pose2d(0.70,6.69,Rotation2d.fromDegrees(0));
+    public static final Pose2d redOnePose = new Pose2d(Constants.FIELD_WIDTH - blueOnePose.getX(), blueOnePose.getY(), Rotation2d.fromDegrees(180 - Units.rotationsToDegrees(blueOnePose.getRotation().getRotations())));
+    public static final Pose2d blueTwoPose = new Pose2d(1.39,5.54,Rotation2d.fromDegrees(0));
+    public static final Pose2d redTwoPose = new Pose2d(Constants.FIELD_WIDTH - blueTwoPose.getX(), blueTwoPose.getY(), Rotation2d.fromDegrees(180 - Units.rotationsToDegrees(blueTwoPose.getRotation().getRotations())));
+    public static final Pose2d blueThreePose = new Pose2d(0.70,4.38,Rotation2d.fromDegrees(0));
+    public static final Pose2d redThreePose = new Pose2d(Constants.FIELD_WIDTH - blueThreePose.getX(), blueThreePose.getY(), Rotation2d.fromDegrees(180 - Units.rotationsToDegrees(blueThreePose.getRotation().getRotations())));
+    public static final Pose2d[] initRobotPoses = {blueOnePose, blueTwoPose, blueThreePose, redOnePose, redTwoPose, redThreePose};
+  
+    public static final Pose2d autoEndPose = new Pose2d(5.891426328307202, 6.045027362781998, Rotation2d.fromDegrees(90));
   }
 
 }
