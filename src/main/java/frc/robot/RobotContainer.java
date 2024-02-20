@@ -6,10 +6,8 @@ package frc.robot;
 
 import java.io.File;
 import java.util.Optional;
-import java.util.OptionalInt;
 
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -22,18 +20,15 @@ import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.Commands.AimAndLaunch;
-import frc.robot.Commands.StaticLaunch;
 import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.ScoringArmConstants;
 import frc.robot.subsystems.ScoringArm;
-import frc.robot.subsystems.drive.FieldDriverStick;
+import frc.robot.subsystems.Drive.FieldDriverStick;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
@@ -54,6 +49,12 @@ public class RobotContainer {
   private static VisionSubsystem m_robotVision = new VisionSubsystem();
 
   SendableChooser<Command> m_autoChooser = AutoBuilder.buildAutoChooser();
+
+  SendableChooser<Integer> m_startingPoseChooser = new SendableChooser<>();
+
+  private static final Integer m_positionOne = 1;
+  private static final Integer m_positionTwo = 2;
+  private static final Integer m_positionThree = 3;
 
 
 
@@ -142,6 +143,14 @@ public class RobotContainer {
     Shuffleboard.getTab("Game HUD").addDouble("Robot Pitch", (()-> drivebase.getPitch().getDegrees())).withWidget(BuiltInWidgets.kDial);
     Shuffleboard.getTab("Game HUD").addDouble("Arm Angle", m_ScoringArm::GetArmAngle);
     //Shuffleboard.getTab("Game HUD").add(autoChooser).withSize(2,1);
+
+    // Creates the starting pose selectible chooser
+
+    m_startingPoseChooser.setDefaultOption("Postion 1", m_positionOne);
+    m_startingPoseChooser.addOption("Position 2", m_positionTwo);
+    m_startingPoseChooser.addOption("Position 3", m_positionThree);
+
+    SmartDashboard.putData(m_startingPoseChooser);
 
   }
 
@@ -252,11 +261,7 @@ public class RobotContainer {
    */
    public void setInitialPose()
   {
-    //Read position
-    OptionalInt driverStationLocation = DriverStation.getLocation();
-    int location = (driverStationLocation.isPresent())?driverStationLocation.getAsInt():1;
-    //set zero based
-    location--;
+    int location = m_startingPoseChooser.getSelected().intValue() - 1;
 
     //Set default to robot on field position
     if (isRedAlliance()) 
