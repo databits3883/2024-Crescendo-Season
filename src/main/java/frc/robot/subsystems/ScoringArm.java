@@ -25,7 +25,8 @@ import frc.robot.Constants.ScoringArmConstants;
 
 public class ScoringArm extends SubsystemBase {
 
-  public CANSparkMax intakeMotor;
+  public CANSparkMax topIntakeMotor;
+  public CANSparkMax bottomIntakeMotor;
   public Servo flapServo = new Servo(ScoringArmConstants.kFlapServoChannel);
   public Servo climbLockServo = new Servo(ScoringArmConstants.kClimbLockServoChannel);
 
@@ -74,9 +75,10 @@ public class ScoringArm extends SubsystemBase {
     launchSpeedLeaderEncoder = launchMotorLeader.getEncoder();
     launchSpeedFollowerEncoder = launchMotorFollower.getEncoder();
     
-    intakeMotor = new CANSparkMax(ScoringArmConstants.kIntakeMotorID, MotorType.kBrushless);
+    topIntakeMotor = new CANSparkMax(ScoringArmConstants.kTopIntakeMotorID, MotorType.kBrushless);
+    bottomIntakeMotor = new CANSparkMax(ScoringArmConstants.kBottomIntakeMotorID, MotorType.kBrushless);
     
-    intakeSensor = intakeMotor.getForwardLimitSwitch(Type.kNormallyOpen);
+    intakeSensor = topIntakeMotor.getForwardLimitSwitch(Type.kNormallyOpen);
 
     absArmAngleEncoder = armAngleLeaderMotor.getAbsoluteEncoder(SparkAbsoluteEncoder.Type.kDutyCycle);
     absArmAngleEncoder.setPositionConversionFactor(360);
@@ -193,15 +195,20 @@ public class ScoringArm extends SubsystemBase {
 
   public void Intake(){
     SetFlap(false);
-    intakeMotor.set(-0.5);
+    SetIntakeMotors(0.5);
+  }
+
+  public void SetIntakeMotors(double fraction){
+    topIntakeMotor.set(fraction);
+    bottomIntakeMotor.set(-1 * fraction);
   }
 
   public void Outtake(){
-    intakeMotor.set(0.5);
+    SetIntakeMotors(-0.5);
   }
 
   public void Launch(){
-    intakeMotor.set(-1.0);
+    SetIntakeMotors(1.0);
     SetFlap(true);
     
   }
@@ -225,7 +232,7 @@ public class ScoringArm extends SubsystemBase {
   }
 
 public void StopIntake() {
-    intakeMotor.set(0);
+    SetIntakeMotors(0);
     SetFlap(false);
 }
 
@@ -249,6 +256,7 @@ public void StopIntake() {
   }
 
   public void Climb(){
+    LatchClimb();
     SetArmAngle(ScoringArmConstants.kArmPosClimbFinish);
   }
 
