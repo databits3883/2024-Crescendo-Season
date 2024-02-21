@@ -57,6 +57,13 @@ public class RobotContainer {
 
   SendableChooser<Command> m_autoChooser = AutoBuilder.buildAutoChooser();
 
+  SendableChooser<Integer> m_poseSelector = new SendableChooser<>();
+
+  private static final Integer positionOne = 1;
+  private static final Integer positionTwo = 2;
+  private static final Integer positionThree = 3;
+
+
 
 
   // The driver's controller
@@ -144,6 +151,12 @@ public class RobotContainer {
     Shuffleboard.getTab("Game HUD").addDouble("Arm Angle", m_ScoringArm::GetArmAngle);
     //Shuffleboard.getTab("Game HUD").add(autoChooser).withSize(2,1);
     configureAutoNamedCommands();
+
+
+    m_poseSelector.setDefaultOption("Position 1", positionOne);
+    m_poseSelector.addOption("Position 2", positionTwo);
+    m_poseSelector.addOption("Position 3", positionThree);
+    SmartDashboard.putData(m_poseSelector);
 
   }
 
@@ -262,10 +275,7 @@ public class RobotContainer {
    public void setInitialPose()
   {
     //Read position
-    OptionalInt driverStationLocation = DriverStation.getLocation();
-    int location = (driverStationLocation.isPresent())?driverStationLocation.getAsInt():1;
-    //set zero based
-    location--;
+    int location = m_poseSelector.getSelected().intValue() - 1;
 
     //Set default to robot on field position
     if (isRedAlliance()) 
