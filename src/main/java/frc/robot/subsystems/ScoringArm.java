@@ -156,7 +156,7 @@ public class ScoringArm extends SubsystemBase {
     
     //Shuffleboard.getTab("Arm Debug").addDouble("Launch Vel Error", launchSpeedPIDController::getPositionError);
     Shuffleboard.getTab("Arm Debug").addDouble("Launch Vel SP", ()-> launchSpeedSetpoint);
-    Shuffleboard.getTab("Arm Debug").addDouble("Launch Vel Encoder", launchSpeedLeaderEncoder::getVelocity);
+    Shuffleboard.getTab("Arm Debug").addDouble("Launch Vel Encoder", () -> (launchSpeedLeaderEncoder.getVelocity() / ScoringArmConstants.kLaunchVelConversionFactor));
     //Shuffleboard.getTab("Arm Debug").addDouble("Launch Vel Output", () -> launchSpeedPIDController.calculate(10));
 
     Shuffleboard.getTab("Arm Debug").addDouble("Arm SP", anglePIDController::getSetpoint);

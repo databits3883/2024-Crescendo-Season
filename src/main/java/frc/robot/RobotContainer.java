@@ -55,7 +55,7 @@ public class RobotContainer {
 
   private static VisionSubsystem m_robotVision = new VisionSubsystem();
 
-  SendableChooser<Command> m_autoChooser = AutoBuilder.buildAutoChooser();
+  final SendableChooser<Command> m_autoChooser;
 
 
 
@@ -106,6 +106,7 @@ public class RobotContainer {
   public RobotContainer() {
 
     configureAutoNamedCommands();
+    m_autoChooser = AutoBuilder.buildAutoChooser();
 
     if (Constants.VisionConstants.hasCamera)
     {
