@@ -41,7 +41,7 @@ public class VisionSubsystem  extends SubsystemBase {
     * @param cameraHeightInMeters
     * @param cameraName
     */
-   public VisionSubsystem(double cameraFrontToBackInMeters, double cameraSideToSideInMeters, double cameraHeightInMeters, String cameraName) 
+   public VisionSubsystem(double cameraFrontToBackInMeters, double cameraSideToSideInMeters, double cameraHeightInMeters, Rotation3d cameraRotation, String cameraName) 
    {
       m_hasCameraEnabled = true;
 
@@ -63,7 +63,7 @@ public class VisionSubsystem  extends SubsystemBase {
       //Setup Pipeline - 1 ?= AprilTag pipeline
       camera.setPipelineIndex(1);      
 
-      Transform3d robotToCam = new Transform3d(new Translation3d(cameraFrontToBackInMeters, cameraSideToSideInMeters, cameraHeightInMeters), new Rotation3d(0.0D, 0.0D, 0.0D));
+      Transform3d robotToCam = new Transform3d(new Translation3d(cameraFrontToBackInMeters, cameraSideToSideInMeters, cameraHeightInMeters), cameraRotation);
       this.photonPoseEstimator = new PhotonPoseEstimator(this.aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, this.camera, robotToCam); 
       System.out.println("Vision: Setup Pose Estimator: " + this.photonPoseEstimator);
    }

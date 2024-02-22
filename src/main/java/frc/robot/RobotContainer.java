@@ -112,11 +112,10 @@ public class RobotContainer {
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
 
-
-
     if (Constants.VisionConstants.hasCamera)
     {
-      RobotContainer.setRobotVision(new VisionSubsystem(Constants.VisionConstants.cameraY, Constants.VisionConstants.cameraX, Constants.VisionConstants.cameraZ, Constants.VisionConstants.cameraName));
+      RobotContainer.setRobotVision(new VisionSubsystem(Constants.VisionConstants.LCcameraY, Constants.VisionConstants.LCcameraX, Constants.VisionConstants.LCcameraZ, 
+                                    Constants.VisionConstants.LCcameraRotation, Constants.VisionConstants.cameraName));
     } 
 
     // Configure the button bindings
