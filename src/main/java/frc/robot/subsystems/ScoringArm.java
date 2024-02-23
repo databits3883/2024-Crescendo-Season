@@ -27,10 +27,14 @@ public class ScoringArm extends SubsystemBase {
 
   public CANSparkMax topIntakeMotor;
   public CANSparkMax bottomIntakeMotor;
+  public SparkLimitSwitch intakeSensor;
+  public SparkPIDController topIntakePIDController;
+  public SparkPIDController bottomIntakePIDController;
+  public RelativeEncoder topIntakeEncoder;
+  public RelativeEncoder bottomIntakeEncoder;
+
   public Servo flapServo = new Servo(ScoringArmConstants.kFlapServoChannel);
   public Servo climbLockServo = new Servo(ScoringArmConstants.kClimbLockServoChannel);
-
-  public SparkLimitSwitch intakeSensor;
 
   public CANSparkMax launchMotorLeader;
   public CANSparkMax launchMotorFollower;
@@ -77,6 +81,39 @@ public class ScoringArm extends SubsystemBase {
     
     topIntakeMotor = new CANSparkMax(ScoringArmConstants.kTopIntakeMotorID, MotorType.kBrushless);
     bottomIntakeMotor = new CANSparkMax(ScoringArmConstants.kBottomIntakeMotorID, MotorType.kBrushless);
+
+    topIntakeMotor.setInverted(true);
+    bottomIntakeMotor.setInverted(false);
+
+    topIntakePIDController = topIntakeMotor.getPIDController();
+    bottomIntakePIDController = bottomIntakeMotor.getPIDController();
+
+    topIntakePIDController.setP(ScoringArmConstants.kIntakeP);
+    topIntakePIDController.setI(ScoringArmConstants.kIntakeI);
+    topIntakePIDController.setD(ScoringArmConstants.kIntakeD);
+    topIntakePIDController.setIZone(ScoringArmConstants.kIntakeIZone);
+    topIntakePIDController.setFF(ScoringArmConstants.kIntakeFF);
+
+    bottomIntakePIDController.setP(ScoringArmConstants.kIntakeP);
+    bottomIntakePIDController.setI(ScoringArmConstants.kIntakeI);
+    bottomIntakePIDController.setD(ScoringArmConstants.kIntakeD);
+    bottomIntakePIDController.setIZone(ScoringArmConstants.kIntakeIZone);
+    bottomIntakePIDController.setFF(ScoringArmConstants.kIntakeFF);
+
+    topIntakeEncoder = topIntakeMotor.getEncoder();
+    bottomIntakeEncoder = bottomIntakeMotor.getEncoder();
+
+    topIntakeEncoder.setPositionConversionFactor(ScoringArmConstants.kIntakePosConversionFactor);
+    topIntakeEncoder.setVelocityConversionFactor(ScoringArmConstants.kIntakeVelConversionFactor);
+
+    bottomIntakeEncoder.setPositionConversionFactor(ScoringArmConstants.kIntakePosConversionFactor);
+    bottomIntakeEncoder.setVelocityConversionFactor(ScoringArmConstants.kIntakeVelConversionFactor);
+
+    launchSpeedFollowerEncoder.setPositionConversionFactor(ScoringArmConstants.kLaunchPosConversionFactor);
+    launchSpeedFollowerEncoder.setVelocityConversionFactor(ScoringArmConstants.kLaunchVelConversionFactor);
+
+    launchSpeedFollowerEncoder.setPositionConversionFactor(ScoringArmConstants.kLaunchPosConversionFactor);//diameter of wheel times pi
+    launchSpeedFollowerEncoder.setVelocityConversionFactor(ScoringArmConstants.kLaunchVelConversionFactor);
     
     intakeSensor = topIntakeMotor.getForwardLimitSwitch(Type.kNormallyOpen);
 
@@ -98,10 +135,10 @@ public class ScoringArm extends SubsystemBase {
     launchSpeedLeaderPIDController = launchMotorLeader.getPIDController();
     launchSpeedFollowerPIDController = launchMotorFollower.getPIDController();
 
-    launchSpeedLeaderEncoder.setPositionConversionFactor(4*Math.PI);//diameter of wheel times pi
+    launchSpeedLeaderEncoder.setPositionConversionFactor(4*0.254*Math.PI);//diameter of wheel times pi, and gear ration
     launchSpeedLeaderEncoder.setVelocityConversionFactor(4*0.254*Math.PI/60);
 
-    launchSpeedFollowerEncoder.setPositionConversionFactor(4*Math.PI);//diameter of wheel times pi
+    launchSpeedFollowerEncoder.setPositionConversionFactor(4*0.254*Math.PI);//diameter of wheel times pi and gear ration
     launchSpeedFollowerEncoder.setVelocityConversionFactor(4*0.254*Math.PI/60);
     
     launchSpeedLeaderPIDController.setP(ScoringArmConstants.kLaunchSpeedP);
@@ -119,10 +156,12 @@ public class ScoringArm extends SubsystemBase {
     
     //Shuffleboard.getTab("Arm Debug").addDouble("Launch Vel Error", launchSpeedPIDController::getPositionError);
     Shuffleboard.getTab("Arm Debug").addDouble("Launch Vel SP", ()-> launchSpeedSetpoint);
-    Shuffleboard.getTab("Arm Debug").addDouble("Launch Vel Encoder", launchSpeedLeaderEncoder::getVelocity);
+    Shuffleboard.getTab("Arm Debug").addDouble("Launch Vel Encoder", () -> (launchSpeedLeaderEncoder.getVelocity() / ScoringArmConstants.kLaunchVelConversionFactor));
     //Shuffleboard.getTab("Arm Debug").addDouble("Launch Vel Output", () -> launchSpeedPIDController.calculate(10));
 
     Shuffleboard.getTab("Arm Debug").addDouble("Arm SP", anglePIDController::getSetpoint);
+
+    Shuffleboard.getTab("Arm Debug").addDouble("Intake Vel Encoder", topIntakeEncoder::getVelocity);
 
     SetLaunchSpeed(0);//theoretical max of 622.9 meters per second
     EnableArmAngleControl(false); 
@@ -142,6 +181,8 @@ public class ScoringArm extends SubsystemBase {
 
     
     RunLaunchSpeedPIDControl();
+
+    
     //launchMotorLeader.set(0.1);
 
   }
@@ -179,7 +220,7 @@ public class ScoringArm extends SubsystemBase {
     SetArmAngle(SmartDashboard.getNumber("ArmAngleSlider", 5));
   }
 
-  public void RunLaunchSpeedPIDControl(){
+  public void RunLaunchSpeedPIDControl(){//can probably be removed, but haven't tried
     //launchMotorLeader.set(launchSpeedPIDController.calculate(launchSpeedEncoder.getVelocity()));
     launchSpeedLeaderPIDController.setReference(1 * launchSpeedSetpoint, ControlType.kVelocity);
     launchSpeedFollowerPIDController.setReference(-1 * launchSpeedSetpoint, ControlType.kVelocity);
@@ -195,17 +236,24 @@ public class ScoringArm extends SubsystemBase {
 
   public void Intake(){
     SetFlap(false);
-    SetIntakeMotors(0.5);
+    SetIntakeSpeed(100);
+  }
+
+  public void Outtake(){
+    SetIntakeSpeed(-100);
+  }
+
+  public void SetIntakeSpeed(double speed){
+    topIntakePIDController.setReference(speed, ControlType.kVelocity);
+    bottomIntakePIDController.setReference(speed, ControlType.kVelocity);
   }
 
   public void SetIntakeMotors(double fraction){
     topIntakeMotor.set(fraction);
-    bottomIntakeMotor.set(-1 * fraction);
+    bottomIntakeMotor.set(fraction);
   }
 
-  public void Outtake(){
-    SetIntakeMotors(-0.5);
-  }
+
 
   public void Launch(){
     SetIntakeMotors(1.0);

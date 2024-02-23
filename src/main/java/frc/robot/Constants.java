@@ -43,16 +43,32 @@ public final class Constants {
     public static final double kAngleIZone = Double.POSITIVE_INFINITY;
 
 
-    public static final double kLaunchSpeedP = 0.001;//0.021
+    public static final double kLaunchSpeedP = 0.002;//0.021
     public static final double kLaunchSpeedI = 0;//0
     public static final double kLaunchSpeedD = 0.0;//0.04
-    public static final double kLaunchSpeedFF = 0.003;//0.003
+    public static final double kLaunchSpeedFF = 0.0035;//0.003
     public static final double kLaunchSpeedPosTolerance = 0;
     public static final double kLaunchSpeedVelTolerance = 0;
+    public static final double kLaunchSpeedIZone = 0;
+
+    public static final double kLaunchPosConversionFactor = 4*0.0254*Math.PI;
+    public static final double kLaunchVelConversionFactor = 4*0.0254*Math.PI / 60;
+
 
     public static final int kFlapServoChannel = 1;
     public static final int kClimbLockServoChannel = 2;
-    public static double kLaunchSpeedIZone = 0;
+    
+    public static final double kFlapServoOpenPos = 0.4;
+    public static final double kFlapServoClosedPos = 1.0;
+
+    public static final double kIntakeP = 0.0002;
+    public static final double kIntakeI = 0;
+    public static final double kIntakeD = 0;
+    public static final double kIntakeIZone = 0;
+    public static final double kIntakeFF = 0.003;
+
+    public static final double kIntakePosConversionFactor = 1/(Units.inchesToMeters(2)*Math.PI * 50);
+    public static final double kIntakeVelConversionFactor = kIntakePosConversionFactor / 60;
 
     public static final double kSpeakerHeight = 2.0;
 
@@ -63,9 +79,9 @@ public final class Constants {
     public static final double kArmPosClimbPrep = 90;
     public static final double kArmPosClimbFinish = 25;
 
-    public static final double kFlapServoOpenPos = 0.4;
-    public static final double kFlapServoClosedPos = 1.0;
+    
 
+    
   }
 
    public static final double ROBOT_MASS = (148 - 20.3) * 0.453592; // 32lbs * kg per pound

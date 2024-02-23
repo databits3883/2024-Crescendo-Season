@@ -56,7 +56,7 @@ public class RobotContainer {
 
   private static VisionSubsystem m_robotVision = new VisionSubsystem();
 
-  SendableChooser<Command> m_autoChooser = AutoBuilder.buildAutoChooser();
+  final SendableChooser<Command> m_autoChooser;
 
   SendableChooser<Integer> m_poseSelector = new SendableChooser<>();
 
@@ -113,6 +113,9 @@ public class RobotContainer {
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
 
+    configureAutoNamedCommands();
+    m_autoChooser = AutoBuilder.buildAutoChooser();
+
     if (Constants.VisionConstants.hasCamera)
     {
       RobotContainer.setRobotVision(new VisionSubsystem(Constants.VisionConstants.LCcameraY, Constants.VisionConstants.LCcameraX, Constants.VisionConstants.LCcameraZ, 
@@ -150,7 +153,7 @@ public class RobotContainer {
     Shuffleboard.getTab("Game HUD").addDouble("Robot Pitch", (()-> drivebase.getPitch().getDegrees())).withWidget(BuiltInWidgets.kDial);
     Shuffleboard.getTab("Game HUD").addDouble("Arm Angle", m_ScoringArm::GetArmAngle);
     //Shuffleboard.getTab("Game HUD").add(autoChooser).withSize(2,1);
-    configureAutoNamedCommands();
+    
 
 
     m_poseSelector.setDefaultOption("Position 1", positionOne);
