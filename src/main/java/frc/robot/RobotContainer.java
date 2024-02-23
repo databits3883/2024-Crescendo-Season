@@ -48,7 +48,7 @@ public class RobotContainer {
   
   public final ScoringArm m_ScoringArm = new ScoringArm();
   //Long Claw
-  private final String ROBOT_IN_USE = Constants.ROBOT_LONGCLAW_CONFIG_LOCATION;
+  private final String ROBOT_IN_USE = Constants.ROBOT_SUPERSONIC_CONFIG_LOCATION;
   //SuperSonic
   //private final String ROBOT_IN_USE = Constants.ROBOT_SUPERSONIC_CONFIG_LOCATION;
   

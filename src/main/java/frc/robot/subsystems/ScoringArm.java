@@ -236,11 +236,13 @@ public class ScoringArm extends SubsystemBase {
 
   public void Intake(){
     SetFlap(false);
-    SetIntakeSpeed(100);
+    //SetIntakeSpeed(100);
+    SetIntakeMotors(1);
   }
 
   public void Outtake(){
-    SetIntakeSpeed(-100);
+    //SetIntakeSpeed(-100);
+    SetIntakeMotors(-1);
   }
 
   public void SetIntakeSpeed(double speed){
