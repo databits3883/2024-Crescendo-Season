@@ -6,6 +6,7 @@ package frc.robot;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import swervelib.math.Matter;
@@ -90,6 +91,7 @@ public final class Constants {
   public static final double FIELD_WIDTH = Units.inchesToMeters(653.2);  // (76.1 + 250.5 ) * 2 = 653.2 inches
 
   public static final String ROBOT_SUPERSONIC_CONFIG_LOCATION = "swerve/sonicsparkflex";
+  public static final String ROBOT_LONGCLAW_CONFIG_LOCATION = "swerve/sparkflex";
 
   public static final class Auton
   {
@@ -135,10 +137,14 @@ public final class Constants {
     public static final boolean hasCamera = false;
     //Camera name in network tables
     public static final String cameraName = "Camera_Module_v1";
-    //Position of the camera from center of the robot in meters
-    public static final double cameraZ = Units.inchesToMeters(14.25);
-    public static final double cameraX = Units.inchesToMeters(1);
-    public static final double cameraY = Units.inchesToMeters(10);
+    //Position of the camera from center of the robot in meters, This is measurements from LongClaw
+    public static final double LCcameraZ = Units.inchesToMeters(11.5);
+    public static final double LCcameraX = Units.inchesToMeters(16.5);
+    public static final double LCcameraY = Units.inchesToMeters(7);
+    public static final double LCcameraZYaw = -20; //degress, yaw
+    public static final double LCcameraYPitch = +30; // pitch
+    public static final double LCcameraXRoll = 0; // roll
+    public static final Rotation3d LCcameraRotation = new Rotation3d(LCcameraXRoll, LCcameraYPitch, LCcameraZYaw);
     //Pipeline name in network tables
     public static final String pipelineName = "apriltag";
 
