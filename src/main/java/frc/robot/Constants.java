@@ -75,6 +75,7 @@ public final class Constants {
   public static final double FIELD_WIDTH = Units.inchesToMeters(653.2);  // (76.1 + 250.5 ) * 2 = 653.2 inches
 
   public static final String ROBOT_SUPERSONIC_CONFIG_LOCATION = "swerve/sonicsparkflex";
+  public static final String ROBOT_LONGCLAW_CONFIG_LOCATION = "swerve/sparkflex";
 
   public static final class Auton
   {

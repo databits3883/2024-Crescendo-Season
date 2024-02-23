@@ -6,11 +6,9 @@ package frc.robot;
 
 import java.io.File;
 import java.util.Optional;
-import java.util.OptionalInt;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -23,7 +21,6 @@ import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.Commands.AimAndLaunch;
 import frc.robot.Commands.RunIntakeSmart;
 import frc.robot.Commands.StaticLaunch;
 import frc.robot.Constants.OIConstants;
@@ -35,7 +32,6 @@ import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
@@ -51,7 +47,12 @@ public class RobotContainer {
   // The robot's subsystems
   
   public final ScoringArm m_ScoringArm = new ScoringArm();
-  private final SwerveSubsystem drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),Constants.ROBOT_SUPERSONIC_CONFIG_LOCATION));
+  //Long Claw
+  private final String ROBOT_IN_USE = Constants.ROBOT_LONGCLAW_CONFIG_LOCATION;
+  //SuperSonic
+  //private final String ROBOT_IN_USE = Constants.ROBOT_SUPERSONIC_CONFIG_LOCATION;
+  
+  private final SwerveSubsystem drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),ROBOT_IN_USE));
 
   private static VisionSubsystem m_robotVision = new VisionSubsystem();
 
@@ -242,38 +243,17 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    // Create config for trajectory
-    
 
-    // An example trajectory to follow.  All units in meters.
-    // Trajectory exampleTrajectory =
-    //     TrajectoryGenerator.generateTrajectory(
-    //         // Start at the origin facing the +X direction
-    //         new Pose2d(0, 0, Rotation2d.fromDegrees(0)),
-    //         // Pass through these two interior waypoints, making an 's' curve path
-    //         List.of(new Translation2d(0.5, 0.5)),
-    //         // End 3 meters straight ahead of where we started, facing forward
-    //         new Pose2d(1, 0, Rotation2d.fromDegrees(30)),
-    //         AutoConstants.kMaxSpeedTrajectoryConfig);
-
-
-
-    //FollowTrajectory trajectoryDrive = new FollowTrajectory(exampleTrajectory, m_robotDrive, true, true);
-    
-    // Run path following command, then stop at the end.
-    
-    //return m_autoChooser.getSelected();
-    
-     //m_robotDrive.setDisplayTrajectory(exampleTrajectory);
-   return m_autoChooser.getSelected();
+    //use the command selected in the choose, default is do nothing
+    return m_autoChooser.getSelected();
   }
 
 /**
-   * Set the initial pose of the robot based on driverstation selection
+   * Set the initial pose of the robot based on pose selected in shuffleboard
    */
    public void setInitialPose()
   {
-    //Read position
+    //Read robot position from pose selector
     int location = m_poseSelector.getSelected().intValue() - 1;
 
     //Set default to robot on field position
