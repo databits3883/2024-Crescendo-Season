@@ -170,7 +170,7 @@ public class RobotContainer {
   public void configureAutoNamedCommands(){
     
     NamedCommands.registerCommand("Smart Intake", new RunIntakeSmart(m_ScoringArm));
-    NamedCommands.registerCommand("Near Static Launch", new StaticLaunch(m_ScoringArm, 150));
+    NamedCommands.registerCommand("Near Static Launch", new StaticLaunch(m_ScoringArm, 250));
     NamedCommands.registerCommand("Arm Pickup Pos", new InstantCommand(() -> m_ScoringArm.SetArmAngle(ScoringArmConstants.kArmPosPickup)));
 
   }

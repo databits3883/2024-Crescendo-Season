@@ -37,7 +37,7 @@ public class StaticLaunch extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_ScoringArm.Launch();
+    m_ScoringArm.CoastLaunchMotors();
 
   }
 
@@ -48,6 +48,10 @@ public class StaticLaunch extends Command {
     if(atSPs){
       timer.start();
     }
-    return timer.hasElapsed(0.25);
+    if( timer.hasElapsed(0.5)){
+      m_ScoringArm.Launch();
+    }
+
+    return timer.hasElapsed(1);
   }
 }
