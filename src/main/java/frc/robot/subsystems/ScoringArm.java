@@ -43,6 +43,7 @@ public class ScoringArm extends SubsystemBase {
   public SparkPIDController launchSpeedLeaderPIDController;
   public SparkPIDController launchSpeedFollowerPIDController;
   public double launchSpeedSetpoint = 0;
+  public boolean launchCoastMode = false;
 
   
   public CANSparkMax armAngleLeaderMotor;
@@ -179,8 +180,13 @@ public class ScoringArm extends SubsystemBase {
       SetArmAngleMotors(0);
     }
 
+    if(launchCoastMode){
+      CoastLaunchMotors();
+    }
+    else{
+      RunLaunchSpeedPIDControl();
+    }
     
-    RunLaunchSpeedPIDControl();
 
     
     //launchMotorLeader.set(0.1);
@@ -228,10 +234,17 @@ public class ScoringArm extends SubsystemBase {
 
   public void SetLaunchSpeed(double launchRPM){
     launchSpeedSetpoint = launchRPM;
+    launchCoastMode = false;
   }
 
   public void ChangeLaunchSpeed(double deltaRPM){
     SetLaunchSpeed(launchSpeedSetpoint+deltaRPM);
+  }
+
+  public void CoastLaunchMotors(){
+    launchMotorLeader.set(0);
+    launchMotorFollower.set(0);
+    launchCoastMode = true;
   }
 
   public void Intake(){
@@ -318,5 +331,11 @@ public void StopIntake() {
   public boolean IntakeSensorBlocked() {
     return intakeSensor.isPressed();
   }
+
+  public void AmpPreparation () {
+    SetArmAngle(ScoringArmConstants.kArmPosAmp);
+    SetLaunchSpeed(150);
+  }
+
 
 }

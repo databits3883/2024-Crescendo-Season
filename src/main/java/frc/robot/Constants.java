@@ -23,6 +23,8 @@ import swervelib.parser.PIDFConfig;
 public final class Constants {
 
   public static final class ScoringArmConstants {
+    public static final boolean kUseSquished = false;
+
     public static final int kTopIntakeMotorID = 18;
     public static final int kBottomIntakeMotorID = 21;
 
@@ -59,7 +61,7 @@ public final class Constants {
     public static final int kClimbLockServoChannel = 2;
     
     public static final double kFlapServoOpenPos = 0.4;
-    public static final double kFlapServoClosedPos = 0.7;
+    public static final double kFlapServoClosedPos = 0.8;
 
     public static final double kIntakeP = 0.0002;
     public static final double kIntakeI = 0;
@@ -73,11 +75,11 @@ public final class Constants {
     public static final double kSpeakerHeight = 2.0;
 
     public static final double kArmPosNearStaticLaunch = 20;
-    public static final double kArmPosFarStaticLaunch = 30;
+    public static final double kArmPosFarStaticLaunch = 50;
     public static final double kArmPosPickup = -1;
     public static final double kArmPosAmp = 140;
-    public static final double kArmPosClimbPrep = 90;
-    public static final double kArmPosClimbFinish = 25;
+    public static final double kArmPosClimbPrep = 140;
+    public static final double kArmPosClimbFinish = 0;
 
     
 

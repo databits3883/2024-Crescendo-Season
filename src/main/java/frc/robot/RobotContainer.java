@@ -113,6 +113,8 @@ public class RobotContainer {
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
 
+    
+
     configureAutoNamedCommands();
     m_autoChooser = AutoBuilder.buildAutoChooser();
 
@@ -222,10 +224,10 @@ public class RobotContainer {
       new JoystickButton(m_copilotController, 6).onTrue(new InstantCommand(() -> m_ScoringArm.Climb()));
       new JoystickButton(m_copilotController, 3).onTrue(new InstantCommand(() -> m_ScoringArm.SetArmAngle(ScoringArmConstants.kArmPosNearStaticLaunch)));
       new JoystickButton(m_copilotController, 2).onTrue(new InstantCommand(() -> m_ScoringArm.SetArmAngle(ScoringArmConstants.kArmPosFarStaticLaunch)));
-      new JoystickButton(m_copilotController, 1).onTrue(new InstantCommand(() -> m_ScoringArm.SetArmAngle(ScoringArmConstants.kArmPosAmp)));
+      new JoystickButton(m_copilotController, 1).onTrue(new InstantCommand(() -> m_ScoringArm.AmpPreparation()));
       new JoystickButton(m_copilotController, 4).onTrue(new InstantCommand(() -> m_ScoringArm.SetArmAngle(ScoringArmConstants.kArmPosPickup)));
       new JoystickButton(m_copilotController, 7).whileTrue(new StartEndCommand(() -> m_ScoringArm.Launch(), ()-> m_ScoringArm.StopIntake()));
-      new JoystickButton(m_copilotController, 10).whileTrue(new StartEndCommand(() -> m_ScoringArm.SetLaunchSpeed(200), () -> m_ScoringArm.SetLaunchSpeed(0)));
+      new JoystickButton(m_copilotController, 10).whileTrue(new StartEndCommand(() -> m_ScoringArm.SetLaunchSpeed(250), () -> m_ScoringArm.CoastLaunchMotors()));
       new JoystickButton(m_copilotController, 11).onTrue(new InstantCommand(()-> m_ScoringArm.SetArmAngleToSDBValue()));
       //new JoystickButton(m_copilotController, 7).onTrue(new StaticLaunch(m_ScoringArm));
 
@@ -250,6 +252,7 @@ public class RobotContainer {
 
     //use the command selected in the choose, default is do nothing
     return m_autoChooser.getSelected();
+    //return drivebase.sysIdDriveMotorCommand();
   }
 
 /**
