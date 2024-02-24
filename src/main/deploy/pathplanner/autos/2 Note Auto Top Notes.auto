@@ -30,6 +30,12 @@
               {
                 "type": "named",
                 "data": {
+                  "name": "Arm Pickup Pos"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
                   "name": "Smart Intake"
                 }
               }

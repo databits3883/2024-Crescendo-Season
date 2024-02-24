@@ -22,18 +22,49 @@
           "data": {
             "commands": [
               {
+                "type": "named",
+                "data": {
+                  "name": "Smart Intake"
+                }
+              },
+              {
                 "type": "path",
                 "data": {
                   "pathName": "GoalOne"
                 }
-              },
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Near Static Launch"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
               {
                 "type": "named",
                 "data": {
                   "name": "Smart Intake"
                 }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "MidRingOne"
+                }
               }
             ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "GoalOne"
           }
         },
         {

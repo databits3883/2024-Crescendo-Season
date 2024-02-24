@@ -25,8 +25,8 @@ public final class Constants {
   public static final class ScoringArmConstants {
     public static final boolean kUseSquished = false;
 
-    public static final int kTopIntakeMotorID = 18;
-    public static final int kBottomIntakeMotorID = 21;
+    public static final int kTopIntakeMotorID = 21;
+    public static final int kBottomIntakeMotorID = 18;
 
     public static final int kLaunchMotorLeaderID = 19;
     public static final int kLaunchMotorFollowerID = 20;
@@ -154,7 +154,7 @@ public final class Constants {
     public static final double acceptibleAmbiguity = 0.25;
 
     //If false, will not automatically update our pose
-    public static final boolean autoUpdatePose = true;
+    public static final boolean autoUpdatePose = false;
   }
 
   public static final class PoseConstants

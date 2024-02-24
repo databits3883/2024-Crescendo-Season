@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Commands.ManualArmControl;
 import frc.robot.Commands.RunIntakeSmart;
 import frc.robot.Commands.StaticLaunch;
 import frc.robot.Constants.OIConstants;
@@ -34,6 +35,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 
 
@@ -169,6 +171,7 @@ public class RobotContainer {
     
     NamedCommands.registerCommand("Smart Intake", new RunIntakeSmart(m_ScoringArm));
     NamedCommands.registerCommand("Near Static Launch", new StaticLaunch(m_ScoringArm, 150));
+    NamedCommands.registerCommand("Arm Pickup Pos", new InstantCommand(() -> m_ScoringArm.SetArmAngle(ScoringArmConstants.kArmPosPickup)));
 
   }
 
@@ -218,17 +221,20 @@ public class RobotContainer {
 
     if (!ROBOT_IN_USE.equals(Constants.ROBOT_LONGCLAW_CONFIG_LOCATION))
     {
-      new JoystickButton(m_copilotController, 8).whileTrue(new StartEndCommand(() ->m_ScoringArm.Intake() , () -> m_ScoringArm.StopIntake()));
-      new JoystickButton(m_copilotController, 9).whileTrue(new StartEndCommand(() ->m_ScoringArm.Outtake() , () -> m_ScoringArm.StopIntake()));    
-      new JoystickButton(m_copilotController, 5).onTrue(new InstantCommand(() -> m_ScoringArm.SetArmAngle(ScoringArmConstants.kArmPosClimbPrep)));
-      new JoystickButton(m_copilotController, 6).onTrue(new InstantCommand(() -> m_ScoringArm.Climb()));
-      new JoystickButton(m_copilotController, 3).onTrue(new InstantCommand(() -> m_ScoringArm.SetArmAngle(ScoringArmConstants.kArmPosNearStaticLaunch)));
-      new JoystickButton(m_copilotController, 2).onTrue(new InstantCommand(() -> m_ScoringArm.SetArmAngle(ScoringArmConstants.kArmPosFarStaticLaunch)));
-      new JoystickButton(m_copilotController, 1).onTrue(new InstantCommand(() -> m_ScoringArm.AmpPreparation()));
+      new JoystickButton(m_copilotController, 5).whileTrue(new RunIntakeSmart(m_ScoringArm));
+      new JoystickButton(m_copilotController, 6).whileTrue(new StartEndCommand(() ->m_ScoringArm.Outtake() , () -> m_ScoringArm.StopIntake()));    
+      new JoystickButton(m_copilotController, 10).onTrue(new InstantCommand(() -> m_ScoringArm.SetArmAngle(ScoringArmConstants.kArmPosClimbPrep)));
+      new JoystickButton(m_copilotController, 9).onTrue(new InstantCommand(() -> m_ScoringArm.Climb()));
+      new JoystickButton(m_copilotController, 2).onTrue(new InstantCommand(() -> m_ScoringArm.SetArmAngle(ScoringArmConstants.kArmPosNearStaticLaunch)));
+      new JoystickButton(m_copilotController, 1).onTrue(new InstantCommand(() -> m_ScoringArm.SetArmAngle(ScoringArmConstants.kArmPosFarStaticLaunch)));
+      new JoystickButton(m_copilotController, 3).whileTrue((new StartEndCommand(() -> m_ScoringArm.AmpPreparation(), () -> m_ScoringArm.CoastLaunchMotors())));
       new JoystickButton(m_copilotController, 4).onTrue(new InstantCommand(() -> m_ScoringArm.SetArmAngle(ScoringArmConstants.kArmPosPickup)));
-      new JoystickButton(m_copilotController, 7).whileTrue(new StartEndCommand(() -> m_ScoringArm.Launch(), ()-> m_ScoringArm.StopIntake()));
-      new JoystickButton(m_copilotController, 10).whileTrue(new StartEndCommand(() -> m_ScoringArm.SetLaunchSpeed(250), () -> m_ScoringArm.CoastLaunchMotors()));
-      new JoystickButton(m_copilotController, 11).onTrue(new InstantCommand(()-> m_ScoringArm.SetArmAngleToSDBValue()));
+      new JoystickButton(m_copilotController, 7).whileTrue(new StartEndCommand(() -> m_ScoringArm.SetLaunchSpeed(250), () -> m_ScoringArm.CoastLaunchMotors()));
+      new Trigger(() -> (m_copilotController.getRawAxis(2) > 0.5)).whileTrue(new StartEndCommand(() -> m_ScoringArm.Launch(), ()-> m_ScoringArm.StopIntake()));//
+      new Trigger(() -> (m_copilotController.getRawAxis(3) > 0.5)).whileTrue(new ManualArmControl(m_ScoringArm, ()-> ((( -m_copilotController.getRawAxis(5)+1)/2) * 180 ) ) ) ;
+
+      
+      //new JoystickButton(m_copilotController, 11).onTrue(new InstantCommand(()-> m_ScoringArm.SetArmAngleToSDBValue()));
       //new JoystickButton(m_copilotController, 7).onTrue(new StaticLaunch(m_ScoringArm));
 
       // new JoystickButton(m_driverController, 3).onTrue(new InstantCommand( ()-> m_ScoringArm.LatchClimb() ) );

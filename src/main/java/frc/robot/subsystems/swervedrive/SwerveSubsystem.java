@@ -168,7 +168,9 @@ public class SwerveSubsystem extends SubsystemBase {
 
     if (setOdomToStart) {
       // Get the initial pose with alliance switching
-      Pose2d initialPose = convertToRedSide(path.getPreviewStartingHolonomicPose());
+      Pose2d initialPose = path.getPreviewStartingHolonomicPose();
+      //Pose2d initialPose = convertToRedSide(path.getPreviewStartingHolonomicPose()); No longer needed Pathplanner handles it
+
       resetOdometry(initialPose);
     }
  
@@ -604,9 +606,9 @@ public class SwerveSubsystem extends SubsystemBase {
     Optional<DriverStation.Alliance> m_alliance = DriverStation.getAlliance();
     boolean isRedAlliance = (DriverStation.getAlliance().isPresent() && (m_alliance.get() == Alliance.Red));
 
-    if (isRedAlliance) {
-      return new Pose2d((Constants.FIELD_WIDTH - pose.getX()), pose.getY(),
-          pose.getRotation().plus(Rotation2d.fromDegrees(180)));
+     if (isRedAlliance) {
+       return new Pose2d((Constants.FIELD_WIDTH - pose.getX()), pose.getY(),
+           pose.getRotation().plus(Rotation2d.fromDegrees(180)));
     }
     return pose;
   }

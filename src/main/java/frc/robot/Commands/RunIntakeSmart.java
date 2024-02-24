@@ -13,7 +13,8 @@ public class RunIntakeSmart extends Command {
 
   public ScoringArm m_ScoringArm;
   public Timer stopDelayTimer;
-  public boolean timerStarted = false;
+  public boolean sensorTriggered = false;
+  
 
   /** Creates a new RunIntakeSmart. */
   public RunIntakeSmart(ScoringArm arm) {
@@ -28,15 +29,17 @@ public class RunIntakeSmart extends Command {
     m_ScoringArm.Intake();
     stopDelayTimer.reset();
     stopDelayTimer.stop();
-    timerStarted = false;
+    sensorTriggered = false;
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
     m_ScoringArm.Intake();
+    
+    
 
-    if (!timerStarted && m_ScoringArm.IntakeSensorBlocked()) {
+    if (!sensorTriggered && m_ScoringArm.IntakeSensorBlocked()) {
       stopDelayTimer.start();
     }
   }
@@ -50,12 +53,19 @@ public class RunIntakeSmart extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
+
+    if (m_ScoringArm.IntakeSensorBlocked()) {
+      sensorTriggered = true;
+    }
+
     if (ScoringArmConstants.kUseSquished) {
       return stopDelayTimer.hasElapsed(1);
     }
     else{
       return m_ScoringArm.IntakeSensorBlocked();
     }
+
+    
     
   }
 }

@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.39,
-      "y": 5.54
+      "x": 0.6766573533147066,
+      "y": 6.632738356385804
     },
-    "rotation": 0.0
+    "rotation": 60.0
   },
   "command": {
     "type": "sequential",
@@ -14,7 +14,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "GoalTwo"
+            "pathName": "DefensePrep"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "MidDefense"
           }
         }
       ]

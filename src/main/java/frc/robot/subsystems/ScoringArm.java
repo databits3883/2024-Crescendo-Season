@@ -54,7 +54,7 @@ public class ScoringArm extends SubsystemBase {
   public AbsoluteEncoder absArmAngleEncoder;
   public PIDController anglePIDController = new PIDController(ScoringArmConstants.kAngleP, ScoringArmConstants.kAngleI, ScoringArmConstants.kAngleD);
   private boolean armControlEnabled = false;
-
+  private boolean outakeToSensor = false;
   
 
   /** Creates a new ScoringArm. */
@@ -83,8 +83,8 @@ public class ScoringArm extends SubsystemBase {
     topIntakeMotor = new CANSparkMax(ScoringArmConstants.kTopIntakeMotorID, MotorType.kBrushless);
     bottomIntakeMotor = new CANSparkMax(ScoringArmConstants.kBottomIntakeMotorID, MotorType.kBrushless);
 
-    topIntakeMotor.setInverted(true);
-    bottomIntakeMotor.setInverted(false);
+    topIntakeMotor.setInverted(false);
+    bottomIntakeMotor.setInverted(true);
 
     topIntakePIDController = topIntakeMotor.getPIDController();
     bottomIntakePIDController = bottomIntakeMotor.getPIDController();
@@ -117,6 +117,7 @@ public class ScoringArm extends SubsystemBase {
     launchSpeedFollowerEncoder.setVelocityConversionFactor(ScoringArmConstants.kLaunchVelConversionFactor);
     
     intakeSensor = topIntakeMotor.getForwardLimitSwitch(Type.kNormallyOpen);
+    
 
     absArmAngleEncoder = armAngleLeaderMotor.getAbsoluteEncoder(SparkAbsoluteEncoder.Type.kDutyCycle);
     absArmAngleEncoder.setPositionConversionFactor(360);
@@ -166,6 +167,7 @@ public class ScoringArm extends SubsystemBase {
 
     SetLaunchSpeed(0);//theoretical max of 622.9 meters per second
     EnableArmAngleControl(false); 
+    resetSetpoints();
   }
 
 
@@ -186,6 +188,18 @@ public class ScoringArm extends SubsystemBase {
     else{
       RunLaunchSpeedPIDControl();
     }
+
+    if(outakeToSensor){
+      if(IntakeSensorBlocked()){
+        
+        SetIntakeMotors(-0.1);
+     }
+    else {
+        outakeToSensor = false;
+        StopIntake();
+      }
+    }
+    
     
 
     
@@ -233,6 +247,7 @@ public class ScoringArm extends SubsystemBase {
   }
 
   public void SetLaunchSpeed(double launchRPM){
+    OutakeToSensor();
     launchSpeedSetpoint = launchRPM;
     launchCoastMode = false;
   }
@@ -250,12 +265,12 @@ public class ScoringArm extends SubsystemBase {
   public void Intake(){
     SetFlap(false);
     //SetIntakeSpeed(100);
-    SetIntakeMotors(1);
+    SetIntakeMotors(0.5);
   }
 
   public void Outtake(){
     //SetIntakeSpeed(-100);
-    SetIntakeMotors(-1);
+    SetIntakeMotors(-0.5);
   }
 
   public void SetIntakeSpeed(double speed){
@@ -265,10 +280,12 @@ public class ScoringArm extends SubsystemBase {
 
   public void SetIntakeMotors(double fraction){
     topIntakeMotor.set(fraction);
-    bottomIntakeMotor.set(fraction);
+    bottomIntakeMotor.set(fraction*(0.6));
   }
 
-
+  public void OutakeToSensor(){
+    outakeToSensor = true;
+  }
 
   public void Launch(){
     SetIntakeMotors(1.0);
@@ -281,7 +298,7 @@ public class ScoringArm extends SubsystemBase {
     SetLaunchSpeed(0);//theoretical max of 622.9 meters per second
     anglePIDController.setSetpoint(absArmAngleEncoder.getPosition());
     EnableArmAngleControl(false);
-
+    outakeToSensor = false;
   }
 
   public void SetFlap(boolean isOpen){
@@ -301,7 +318,6 @@ public void StopIntake() {
 
   public boolean atLaunchSetpoint() {
     boolean atSP = (Math.abs(launchSpeedSetpoint-launchSpeedLeaderEncoder.getVelocity()) < 10);
-    System.out.println("At sp "+ atSP);
     return atSP;
   }
 
@@ -329,7 +345,11 @@ public void StopIntake() {
 
 
   public boolean IntakeSensorBlocked() {
-    return intakeSensor.isPressed();
+    boolean pressed = intakeSensor.isPressed();
+    if (!pressed) {
+      outakeToSensor = false;
+    }
+    return pressed;
   }
 
   public void AmpPreparation () {
