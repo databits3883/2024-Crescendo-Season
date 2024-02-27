@@ -24,7 +24,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "GoalOne"
+                  "pathName": "ToNoteOne"
                 }
               },
               {
@@ -40,6 +40,12 @@
                 }
               }
             ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "ReturnGoalOne"
           }
         },
         {

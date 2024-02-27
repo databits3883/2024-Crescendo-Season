@@ -26,7 +26,7 @@ public class StaticLaunch extends Command {
   @Override
   public void initialize() {
     m_ScoringArm.SetArmAngle(ScoringArmConstants.kArmPosNearStaticLaunch);
-    m_ScoringArm.SetLaunchSpeed(launchSpeed);
+    m_ScoringArm.OutakeToSensor();
     timer.reset();
   }
 
@@ -44,14 +44,18 @@ public class StaticLaunch extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    boolean atSPs = m_ScoringArm.atLaunchSetpoint() && (m_ScoringArm.anglePIDController.getPositionError() < 5);
+    boolean atSPs = (m_ScoringArm.anglePIDController.getPositionError() < 5);
     if(atSPs){
       timer.start();
     }
-    if( timer.hasElapsed(0.5)){
+
+    if(timer.hasElapsed(1.0) && m_ScoringArm.atLaunchSetpoint()){
       m_ScoringArm.Launch();
     }
+    else if(timer.hasElapsed(0.5)){
+      m_ScoringArm.SetLaunchSpeed(launchSpeed);
+    }
 
-    return timer.hasElapsed(1);
+    return timer.hasElapsed(1.5);
   }
 }

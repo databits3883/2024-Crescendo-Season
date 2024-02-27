@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Commands.ManualArmControl;
+import frc.robot.Commands.OutakeNoteToLaunchPos;
 import frc.robot.Commands.RunIntakeSmart;
 import frc.robot.Commands.StaticLaunch;
 import frc.robot.Constants.OIConstants;
@@ -168,7 +169,7 @@ public class RobotContainer {
   }
 
   public void configureAutoNamedCommands(){
-    
+    NamedCommands.registerCommand("Outake Launch Prep", new OutakeNoteToLaunchPos(m_ScoringArm));
     NamedCommands.registerCommand("Smart Intake", new RunIntakeSmart(m_ScoringArm));
     NamedCommands.registerCommand("Near Static Launch", new StaticLaunch(m_ScoringArm, 250));
     NamedCommands.registerCommand("Arm Pickup Pos", new InstantCommand(() -> m_ScoringArm.SetArmAngle(ScoringArmConstants.kArmPosPickup)));
@@ -258,13 +259,13 @@ public class RobotContainer {
 
     //use the command selected in the choose, default is do nothing
     return m_autoChooser.getSelected();
-    //return drivebase.sysIdDriveMotorCommand();
+    //return drivebase.sysIdAngleMotorCommand();
   }
 
 /**
    * Set the initial pose of the robot based on pose selected in shuffleboard
    */
-   public void setInitialPose()
+  public void setInitialPose()
   {
     //Read robot position from pose selector
     int location = m_poseSelector.getSelected().intValue() - 1;

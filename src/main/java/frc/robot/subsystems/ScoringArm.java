@@ -322,6 +322,7 @@ public void StopIntake() {
   }
 
   public void UnlatchClimb(){
+    ChangeArmAngle(5);
     climbLockServo.set(0);
   }
 

@@ -30,7 +30,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "GoalOne"
+                  "pathName": "ReturnGoalOne"
                 }
               }
             ]
@@ -64,7 +64,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "GoalOne"
+            "pathName": "ReturnGoalOne"
           }
         },
         {
