@@ -43,9 +43,15 @@
           }
         },
         {
+          "type": "path",
+          "data": {
+            "pathName": "ReturnGoalOne"
+          }
+        },
+        {
           "type": "named",
           "data": {
-            "name": "Far Static Launch"
+            "name": "Near Static Launch"
           }
         }
       ]

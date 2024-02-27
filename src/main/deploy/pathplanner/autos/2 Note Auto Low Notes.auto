@@ -3,9 +3,9 @@
   "startingPose": {
     "position": {
       "x": 0.7,
-      "y": 6.69
+      "y": 4.38
     },
-    "rotation": 60.0
+    "rotation": -60.0
   },
   "command": {
     "type": "sequential",
@@ -22,30 +22,11 @@
           "data": {
             "commands": [
               {
-                "type": "named",
-                "data": {
-                  "name": "Smart Intake"
-                }
-              },
-              {
                 "type": "path",
                 "data": {
-                  "pathName": "ReturnGoalOne"
+                  "pathName": "GoalThree"
                 }
-              }
-            ]
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Near Static Launch"
-          }
-        },
-        {
-          "type": "parallel",
-          "data": {
-            "commands": [
+              },
               {
                 "type": "named",
                 "data": {
@@ -53,18 +34,12 @@
                 }
               },
               {
-                "type": "path",
+                "type": "named",
                 "data": {
-                  "pathName": "MidRingOne"
+                  "name": "Arm Pickup Pos"
                 }
               }
             ]
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "ReturnGoalOne"
           }
         },
         {
