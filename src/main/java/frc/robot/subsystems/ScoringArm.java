@@ -55,6 +55,7 @@ public class ScoringArm extends SubsystemBase {
   public PIDController anglePIDController = new PIDController(ScoringArmConstants.kAngleP, ScoringArmConstants.kAngleI, ScoringArmConstants.kAngleD);
   private boolean armControlEnabled = false;
   private boolean outakeToSensor = false;
+  private double sensorOutakeSpeed = 0.1;
   
 
   /** Creates a new ScoringArm. */
@@ -192,7 +193,7 @@ public class ScoringArm extends SubsystemBase {
     if(outakeToSensor){
       if(IntakeSensorBlocked()){
         
-        SetIntakeMotors(-0.1);
+        SetIntakeMotors(-1 * sensorOutakeSpeed);
      }
     else {
         outakeToSensor = false;
@@ -247,7 +248,7 @@ public class ScoringArm extends SubsystemBase {
   }
 
   public void SetLaunchSpeed(double launchRPM){
-    OutakeToSensor();
+    OutakeToSensorSlow();
     launchSpeedSetpoint = launchRPM;
     launchCoastMode = false;
   }
@@ -283,8 +284,14 @@ public class ScoringArm extends SubsystemBase {
     bottomIntakeMotor.set(fraction*(0.6));
   }
 
-  public void OutakeToSensor(){
+  public void OutakeToSensorSlow(){
     outakeToSensor = true;
+    sensorOutakeSpeed = 0.1;
+  }
+
+  public void OutakeToSensorFast(){
+    outakeToSensor = true;
+    sensorOutakeSpeed = 0.3;
   }
 
   public void Launch(){

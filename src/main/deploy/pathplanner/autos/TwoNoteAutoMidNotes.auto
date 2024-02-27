@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.7,
-      "y": 6.69
+      "x": 1.39,
+      "y": 5.54
     },
-    "rotation": 60.0
+    "rotation": 0.0
   },
   "command": {
     "type": "sequential",
@@ -18,25 +18,25 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "Arm Pickup Pos"
+          }
+        },
+        {
           "type": "parallel",
           "data": {
             "commands": [
               {
-                "type": "path",
-                "data": {
-                  "pathName": "ToNoteOne"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Arm Pickup Pos"
-                }
-              },
-              {
                 "type": "named",
                 "data": {
                   "name": "Smart Intake"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "GoalTwo"
                 }
               }
             ]
@@ -45,7 +45,7 @@
         {
           "type": "named",
           "data": {
-            "name": "Far Static Launch"
+            "name": "Near Static Launch"
           }
         }
       ]

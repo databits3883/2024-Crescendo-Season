@@ -171,7 +171,8 @@ public class RobotContainer {
   public void configureAutoNamedCommands(){
     NamedCommands.registerCommand("Outake Launch Prep", new OutakeNoteToLaunchPos(m_ScoringArm));
     NamedCommands.registerCommand("Smart Intake", new RunIntakeSmart(m_ScoringArm));
-    NamedCommands.registerCommand("Near Static Launch", new StaticLaunch(m_ScoringArm, 250));
+    NamedCommands.registerCommand("Near Static Launch", new StaticLaunch(m_ScoringArm, ScoringArmConstants.kArmPosNearStaticLaunch));
+    NamedCommands.registerCommand("Far Static Launch", new StaticLaunch(m_ScoringArm, 30));
     NamedCommands.registerCommand("Arm Pickup Pos", new InstantCommand(() -> m_ScoringArm.SetArmAngle(ScoringArmConstants.kArmPosPickup)));
 
   }

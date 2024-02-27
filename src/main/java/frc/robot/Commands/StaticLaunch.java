@@ -12,21 +12,23 @@ import frc.robot.subsystems.ScoringArm;
 public class StaticLaunch extends Command {
   ScoringArm m_ScoringArm;
   double launchSpeed;
+  double launchAngle;
   Timer timer;
 
   /** Creates a new StaticLaunch. */
-  public StaticLaunch(ScoringArm arm,double speed) {
+  public StaticLaunch(ScoringArm arm,double angle) {
     // Use addRequirements() here to declare subsystem dependencies.
     m_ScoringArm = arm;
-    launchSpeed = speed;
+    launchAngle = angle;
+    launchSpeed = 250;
     timer = new Timer();
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_ScoringArm.SetArmAngle(ScoringArmConstants.kArmPosNearStaticLaunch);
-    m_ScoringArm.OutakeToSensor();
+    m_ScoringArm.SetArmAngle(launchAngle);
+    m_ScoringArm.OutakeToSensorFast();
     timer.reset();
   }
 
