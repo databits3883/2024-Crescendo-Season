@@ -14,6 +14,7 @@ public class StaticLaunch extends Command {
   double launchSpeed;
   double launchAngle;
   Timer timer;
+  boolean wasAtSP = false;
 
   /** Creates a new StaticLaunch. */
   public StaticLaunch(ScoringArm arm,double angle) {
@@ -30,6 +31,8 @@ public class StaticLaunch extends Command {
     m_ScoringArm.SetArmAngle(launchAngle);
     m_ScoringArm.OutakeToSensorFast();
     timer.reset();
+    timer.start();
+    wasAtSP = false;
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -46,18 +49,32 @@ public class StaticLaunch extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
+    
     boolean atSPs = (m_ScoringArm.anglePIDController.getPositionError() < 5);
     if(atSPs){
-      timer.start();
+      if(!wasAtSP){
+        wasAtSP = true;
+        timer.reset();
+        timer.start();
+      }
+      
+      if(timer.hasElapsed(1.0) && m_ScoringArm.atLaunchSetpoint()){
+        m_ScoringArm.Launch();
+      }
+      else if(timer.hasElapsed(0.5)){
+        m_ScoringArm.SetLaunchSpeed(launchSpeed);
+      }
     }
-
-    if(timer.hasElapsed(1.0) && m_ScoringArm.atLaunchSetpoint()){
-      m_ScoringArm.Launch();
+    else{
+      //check timer if at 1.5
+      //spit out
     }
-    else if(timer.hasElapsed(0.5)){
-      m_ScoringArm.SetLaunchSpeed(launchSpeed);
-    }
+    
 
     return timer.hasElapsed(1.5);
+    
   }
+
+    
+  
 }

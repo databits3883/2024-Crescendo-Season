@@ -14,12 +14,14 @@ public class RunIntakeSmart extends Command {
   public ScoringArm m_ScoringArm;
   public Timer stopDelayTimer;
   public boolean sensorTriggered = false;
+  public boolean launchPrepAfter = false;
   
 
   /** Creates a new RunIntakeSmart. */
-  public RunIntakeSmart(ScoringArm arm) {
+  public RunIntakeSmart(ScoringArm arm, boolean launchPos) {
     stopDelayTimer = new Timer();
     m_ScoringArm = arm;
+    launchPrepAfter = launchPos;
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
@@ -29,6 +31,7 @@ public class RunIntakeSmart extends Command {
     m_ScoringArm.Intake();
     stopDelayTimer.reset();
     stopDelayTimer.stop();
+
     sensorTriggered = false;
   }
 
@@ -48,6 +51,9 @@ public class RunIntakeSmart extends Command {
   @Override
   public void end(boolean interrupted) {
     m_ScoringArm.StopIntake();
+    if(launchPrepAfter){
+      m_ScoringArm.SetArmAngle(ScoringArmConstants.kArmPosNearStaticLaunch);
+    }
   }
 
   // Returns true when the command should end.

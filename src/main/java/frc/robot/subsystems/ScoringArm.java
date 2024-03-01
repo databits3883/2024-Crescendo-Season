@@ -132,7 +132,7 @@ public class ScoringArm extends SubsystemBase {
     anglePIDController.setTolerance(ScoringArmConstants.kAnglePosTolerance,ScoringArmConstants.kAngleVelTolerance);
     anglePIDController.setSetpoint(absArmAngleEncoder.getPosition());
     anglePIDController.enableContinuousInput(0, 360);
-    anglePIDController.setIntegratorRange(-0.05, 0.05);
+    anglePIDController.setIntegratorRange(-1 * ScoringArmConstants.kIRange, ScoringArmConstants.kIRange);//0.05
     
 
     launchSpeedLeaderPIDController = launchMotorLeader.getPIDController();

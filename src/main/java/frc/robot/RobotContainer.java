@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.WidgetType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Commands.ManualArmControl;
@@ -151,12 +152,14 @@ public class RobotContainer {
 
     //Set default to robot on field position
     SmartDashboard.putData("Auto Chooser", m_autoChooser);
+    Shuffleboard.getTab("Game HUD").add(m_autoChooser).withSize(3, 1);
     SmartDashboard.putNumber("ArmAngleSlider", 10);
   }
 
   public void robotInit(){
     Shuffleboard.getTab("Game HUD").addDouble("Robot Pitch", (()-> drivebase.getPitch().getDegrees())).withWidget(BuiltInWidgets.kDial);
     Shuffleboard.getTab("Game HUD").addDouble("Arm Angle", m_ScoringArm::GetArmAngle);
+    Shuffleboard.getTab("Game HUD").addBoolean("Has Note", m_ScoringArm::IntakeSensorBlocked).withSize(6, 6).withWidget(BuiltInWidgets.kBooleanBox);
     //Shuffleboard.getTab("Game HUD").add(autoChooser).withSize(2,1);
     
 
@@ -170,9 +173,9 @@ public class RobotContainer {
 
   public void configureAutoNamedCommands(){
     NamedCommands.registerCommand("Outake Launch Prep", new OutakeNoteToLaunchPos(m_ScoringArm));
-    NamedCommands.registerCommand("Smart Intake", new RunIntakeSmart(m_ScoringArm));
+    NamedCommands.registerCommand("Smart Intake", new RunIntakeSmart(m_ScoringArm,true));
     NamedCommands.registerCommand("Near Static Launch", new StaticLaunch(m_ScoringArm, ScoringArmConstants.kArmPosNearStaticLaunch));
-    NamedCommands.registerCommand("Far Static Launch", new StaticLaunch(m_ScoringArm, 30));
+    NamedCommands.registerCommand("Far Static Launch", new StaticLaunch(m_ScoringArm, 44.0));
     NamedCommands.registerCommand("Arm Pickup Pos", new InstantCommand(() -> m_ScoringArm.SetArmAngle(ScoringArmConstants.kArmPosPickup)));
 
   }
@@ -223,7 +226,10 @@ public class RobotContainer {
 
     if (!ROBOT_IN_USE.equals(Constants.ROBOT_LONGCLAW_CONFIG_LOCATION))
     {
-      new JoystickButton(m_copilotController, 5).whileTrue(new RunIntakeSmart(m_ScoringArm));
+      new Trigger(()-> m_driverController.getTrigger()).whileTrue(new StartEndCommand(() -> m_ScoringArm.Launch(), ()-> m_ScoringArm.StopIntake()));//
+      
+
+      new JoystickButton(m_copilotController, 5).whileTrue(new RunIntakeSmart(m_ScoringArm,false));
       new JoystickButton(m_copilotController, 6).whileTrue(new StartEndCommand(() ->m_ScoringArm.Outtake() , () -> m_ScoringArm.StopIntake()));    
       new JoystickButton(m_copilotController, 10).onTrue(new InstantCommand(() -> m_ScoringArm.SetArmAngle(ScoringArmConstants.kArmPosClimbPrep)));
       new JoystickButton(m_copilotController, 9).onTrue(new InstantCommand(() -> m_ScoringArm.Climb()));
@@ -231,10 +237,9 @@ public class RobotContainer {
       new JoystickButton(m_copilotController, 1).onTrue(new InstantCommand(() -> m_ScoringArm.SetArmAngle(ScoringArmConstants.kArmPosFarStaticLaunch)));
       new JoystickButton(m_copilotController, 3).whileTrue((new StartEndCommand(() -> m_ScoringArm.AmpPreparation(), () -> m_ScoringArm.CoastLaunchMotors())));
       new JoystickButton(m_copilotController, 4).onTrue(new InstantCommand(() -> m_ScoringArm.SetArmAngle(ScoringArmConstants.kArmPosPickup)));
-      new JoystickButton(m_copilotController, 7).whileTrue(new StartEndCommand(() -> m_ScoringArm.SetLaunchSpeed(250), () -> m_ScoringArm.CoastLaunchMotors()));
+      new Trigger(() -> (m_copilotController.getRawAxis(3) > 0.5)).whileTrue(new StartEndCommand(() -> m_ScoringArm.SetLaunchSpeed(250), () -> m_ScoringArm.CoastLaunchMotors()));
       new Trigger(() -> (m_copilotController.getRawAxis(2) > 0.5)).whileTrue(new StartEndCommand(() -> m_ScoringArm.Launch(), ()-> m_ScoringArm.StopIntake()));//
-      new Trigger(() -> (m_copilotController.getRawAxis(3) > 0.5)).whileTrue(new ManualArmControl(m_ScoringArm, ()-> ((( -m_copilotController.getRawAxis(5)+1)/2) * 180 ) ) ) ;
-
+      new JoystickButton(m_copilotController, 8).whileTrue(new ManualArmControl(m_ScoringArm, ()-> ((( -m_copilotController.getRawAxis(5)+1)/2) * 180 ) ) ) ;
       
       //new JoystickButton(m_copilotController, 11).onTrue(new InstantCommand(()-> m_ScoringArm.SetArmAngleToSDBValue()));
       //new JoystickButton(m_copilotController, 7).onTrue(new StaticLaunch(m_ScoringArm));

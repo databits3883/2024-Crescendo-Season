@@ -1,0 +1,87 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 1.39,
+      "y": 5.54
+    },
+    "rotation": 0.0
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "Near Static Launch"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Arm Pickup Pos"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "Smart Intake"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "GoalTwo"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Near Static Launch"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Arm Pickup Pos"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "Smart Intake"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "MidMidNoteGoalTwo"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Near Static Launch"
+          }
+        }
+      ]
+    }
+  },
+  "folder": null,
+  "choreoAuto": false
+}

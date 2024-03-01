@@ -24,7 +24,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "ReturnGoalOne"
+                  "pathName": "ToNoteOne"
                 }
               },
               {
@@ -32,8 +32,20 @@
                 "data": {
                   "name": "Smart Intake"
                 }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Arm Pickup Pos"
+                }
               }
             ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "ReturnGoalOne"
           }
         },
         {

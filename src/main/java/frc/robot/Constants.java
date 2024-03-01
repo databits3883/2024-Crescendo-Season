@@ -40,6 +40,10 @@ public final class Constants {
     public static final double kAngleP = 0.003;
     public static final double kAngleI = 0.00325;
     public static final double kAngleD = 0;
+    public static final double kIRange = 0.05;
+    // public static final double kAngleP = 0.005;
+    // public static final double kAngleI = 0.00325;
+    // public static final double kAngleD = 0.00015;
     public static final double kAngleVelTolerance = 0;
     public static final double kAnglePosTolerance = 0;
     public static final double kAngleIZone = Double.POSITIVE_INFINITY;
@@ -74,12 +78,12 @@ public final class Constants {
 
     public static final double kSpeakerHeight = 2.0;
 
-    public static final double kArmPosNearStaticLaunch = 20;
+    public static final double kArmPosNearStaticLaunch = 23;
     public static final double kArmPosFarStaticLaunch = 50;
     public static final double kArmPosPickup = -1;
     public static final double kArmPosAmp = 140;
     public static final double kArmPosClimbPrep = 140;
-    public static final double kArmPosClimbFinish = 0;
+    public static final double kArmPosClimbFinish = -3;
 
     
 
