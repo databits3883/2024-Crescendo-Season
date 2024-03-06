@@ -124,8 +124,8 @@ public class RobotContainer {
 
     if (Constants.VisionConstants.hasCamera)
     {
-      RobotContainer.setRobotVision(new VisionSubsystem(Constants.VisionConstants.LCcameraY, Constants.VisionConstants.LCcameraX, Constants.VisionConstants.LCcameraZ, 
-                                    Constants.VisionConstants.LCcameraRotation, Constants.VisionConstants.cameraName));
+      RobotContainer.setRobotVision(new VisionSubsystem(Constants.VisionConstants.SScameraY, Constants.VisionConstants.SScameraX, Constants.VisionConstants.SScameraZ, 
+                                    Constants.VisionConstants.SScameraRotation, Constants.VisionConstants.cameraName));
     } 
 
     // Configure the button bindings
