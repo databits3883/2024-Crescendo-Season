@@ -14,6 +14,12 @@
         {
           "type": "named",
           "data": {
+            "name": "Outake Launch Prep"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
             "name": "Near Static Launch"
           }
         },
