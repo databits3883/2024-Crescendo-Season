@@ -154,13 +154,14 @@ public final class Constants {
     //Camera name in network tables
     public static final String cameraName = "Camera_Module_v1";
     //Position of the camera from center of the robot in meters, This is measurements from LongClaw
-    public static final double LCcameraZ = Units.inchesToMeters(11.5);
-    public static final double LCcameraX = Units.inchesToMeters(16.5);
-    public static final double LCcameraY = Units.inchesToMeters(7);
-    public static final double LCcameraZYaw = -20; //degress, yaw
-    public static final double LCcameraYPitch = +30; // pitch
-    public static final double LCcameraXRoll = 0; // roll
-    public static final Rotation3d LCcameraRotation = new Rotation3d(LCcameraXRoll, LCcameraYPitch, LCcameraZYaw);
+    public static final double SScameraZ = Units.inchesToMeters(11);
+    public static final double SScameraX = Units.inchesToMeters(15);
+    public static final double SScameraY = Units.inchesToMeters(9.75);
+    public static final double SScameraZYaw = -20; //degress, yaw
+    public static final double SScameraYPitch = +15; // pitch
+    public static final double SScameraXRoll = 0; // roll
+
+    public static final Rotation3d SScameraRotation = new Rotation3d(SScameraXRoll, SScameraYPitch, SScameraZYaw);
     //Pipeline name in network tables
     public static final String pipelineName = "apriltag";
 
