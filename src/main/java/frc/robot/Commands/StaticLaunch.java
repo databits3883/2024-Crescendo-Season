@@ -32,7 +32,7 @@ public class StaticLaunch extends Command {
   public void initialize() {
     m_ScoringArm.SetArmAngle(launchAngle);
     m_ScoringArm.SetLaunchSpeed(launchSpeed);
-    //m_ScoringArm.OutakeToSensorSlow();
+    m_ScoringArm.OutakeToSensorSlow();
     
     timeoutTimer.reset();
     timeoutTimer.start();
@@ -65,11 +65,11 @@ public class StaticLaunch extends Command {
       launchTimer.start();
     }
 
-    if(launchTimer.hasElapsed(0.5) && m_ScoringArm.atLaunchSetpoint()){
+    if(launchTimer.hasElapsed(0.5) && m_ScoringArm.atLaunchSetpoint() && !m_ScoringArm.IntakeSensorBlocked()){
       m_ScoringArm.Launch();
     }
 
-    return launchTimer.hasElapsed(3);
+    return launchTimer.hasElapsed(3) && !m_ScoringArm.IntakeSensorBlocked();
     
     
   }

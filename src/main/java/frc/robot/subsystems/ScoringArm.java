@@ -56,7 +56,7 @@ public class ScoringArm extends SubsystemBase {
   private boolean armControlEnabled = false;
   private boolean outakeToSensor = false;
   private double sensorOutakeSpeed = 0.1;
-  
+  private boolean lastIntakeSensorReading = false;
 
   /** Creates a new ScoringArm. */
   public ScoringArm() {
@@ -252,6 +252,12 @@ public class ScoringArm extends SubsystemBase {
   }
 
   public void SetLaunchSpeed(double launchRPM){
+    
+    launchSpeedSetpoint = launchRPM;
+    launchCoastMode = false;
+  }
+
+  public void SetLaunchSpeedWithOutake(double launchRPM){
     OutakeToSensorSlow();
     launchSpeedSetpoint = launchRPM;
     launchCoastMode = false;
@@ -268,7 +274,7 @@ public class ScoringArm extends SubsystemBase {
   }
 
   public void SuperLaunchSpeed(){
-    SetLaunchSpeed(5676);
+    SetLaunchSpeedWithOutake(5676);
   }
 
   public void Intake(){
@@ -297,10 +303,10 @@ public class ScoringArm extends SubsystemBase {
     sensorOutakeSpeed = 0.1;
   }
 
-  public void OutakeToSensorFast(){
-    outakeToSensor = true;
-    sensorOutakeSpeed = 0.3;
-  }
+  // public void OutakeToSensorFast(){
+  //   outakeToSensor = true;
+  //   sensorOutakeSpeed = 0.3;
+  // }
 
   public void Launch(){
     SetIntakeMotors(1.0);
@@ -332,7 +338,7 @@ public void StopIntake() {
 }
 
   public boolean atLaunchSetpoint() {
-    boolean atSP = (Math.abs(launchSpeedSetpoint-launchSpeedLeaderEncoder.getVelocity()) < 5);
+    boolean atSP = (Math.abs(launchSpeedSetpoint-launchSpeedLeaderEncoder.getVelocity()) < 20);
     return atSP;
   }
 
@@ -365,12 +371,14 @@ public void StopIntake() {
     if (!pressed) {
       outakeToSensor = false;
     }
-    return pressed;
+    boolean errorReduced = lastIntakeSensorReading && pressed;
+    lastIntakeSensorReading = pressed;
+    return errorReduced;
   }
 
   public void AmpPreparation () {
     SetArmAngle(ScoringArmConstants.kArmPosAmp);
-    SetLaunchSpeed(150);
+    SetLaunchSpeedWithOutake(150);
   }
 
   public void EnableDownAnglePID(){

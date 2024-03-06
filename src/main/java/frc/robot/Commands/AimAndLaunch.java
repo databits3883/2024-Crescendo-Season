@@ -26,7 +26,7 @@ public class AimAndLaunch extends Command {
 
     double angle = Math.atan(ScoringArmConstants.kSpeakerHeight/distanceMeters);
     double velocity = Math.sqrt((19.6*ScoringArmConstants.kSpeakerHeight)/(2*Math.sin(angle)));
-    scoringArm.SetLaunchSpeed(velocity);
+    scoringArm.SetLaunchSpeedWithOutake(velocity);
     
     
     

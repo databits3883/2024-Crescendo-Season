@@ -175,7 +175,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("Outake Launch Prep", new OutakeNoteToLaunchPos(m_ScoringArm));
     NamedCommands.registerCommand("Smart Intake", new RunIntakeSmart(m_ScoringArm,true));
     NamedCommands.registerCommand("Near Static Launch", new StaticLaunch(m_ScoringArm, ScoringArmConstants.kArmPosNearStaticLaunch, 250));
-    NamedCommands.registerCommand("Far Static Launch", new StaticLaunch(m_ScoringArm, 44.0 , 300));
+    NamedCommands.registerCommand("Far Static Launch", new StaticLaunch(m_ScoringArm, 46.0 , 250));
     NamedCommands.registerCommand("Arm Pickup Pos", new InstantCommand(() -> m_ScoringArm.SetArmAngle(ScoringArmConstants.kArmPosPickup)));
 
   }
@@ -237,7 +237,7 @@ public class RobotContainer {
       new JoystickButton(m_copilotController, 1).onTrue(new InstantCommand(() -> m_ScoringArm.SetArmAngle(ScoringArmConstants.kArmPosFarStaticLaunch)));
       new JoystickButton(m_copilotController, 3).whileTrue((new StartEndCommand(() -> m_ScoringArm.AmpPreparation(), () -> m_ScoringArm.CoastLaunchMotors())));
       new JoystickButton(m_copilotController, 4).onTrue(new InstantCommand(() -> m_ScoringArm.SetArmAngle(ScoringArmConstants.kArmPosPickup)));
-      new Trigger(() -> (m_copilotController.getRawAxis(3) > 0.5)).whileTrue(new StartEndCommand(() -> m_ScoringArm.SetLaunchSpeed(250), () -> m_ScoringArm.CoastLaunchMotors()));
+      new Trigger(() -> (m_copilotController.getRawAxis(3) > 0.5)).whileTrue(new StartEndCommand(() -> m_ScoringArm.SetLaunchSpeedWithOutake(250), () -> m_ScoringArm.CoastLaunchMotors()));
       new Trigger(() -> (m_copilotController.getRawAxis(2) > 0.5)).whileTrue(new StartEndCommand(() -> m_ScoringArm.Launch(), ()-> m_ScoringArm.StopIntake()));//
       new JoystickButton(m_copilotController, 8).whileTrue(new ManualArmControl(m_ScoringArm, ()-> ((( -m_copilotController.getRawAxis(5)+1)/2) * 180 ) ) ) ;
       new JoystickButton(m_copilotController,7).whileTrue(new StartEndCommand(() -> m_ScoringArm.SuperLaunchSpeed(), () -> m_ScoringArm.CoastLaunchMotors()));

@@ -14,49 +14,6 @@
         {
           "type": "named",
           "data": {
-            "name": "Outake Launch Prep"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Near Static Launch"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Arm Pickup Pos"
-          }
-        },
-        {
-          "type": "parallel",
-          "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "Smart Intake"
-                }
-              },
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "GoalTwo"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Near Static Launch"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
             "name": "Arm Pickup Pos"
           }
         },
