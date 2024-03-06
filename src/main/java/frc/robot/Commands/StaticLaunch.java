@@ -13,7 +13,8 @@ public class StaticLaunch extends Command {
   ScoringArm m_ScoringArm;
   double launchSpeed;
   double launchAngle;
-  Timer timer;
+  Timer timeoutTimer;
+  Timer launchTimer;
   boolean wasAtSP = false;
 
   /** Creates a new StaticLaunch. */
@@ -22,16 +23,20 @@ public class StaticLaunch extends Command {
     m_ScoringArm = arm;
     launchAngle = angle;
     launchSpeed = speed;
-    timer = new Timer();
+    timeoutTimer = new Timer();
+    launchTimer = new Timer();
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
     m_ScoringArm.SetArmAngle(launchAngle);
-    m_ScoringArm.OutakeToSensorFast();
-    timer.reset();
-    timer.start();
+    m_ScoringArm.SetLaunchSpeed(launchSpeed);
+    //m_ScoringArm.OutakeToSensorSlow();
+    
+    timeoutTimer.reset();
+    timeoutTimer.start();
+    launchTimer.reset();
     wasAtSP = false;
   }
 
@@ -43,35 +48,29 @@ public class StaticLaunch extends Command {
   @Override
   public void end(boolean interrupted) {
     m_ScoringArm.CoastLaunchMotors();
-
+    m_ScoringArm.StopIntake();
+    System.out.println("launch time: "+ launchTimer.get());
+    launchTimer.reset();
+    
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
     
-    boolean atSPs = (m_ScoringArm.anglePIDController.getPositionError() < 5);
-    if(atSPs){
-      if(!wasAtSP){
-        wasAtSP = true;
-        timer.reset();
-        timer.start();
-      }
-      
-      if(timer.hasElapsed(1.0)){
-        m_ScoringArm.Launch();
-      }
-      else if(timer.hasElapsed(0.5)){
-        m_ScoringArm.SetLaunchSpeed(launchSpeed);
-      }
-    }
-    else{
-      //check timer if at 1.5
-      //spit out
-    }
-    
+    boolean atArmSP = (m_ScoringArm.anglePIDController.getPositionError() < 5);
 
-    return timer.hasElapsed(1.5);
+    if((atArmSP || timeoutTimer.hasElapsed(3)) && launchTimer.get() <= 0.1 && !m_ScoringArm.IntakeSensorBlocked()){
+      //m_ScoringArm.SetLaunchSpeed(launchSpeed);
+      launchTimer.start();
+    }
+
+    if(launchTimer.hasElapsed(0.5) && m_ScoringArm.atLaunchSetpoint()){
+      m_ScoringArm.Launch();
+    }
+
+    return launchTimer.hasElapsed(3);
+    
     
   }
 

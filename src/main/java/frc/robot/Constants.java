@@ -42,13 +42,13 @@ public final class Constants {
     // public static final double kUpAngleD = 0;
     // public static final double kUpIRange = 0.05;
 
-    public static final double kUpAngleP = 0.003;
-    public static final double kUpAngleI = 0.000325;
+    public static final double kUpAngleP = 0.0035;
+    public static final double kUpAngleI = 0.006;
     public static final double kUpAngleD = 0;
     public static final double kUpIRange = 0.05;
 
-    public static final double kDownAngleP = 0.002;
-    public static final double kDownAngleI = 0.003;
+    public static final double kDownAngleP = 0.003;
+    public static final double kDownAngleI = 0.002;
     public static final double kDownAngleD = 0.0;
     public static final double kDownIRange = 0.05;
     // public static final double kAngleP = 0.005;

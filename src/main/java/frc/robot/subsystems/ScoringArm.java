@@ -224,7 +224,7 @@ public class ScoringArm extends SubsystemBase {
 
   public void SetArmAngle(double armDeg){
     EnableArmAngleControl(true);
-    if (armDeg > absArmAngleEncoder.getPosition()) {
+    if (armDeg >= anglePIDController.getSetpoint()) {
       EnableUpAnglePID();
     }
     else{
@@ -332,7 +332,7 @@ public void StopIntake() {
 }
 
   public boolean atLaunchSetpoint() {
-    boolean atSP = (Math.abs(launchSpeedSetpoint-launchSpeedLeaderEncoder.getVelocity()) < 10);
+    boolean atSP = (Math.abs(launchSpeedSetpoint-launchSpeedLeaderEncoder.getVelocity()) < 5);
     return atSP;
   }
 
