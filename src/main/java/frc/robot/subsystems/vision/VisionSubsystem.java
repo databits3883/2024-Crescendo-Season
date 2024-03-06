@@ -116,6 +116,42 @@ public class VisionSubsystem  extends SubsystemBase {
 
    }
 
+   public Pose2d closestTargetDistance() {
+      //quick return if camera is not enabled
+      if (m_hasCameraEnabled == false) return null;      
+
+      Pose2d visionEstimatedRobotPose = null;
+      PhotonTrackedTarget target = null;
+      PhotonPipelineResult result = this.camera.getLatestResult();
+      boolean hasTargets = result.hasTargets();
+
+      if (hasTargets) {
+         target = result.getBestTarget();
+         //List<TargetCorner> corners = target.getMinAreaRectCorners();
+         //System.out.println("Vision: got target data: (yaw/pitch/area/skew) (" + yaw + "/" + pitch + "/" + area + "/" + skew + ")");
+         int targetID = target.getFiducialId();
+
+         Optional<Pose3d> aprilPoseOptional = aprilTagFieldLayout.getTagPose(targetID);
+         Pose3d appriltagPose3d = (aprilPoseOptional.isPresent() ? aprilPoseOptional.get() : null);
+         Pose2d appriltagPose = ((appriltagPose3d != null) ? appriltagPose3d.toPose2d() : null);
+
+         if (appriltagPose != null) {
+            Optional<EstimatedRobotPose> estimatedRobotPoseOp = getEstimatedGlobalPose();
+            Pose3d estimatedRobotPose = ((estimatedRobotPoseOp != null && estimatedRobotPoseOp.isPresent()) ? estimatedRobotPoseOp.get().estimatedPose : null);
+
+            if (estimatedRobotPose != null) {
+               visionEstimatedRobotPose = estimatedRobotPose.toPose2d(); 
+               double distanceToTarget = estimatedRobotPose.getTranslation().getDistance(appriltagPose3d.getTranslation());
+               System.out.println("Distance to target: " + distanceToTarget);
+            }
+         }
+      } else {
+         System.out.println("Vision: number of targets: 0");
+      }
+      return visionEstimatedRobotPose;
+
+   }
+
    public PhotonTrackedTarget getTarget() {
       //quick return if camera is not enabled
       if (m_hasCameraEnabled == false) return null;      
