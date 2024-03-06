@@ -47,6 +47,7 @@ public class VisionSubsystem  extends SubsystemBase {
 
       System.out.println("Vision: About to connect to camera");
       this.camera = new PhotonCamera(cameraName);
+      this.camera.setVersionCheckEnabled(false);
       System.out.println("Vision: got Camera: " + this.camera.getName());
       pipelineResult = new PhotonPipelineResult();
       
@@ -69,6 +70,7 @@ public class VisionSubsystem  extends SubsystemBase {
    }
 
    public Pose2d debugClosestTarget() {
+      System.out.println("calling vision debug");
       //quick return if camera is not enabled
       if (m_hasCameraEnabled == false) return null;      
 
@@ -103,6 +105,8 @@ public class VisionSubsystem  extends SubsystemBase {
             if (estimatedRobotPose != null) {
                visionEstimatedRobotPose = estimatedRobotPose.toPose2d();
                System.out.println("Estimated Robot Position X/Y/Rotate: " + visionEstimatedRobotPose.getX() + " / " + visionEstimatedRobotPose.getY() + "/" + visionEstimatedRobotPose.getRotation());  
+               double distanceToTarget = estimatedRobotPose.getTranslation().getDistance(appriltagPose3d.getTranslation());
+               System.out.println("Distance to target: " + distanceToTarget);
             }
          }
       } else {

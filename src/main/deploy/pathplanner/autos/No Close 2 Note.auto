@@ -22,15 +22,15 @@
           "data": {
             "commands": [
               {
-                "type": "named",
-                "data": {
-                  "name": "Arm Pickup Pos"
-                }
-              },
-              {
                 "type": "path",
                 "data": {
                   "pathName": "Low Note Reentry"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Arm Pickup Pos"
                 }
               },
               {

@@ -52,7 +52,7 @@ public class ScoringArm extends SubsystemBase {
   public CANSparkMax armAngleFollowerMotor3i;
 
   public AbsoluteEncoder absArmAngleEncoder;
-  public PIDController anglePIDController = new PIDController(ScoringArmConstants.kAngleP, ScoringArmConstants.kAngleI, ScoringArmConstants.kAngleD);
+  public PIDController anglePIDController = new PIDController(ScoringArmConstants.kUpAngleP, ScoringArmConstants.kUpAngleI, ScoringArmConstants.kUpAngleD);
   private boolean armControlEnabled = false;
   private boolean outakeToSensor = false;
   private double sensorOutakeSpeed = 0.1;
@@ -125,14 +125,10 @@ public class ScoringArm extends SubsystemBase {
     absArmAngleEncoder.setVelocityConversionFactor(360);//degrees per second
 
 
-    anglePIDController.setP(ScoringArmConstants.kAngleP);
-    anglePIDController.setI(ScoringArmConstants.kAngleI);
-    anglePIDController.setD(ScoringArmConstants.kAngleD);
     anglePIDController.setIZone(ScoringArmConstants.kAngleIZone);
     anglePIDController.setTolerance(ScoringArmConstants.kAnglePosTolerance,ScoringArmConstants.kAngleVelTolerance);
     anglePIDController.setSetpoint(absArmAngleEncoder.getPosition());
     anglePIDController.enableContinuousInput(0, 360);
-    anglePIDController.setIntegratorRange(-1 * ScoringArmConstants.kIRange, ScoringArmConstants.kIRange);//0.05
     
 
     launchSpeedLeaderPIDController = launchMotorLeader.getPIDController();
@@ -183,6 +179,8 @@ public class ScoringArm extends SubsystemBase {
       SetArmAngleMotors(0);
     }
 
+    
+
     if(launchCoastMode){
       CoastLaunchMotors();
     }
@@ -216,6 +214,7 @@ public class ScoringArm extends SubsystemBase {
     armControlEnabled = enabled;
   }
 
+
   public void SetArmAngleMotors(double fraction){
     armAngleLeaderMotor.set(fraction);
     armAngleFollowerMotor1i.set(fraction);
@@ -225,8 +224,13 @@ public class ScoringArm extends SubsystemBase {
 
   public void SetArmAngle(double armDeg){
     EnableArmAngleControl(true);
+    if (armDeg > absArmAngleEncoder.getPosition()) {
+      EnableUpAnglePID();
+    }
+    else{
+      EnableDownAnglePID();
+    }
     anglePIDController.setSetpoint(armDeg%360);
-    
   }
 
   public void ChangeArmAngle(double deg){
@@ -261,6 +265,10 @@ public class ScoringArm extends SubsystemBase {
     launchMotorLeader.set(0);
     launchMotorFollower.set(0);
     launchCoastMode = true;
+  }
+
+  public void SuperLaunchSpeed(){
+    SetLaunchSpeed(5676);
   }
 
   public void Intake(){
@@ -365,5 +373,19 @@ public void StopIntake() {
     SetLaunchSpeed(150);
   }
 
+  public void EnableDownAnglePID(){
+    anglePIDController.setP(ScoringArmConstants.kDownAngleP);
+    anglePIDController.setI(ScoringArmConstants.kDownAngleI);
+    anglePIDController.setD(ScoringArmConstants.kDownAngleD);
+    anglePIDController.setIntegratorRange(-1 * ScoringArmConstants.kDownIRange, ScoringArmConstants.kDownIRange);//0.05
+  }
+
+  public void EnableUpAnglePID(){
+    anglePIDController.setP(ScoringArmConstants.kUpAngleP);
+    anglePIDController.setI(ScoringArmConstants.kUpAngleI);
+    anglePIDController.setD(ScoringArmConstants.kUpAngleD);
+    anglePIDController.setIntegratorRange(-1 * ScoringArmConstants.kUpIRange, ScoringArmConstants.kUpIRange);//0.05
+
+  }
 
 }

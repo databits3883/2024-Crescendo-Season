@@ -174,8 +174,8 @@ public class RobotContainer {
   public void configureAutoNamedCommands(){
     NamedCommands.registerCommand("Outake Launch Prep", new OutakeNoteToLaunchPos(m_ScoringArm));
     NamedCommands.registerCommand("Smart Intake", new RunIntakeSmart(m_ScoringArm,true));
-    NamedCommands.registerCommand("Near Static Launch", new StaticLaunch(m_ScoringArm, ScoringArmConstants.kArmPosNearStaticLaunch));
-    NamedCommands.registerCommand("Far Static Launch", new StaticLaunch(m_ScoringArm, 44.0));
+    NamedCommands.registerCommand("Near Static Launch", new StaticLaunch(m_ScoringArm, ScoringArmConstants.kArmPosNearStaticLaunch, 250));
+    NamedCommands.registerCommand("Far Static Launch", new StaticLaunch(m_ScoringArm, 44.0 , 300));
     NamedCommands.registerCommand("Arm Pickup Pos", new InstantCommand(() -> m_ScoringArm.SetArmAngle(ScoringArmConstants.kArmPosPickup)));
 
   }
@@ -240,6 +240,7 @@ public class RobotContainer {
       new Trigger(() -> (m_copilotController.getRawAxis(3) > 0.5)).whileTrue(new StartEndCommand(() -> m_ScoringArm.SetLaunchSpeed(250), () -> m_ScoringArm.CoastLaunchMotors()));
       new Trigger(() -> (m_copilotController.getRawAxis(2) > 0.5)).whileTrue(new StartEndCommand(() -> m_ScoringArm.Launch(), ()-> m_ScoringArm.StopIntake()));//
       new JoystickButton(m_copilotController, 8).whileTrue(new ManualArmControl(m_ScoringArm, ()-> ((( -m_copilotController.getRawAxis(5)+1)/2) * 180 ) ) ) ;
+      new JoystickButton(m_copilotController,7).whileTrue(new StartEndCommand(() -> m_ScoringArm.SuperLaunchSpeed(), () -> m_ScoringArm.CoastLaunchMotors()));
       
       //new JoystickButton(m_copilotController, 11).onTrue(new InstantCommand(()-> m_ScoringArm.SetArmAngleToSDBValue()));
       //new JoystickButton(m_copilotController, 7).onTrue(new StaticLaunch(m_ScoringArm));
@@ -251,8 +252,8 @@ public class RobotContainer {
     }
     
     //Vision Testing
-    if (ROBOT_IN_USE.equals(Constants.ROBOT_LONGCLAW_CONFIG_LOCATION))
-      new JoystickButton(m_driverController, 14).onTrue(new InstantCommand(drivebase::visionPose));
+    
+    new JoystickButton(m_driverController, 14).onTrue(new InstantCommand(drivebase::visionPose));
 
   }
 

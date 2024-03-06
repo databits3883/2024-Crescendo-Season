@@ -17,11 +17,11 @@ public class StaticLaunch extends Command {
   boolean wasAtSP = false;
 
   /** Creates a new StaticLaunch. */
-  public StaticLaunch(ScoringArm arm,double angle) {
+  public StaticLaunch(ScoringArm arm,double angle,double speed) {
     // Use addRequirements() here to declare subsystem dependencies.
     m_ScoringArm = arm;
     launchAngle = angle;
-    launchSpeed = 250;
+    launchSpeed = speed;
     timer = new Timer();
   }
 
@@ -58,7 +58,7 @@ public class StaticLaunch extends Command {
         timer.start();
       }
       
-      if(timer.hasElapsed(1.0) && m_ScoringArm.atLaunchSetpoint()){
+      if(timer.hasElapsed(1.0)){
         m_ScoringArm.Launch();
       }
       else if(timer.hasElapsed(0.5)){

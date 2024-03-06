@@ -37,15 +37,25 @@ public final class Constants {
     public static final int kArmAngleMotor4iID = 17;
 
 
-    public static final double kAngleP = 0.003;
-    public static final double kAngleI = 0.00325;
-    public static final double kAngleD = 0;
-    public static final double kIRange = 0.05;
+    // public static final double kUpAngleP = 0.003;
+    // public static final double kUpAngleI = 0.000325;
+    // public static final double kUpAngleD = 0;
+    // public static final double kUpIRange = 0.05;
+
+    public static final double kUpAngleP = 0.003;
+    public static final double kUpAngleI = 0.000325;
+    public static final double kUpAngleD = 0;
+    public static final double kUpIRange = 0.05;
+
+    public static final double kDownAngleP = 0.002;
+    public static final double kDownAngleI = 0.003;
+    public static final double kDownAngleD = 0.0;
+    public static final double kDownIRange = 0.05;
     // public static final double kAngleP = 0.005;
     // public static final double kAngleI = 0.00325;
     // public static final double kAngleD = 0.00015;
-    public static final double kAngleVelTolerance = 0;
-    public static final double kAnglePosTolerance = 0;
+    public static final double kAngleVelTolerance = 2;
+    public static final double kAnglePosTolerance = 2;
     public static final double kAngleIZone = Double.POSITIVE_INFINITY;
 
 
@@ -140,7 +150,7 @@ public final class Constants {
 
   public static final class VisionConstants
   {
-    public static final boolean hasCamera = false;
+    public static final boolean hasCamera = true;
     //Camera name in network tables
     public static final String cameraName = "Camera_Module_v1";
     //Position of the camera from center of the robot in meters, This is measurements from LongClaw
