@@ -59,7 +59,7 @@ public final class Constants {
     public static final double kAngleIZone = Double.POSITIVE_INFINITY;
 
 
-    public static final double kLaunchSpeedP = 0.002;//0.021
+    public static final double kLaunchSpeedP = 0.001;//0.021
     public static final double kLaunchSpeedI = 0;//0
     public static final double kLaunchSpeedD = 0.0;//0.04
     public static final double kLaunchSpeedFF = 0.0035;//0.003
@@ -157,7 +157,7 @@ public final class Constants {
     public static final double SScameraZ = Units.inchesToMeters(11);
     public static final double SScameraX = Units.inchesToMeters(15);
     public static final double SScameraY = Units.inchesToMeters(9.75);
-    public static final double SScameraZYaw = -15; //degress, yaw
+    public static final double SScameraZYaw = -20; //degress, yaw
     public static final double SScameraYPitch = +15; // pitch
     public static final double SScameraXRoll = 0; // roll
 

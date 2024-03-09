@@ -192,8 +192,8 @@ public class ScoringArm extends SubsystemBase {
       if(IntakeSensorBlocked()){
         
         SetIntakeMotors(-1 * sensorOutakeSpeed);
-     }
-    else {
+      }
+      else {
         outakeToSensor = false;
         StopIntake();
       }
@@ -224,11 +224,11 @@ public class ScoringArm extends SubsystemBase {
 
   public void SetArmAngle(double armDeg){
     EnableArmAngleControl(true);
-    if (armDeg >= anglePIDController.getSetpoint()) {
-      EnableUpAnglePID();
+    if ((anglePIDController.getSetpoint() - armDeg) > 20) {
+      EnableDownAnglePID();
     }
     else{
-      EnableDownAnglePID();
+      EnableUpAnglePID();
     }
     anglePIDController.setSetpoint(armDeg%360);
   }
@@ -320,6 +320,7 @@ public class ScoringArm extends SubsystemBase {
     anglePIDController.setSetpoint(absArmAngleEncoder.getPosition());
     EnableArmAngleControl(false);
     outakeToSensor = false;
+    StopIntake();
   }
 
   public void SetFlap(boolean isOpen){
@@ -368,9 +369,6 @@ public void StopIntake() {
 
   public boolean IntakeSensorBlocked() {
     boolean pressed = intakeSensor.isPressed();
-    if (!pressed) {
-      outakeToSensor = false;
-    }
     boolean errorReduced = lastIntakeSensorReading && pressed;
     lastIntakeSensorReading = pressed;
     return errorReduced;

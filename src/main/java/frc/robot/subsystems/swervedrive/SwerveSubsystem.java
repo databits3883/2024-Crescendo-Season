@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
 import frc.robot.Constants.VisionConstants;
+import frc.robot.subsystems.FieldDriverStick;
 import frc.robot.subsystems.vision.VisionSubsystem;
 
 import java.io.File;
@@ -625,50 +626,39 @@ public class SwerveSubsystem extends SubsystemBase {
    * @param camera
    * @return
    */
-  public Command aimAtTarget(PhotonTrackedTarget target)
+  public Command aimAtTarget(PhotonTrackedTarget target, FieldDriverStick joystick)
   {
+    final double rotationTarget = this.getHeading().getDegrees() - target.getYaw() + VisionConstants.SScameraZYaw;
+    System.out.println("rotation target: "+ rotationTarget);
     
     return run(() -> {
-      Rotation2d initialHeading = getHeading();
 
       if (target != null)
       {
-        System.out.println("getting in if statement");
-        System.out.println("yaw: "+ target.getYaw());
-        System.out.println("offset: "+ VisionConstants.SScameraZYaw);
-        System.out.println("result: " + (target.getYaw() + VisionConstants.SScameraZYaw));
-        drive(getTargetSpeeds(0,
-                              0,
-                              Rotation2d.fromDegrees(target.getYaw() + initialHeading.getDegrees() + VisionConstants.SScameraZYaw))); // Not sure if this will work, more math may be required.
+        System.out.println("robot heading: "+ this.getHeading().getDegrees());
+        // drive(
+        //   getTargetSpeeds(
+        //   joystick.getX(), 
+        //   joystick.getY(), 
+        //   Rotation2d.fromDegrees(rotationTarget)));
+
+        swerveDrive.drive(new Translation2d(Math.pow(joystick.getX(), 3) * swerveDrive.getMaximumVelocity(),
+          Math.pow(joystick.getY(), 3) * swerveDrive.getMaximumVelocity()),
+          Math.pow(rotationTarget, 3) * swerveDrive.getMaximumAngularVelocity(),
+          true,
+          false);
+    
       }
     });
   }
 
-  /**
-   * Test method to turn to aim at speaker
-   * @param camera
-   * @return
-   */
-  public Command aimAtSpeaker()
-  {
-    final VisionSubsystem vision = RobotContainer.getRobotVision();
-    
-
-    return run(() -> {
-      Rotation2d initialHeading = getHeading();
-      PhotonTrackedTarget target = vision.getVisibleSpeakerTarget();
-      if (target != null)
-      {
-        System.out.println("output of the thing: " +  target.getYaw() + " / " + VisionConstants.SScameraZYaw);
-        drive(getTargetSpeeds( 0,0,
-                              Rotation2d.fromDegrees(initialHeading.getDegrees() + target.getYaw() + VisionConstants.SScameraZYaw)
-                              )); // Not sure if this will work, more math may be required.
-      }
-    });
-
-  
+  public double getMaximumVelocity(){
+    return swerveDrive.getMaximumVelocity();
   }
 
+  public double getMaximumAngularVelocity(){
+    return swerveDrive.getMaximumAngularVelocity();
+  }
 
 
   public Command sysIdDriveMotorCommand() {

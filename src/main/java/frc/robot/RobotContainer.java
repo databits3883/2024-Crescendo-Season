@@ -256,7 +256,10 @@ public class RobotContainer {
     //Vision Testing
     
     new JoystickButton(m_driverController, 14).onTrue(new InstantCommand(drivebase::visionPose));
-    new JoystickButton(m_driverController, 13).whileTrue(new SpeakerVisionAim(drivebase, m_robotVision,m_driveStick));
+    //new JoystickButton(m_driverController, 13).whileTrue(Commands.deferredProxy(()-> drivebase.aimAtTarget(
+      // m_robotVision.getVisibleSpeakerTarget(),
+      // m_driveStick)));
+    new JoystickButton(m_driverController, 3).whileTrue(new SpeakerVisionAim(drivebase, m_robotVision, m_driveStick,m_ScoringArm));
     new JoystickButton(m_driverController, 2).whileTrue(new StaticLaunch(m_ScoringArm, 23, 250));
   }
 
