@@ -157,7 +157,7 @@ public final class Constants {
     public static final double SScameraZ = Units.inchesToMeters(11);
     public static final double SScameraX = Units.inchesToMeters(15);
     public static final double SScameraY = Units.inchesToMeters(9.75);
-    public static final double SScameraZYaw = -20; //degress, yaw
+    public static final double SScameraZYaw = -15; //degress, yaw
     public static final double SScameraYPitch = +15; // pitch
     public static final double SScameraXRoll = 0; // roll
 

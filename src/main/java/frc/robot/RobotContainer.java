@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Commands.ManualArmControl;
 import frc.robot.Commands.OutakeNoteToLaunchPos;
 import frc.robot.Commands.RunIntakeSmart;
+import frc.robot.Commands.SpeakerVisionAim;
 import frc.robot.Commands.StaticLaunch;
 import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.OperatorConstants;
@@ -34,6 +35,7 @@ import frc.robot.subsystems.ScoringArm;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -133,13 +135,13 @@ public class RobotContainer {
 
 
     Command driveFieldOrientedAnglularVelocity = drivebase.driveCommand(
-        () -> MathUtil.applyDeadband(-m_driveStick.getX(), OperatorConstants.LEFT_Y_DEADBAND),
-        () -> MathUtil.applyDeadband(-m_driveStick.getY(), OperatorConstants.LEFT_X_DEADBAND),
+        () -> MathUtil.applyDeadband(m_driveStick.getX(), OperatorConstants.LEFT_Y_DEADBAND),
+        () -> MathUtil.applyDeadband(m_driveStick.getY(), OperatorConstants.LEFT_X_DEADBAND),
         () -> MathUtil.applyDeadband(m_driveStick.getZ(), OperatorConstants.RIGHT_X_DEADBAND));
 
     Command driveFieldOrientedDirectAngleSim = drivebase.simDriveCommand(
-        () -> MathUtil.applyDeadband(-m_driveStick.getX(), OperatorConstants.LEFT_Y_DEADBAND),
-        () -> MathUtil.applyDeadband(-m_driveStick.getY(), OperatorConstants.LEFT_X_DEADBAND),
+        () -> MathUtil.applyDeadband(m_driveStick.getX(), OperatorConstants.LEFT_Y_DEADBAND),
+        () -> MathUtil.applyDeadband(m_driveStick.getY(), OperatorConstants.LEFT_X_DEADBAND),
         () -> MathUtil.applyDeadband(m_driveStick.getZ(), OperatorConstants.RIGHT_X_DEADBAND));
 
     drivebase.setDefaultCommand(
@@ -254,6 +256,7 @@ public class RobotContainer {
     //Vision Testing
     
     new JoystickButton(m_driverController, 14).onTrue(new InstantCommand(drivebase::visionPose));
+    new JoystickButton(m_driverController, 13).whileTrue(new SpeakerVisionAim(drivebase, m_robotVision,m_driveStick));
     new JoystickButton(m_driverController, 2).whileTrue(new StaticLaunch(m_ScoringArm, 23, 250));
   }
 

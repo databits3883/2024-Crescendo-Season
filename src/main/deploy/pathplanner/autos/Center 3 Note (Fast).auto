@@ -24,12 +24,6 @@
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "Arm Pickup Pos"
-          }
-        },
-        {
           "type": "parallel",
           "data": {
             "commands": [
@@ -37,6 +31,12 @@
                 "type": "named",
                 "data": {
                   "name": "Smart Intake"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Arm Pickup Pos"
                 }
               },
               {

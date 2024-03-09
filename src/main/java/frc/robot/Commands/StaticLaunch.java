@@ -69,7 +69,7 @@ public class StaticLaunch extends Command {
       m_ScoringArm.Launch();
     }
 
-    return launchTimer.hasElapsed(3) && !m_ScoringArm.IntakeSensorBlocked();
+    return launchTimer.hasElapsed(2) && !m_ScoringArm.IntakeSensorBlocked();
     
     
   }

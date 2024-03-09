@@ -30,7 +30,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Low Note Reentry"
+                  "pathName": "LowMidNoteExit&Rentry"
                 }
               },
               {
@@ -51,7 +51,7 @@
         {
           "type": "named",
           "data": {
-            "name": "Far Static Launch"
+            "name": "Near Static Launch"
           }
         }
       ]

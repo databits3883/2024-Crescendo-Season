@@ -98,6 +98,7 @@ public class VisionSubsystem  extends SubsystemBase {
          Pose3d appriltagPose3d = (aprilPoseOptional.isPresent() ? aprilPoseOptional.get() : null);
          Pose2d appriltagPose = ((appriltagPose3d != null) ? appriltagPose3d.toPose2d() : null);
          if (appriltagPose != null) {
+            System.out.println("Estimated target Yaw: " + target.getYaw());
             System.out.println("AprilTag Position X/Y/Rotate: " + appriltagPose.getX() + " / " + appriltagPose.getY() + "/" + appriltagPose.getRotation());  
             
             Optional<EstimatedRobotPose> estimatedRobotPoseOp = getEstimatedGlobalPose();
@@ -126,6 +127,25 @@ public class VisionSubsystem  extends SubsystemBase {
 
       if(hasTargets) {
          target = result.getBestTarget();
+      }
+      return target;
+   }
+
+   public PhotonTrackedTarget getVisibleSpeakerTarget(){
+      //quick return if camera is not enabled
+      if (m_hasCameraEnabled == false) return null;      
+
+      PhotonTrackedTarget target = null;
+      PhotonPipelineResult result = this.camera.getLatestResult();
+      boolean hasTargets = result.hasTargets();
+
+      if(hasTargets) {
+         for (PhotonTrackedTarget potentialTarget : result.getTargets()){
+            if (potentialTarget.getFiducialId() == 7 || potentialTarget.getFiducialId() == 4) {
+               target = potentialTarget;
+               break;
+            }
+         }
       }
       return target;
    }

@@ -19,7 +19,7 @@ public class FieldDriverStick {
 
     public double getX(){
         double output = m_Joystick.getY();
-        //output *= -1;
+        output *= -1;
         //output = ReduceDecceleration(output, oldXInput);
         //output = Math.pow(output, OIConstants.kDriveStickPower) * Math.signum(output);
         if(Math.abs(output) < 0.05){
@@ -36,7 +36,7 @@ public class FieldDriverStick {
 
     public double getY(){
         double output = m_Joystick.getX();
-        //output *= -1;
+        output *= -1;
         
         //output = Math.pow(output, OIConstants.kDriveStickPower) * Math.signum(output);
         if(Math.abs(output) < 0.05){

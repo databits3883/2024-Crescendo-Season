@@ -24,10 +24,15 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
+import frc.robot.Constants.VisionConstants;
+import frc.robot.subsystems.vision.VisionSubsystem;
 
 import java.io.File;
 import java.util.Optional;
 import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
+
+import javax.print.DocFlavor.CHAR_ARRAY;
 
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.targeting.PhotonTrackedTarget;
@@ -103,6 +108,7 @@ public class SwerveSubsystem extends SubsystemBase {
    */
   public SwerveSubsystem(SwerveDriveConfiguration driveCfg, SwerveControllerConfiguration controllerCfg) {
     swerveDrive = new SwerveDrive(driveCfg, controllerCfg, Constants.ROBOT_MAX_SPEED);
+    
   }
 
   /**
@@ -621,15 +627,49 @@ public class SwerveSubsystem extends SubsystemBase {
    */
   public Command aimAtTarget(PhotonTrackedTarget target)
   {
+    
     return run(() -> {
+      Rotation2d initialHeading = getHeading();
+
       if (target != null)
       {
+        System.out.println("getting in if statement");
+        System.out.println("yaw: "+ target.getYaw());
+        System.out.println("offset: "+ VisionConstants.SScameraZYaw);
+        System.out.println("result: " + (target.getYaw() + VisionConstants.SScameraZYaw));
         drive(getTargetSpeeds(0,
                               0,
-                              Rotation2d.fromDegrees(target.getYaw()))); // Not sure if this will work, more math may be required.
+                              Rotation2d.fromDegrees(target.getYaw() + initialHeading.getDegrees() + VisionConstants.SScameraZYaw))); // Not sure if this will work, more math may be required.
       }
     });
   }
+
+  /**
+   * Test method to turn to aim at speaker
+   * @param camera
+   * @return
+   */
+  public Command aimAtSpeaker()
+  {
+    final VisionSubsystem vision = RobotContainer.getRobotVision();
+    
+
+    return run(() -> {
+      Rotation2d initialHeading = getHeading();
+      PhotonTrackedTarget target = vision.getVisibleSpeakerTarget();
+      if (target != null)
+      {
+        System.out.println("output of the thing: " +  target.getYaw() + " / " + VisionConstants.SScameraZYaw);
+        drive(getTargetSpeeds( 0,0,
+                              Rotation2d.fromDegrees(initialHeading.getDegrees() + target.getYaw() + VisionConstants.SScameraZYaw)
+                              )); // Not sure if this will work, more math may be required.
+      }
+    });
+
+  
+  }
+
+
 
   public Command sysIdDriveMotorCommand() {
     return SwerveDriveTest.generateSysIdCommand(
