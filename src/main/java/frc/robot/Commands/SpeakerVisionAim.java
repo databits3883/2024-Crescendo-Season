@@ -13,9 +13,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.VisionConstants;
@@ -95,7 +93,7 @@ public class SpeakerVisionAim extends Command {
       Pose3d estimatedRobotPose = ((estimatedRobotPoseOp != null && estimatedRobotPoseOp.isPresent()) ? estimatedRobotPoseOp.get().estimatedPose : null);
       double distance = estimatedRobotPose.getTranslation().getDistance(appriltagPose3d.getTranslation());
 
-      double angle = 6.58*distance + 25.7;
+      double angle = -4.61 + 26.5 * distance + -2.94 * Math.pow(distance, 2);
       
       scoringArm.SetArmAngle(angle);
     }

@@ -19,7 +19,6 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.WidgetType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Commands.ManualArmControl;
@@ -32,10 +31,10 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.ScoringArmConstants;
 import frc.robot.subsystems.FieldDriverStick;
 import frc.robot.subsystems.ScoringArm;
+import frc.robot.subsystems.SignalLights;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -61,6 +60,8 @@ public class RobotContainer {
   private final SwerveSubsystem drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),ROBOT_IN_USE));
 
   private static VisionSubsystem m_robotVision = new VisionSubsystem();
+
+  private static SignalLights signalLights = new SignalLights();
 
   final SendableChooser<Command> m_autoChooser;
 
@@ -261,6 +262,11 @@ public class RobotContainer {
       // m_driveStick)));
     new JoystickButton(m_driverController, 3).whileTrue(new SpeakerVisionAim(drivebase, m_robotVision, m_driveStick,m_ScoringArm));
     new JoystickButton(m_driverController, 2).whileTrue(new StaticLaunch(m_ScoringArm, 23, 250));
+
+    new JoystickButton(m_driverController, 5).whileTrue(new InstantCommand( () -> signalLights.SetArmLEDBufferToAllianceColor(RobotContainer::isBlueAlliance)));
+    new JoystickButton(m_driverController, 6).whileTrue(new InstantCommand( () -> signalLights.SetArmLEDBufferToCoolAnimation()));
+    new JoystickButton(m_driverController, 7).whileTrue(new InstantCommand( () -> signalLights.SetArmLEDBufferToDatabitsColors()));
+
   }
 
   /**

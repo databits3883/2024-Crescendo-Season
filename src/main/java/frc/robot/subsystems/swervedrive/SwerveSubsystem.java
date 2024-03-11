@@ -26,14 +26,10 @@ import frc.robot.Constants;
 import frc.robot.RobotContainer;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.subsystems.FieldDriverStick;
-import frc.robot.subsystems.vision.VisionSubsystem;
 
 import java.io.File;
 import java.util.Optional;
 import java.util.function.DoubleSupplier;
-import java.util.function.Supplier;
-
-import javax.print.DocFlavor.CHAR_ARRAY;
 
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.targeting.PhotonTrackedTarget;
@@ -586,7 +582,7 @@ public class SwerveSubsystem extends SubsystemBase {
    * Estimate robot pose through the use of april tags
    */
   public void visionPose() {
-    long currentTimeMillis = System.currentTimeMillis();
+    //long currentTimeMillis = System.currentTimeMillis();
     Pose2d debugTarget = RobotContainer.getRobotVision().debugClosestTarget();
     if(debugTarget != null){
     //  swerveDrive.addVisionMeasurement(debugTarget, currentTimeMillis);

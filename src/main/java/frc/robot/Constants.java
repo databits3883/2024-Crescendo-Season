@@ -154,10 +154,10 @@ public final class Constants {
     //Camera name in network tables
     public static final String cameraName = "Camera_Module_v1";
     //Position of the camera from center of the robot in meters, This is measurements from LongClaw
-    public static final double SScameraZ = Units.inchesToMeters(11);
-    public static final double SScameraX = Units.inchesToMeters(15);
-    public static final double SScameraY = Units.inchesToMeters(9.75);
-    public static final double SScameraZYaw = -20; //degress, yaw
+    public static final double SScameraZ = Units.inchesToMeters(12.5);
+    public static final double SScameraX = Units.inchesToMeters(16.5);
+    public static final double SScameraY = Units.inchesToMeters(0);
+    public static final double SScameraZYaw = 0; //degress, yaw
     public static final double SScameraYPitch = +15; // pitch
     public static final double SScameraXRoll = 0; // roll
 
@@ -187,6 +187,11 @@ public final class Constants {
     public static final Pose2d[] initRobotPoses = {blueOnePose, blueTwoPose, blueThreePose, redOnePose, redTwoPose, redThreePose};
   
     public static final Pose2d autoEndPose = new Pose2d(5.891426328307202, 6.045027362781998, Rotation2d.fromDegrees(90));
+  }
+
+  public static final class LEDConstants{
+    public static final int kArmLEDPort = 4;
+    public static final int kArmLEDCount = 68;
   }
 
 }
