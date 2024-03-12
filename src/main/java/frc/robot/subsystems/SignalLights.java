@@ -12,16 +12,27 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.LEDConstants;
 
 public class SignalLights extends SubsystemBase {
+  
   public AddressableLED armLEDs;
-  public AddressableLEDBuffer armLEDBuffer = new AddressableLEDBuffer(LEDConstants.kArmLEDCount);
+  public AddressableLEDBuffer armLEDBuffer;
+  public boolean isSignaling = false;
+  
   /** Creates a new SignalLights. */
   public SignalLights() {
     armLEDs = new AddressableLED(LEDConstants.kArmLEDPort);
+    armLEDBuffer = new AddressableLEDBuffer(LEDConstants.kArmLEDCount);
+    armLEDs.setLength(LEDConstants.kArmLEDCount);
+    armLEDs.setData(armLEDBuffer);
+    armLEDs.start();
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+
+    if(!isSignaling){
+      SetArmLEDBufferToCoolAnimation()
+    }
   }
 
   public void SetArmLEDBufferToSolidColor(int h, int s, int v){
@@ -29,7 +40,7 @@ public class SignalLights extends SubsystemBase {
       
       armLEDBuffer.setHSV(i, h, s, v);
    }
-   ApplyLEDBuffer();
+    
   }
 
   public void SetArmLEDBufferToCoolAnimation(){
@@ -37,7 +48,6 @@ public class SignalLights extends SubsystemBase {
       
       armLEDBuffer.setHSV(i, 120, 61, (int)(55 * Math.sin(i + ((double)(System.currentTimeMillis()*100)))) );
    }
-   ApplyLEDBuffer();
   }
 
   public void SetArmLEDBufferToAllianceColor(BooleanSupplier isBlueSupplier){
@@ -53,17 +63,20 @@ public class SignalLights extends SubsystemBase {
       }
 
    }
-   ApplyLEDBuffer();
+    EnableSignaling(true);
   }
 
   public void SetArmLEDBufferToDatabitsColors(){
     for (var i = 0; i < armLEDBuffer.getLength(); i++) {
       armLEDBuffer.setHSV(i, 120, 61, 55);
     }
-    ApplyLEDBuffer();
+    EnableSignaling(true);
   }
 
-  public void ApplyLEDBuffer(){
-    armLEDs.setData(armLEDBuffer);
+  public void EnableSignaling(boolean enabled){
+    isSignaling = enabled;
   }
+
+
+  
 }
