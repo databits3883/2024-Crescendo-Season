@@ -48,6 +48,7 @@ public class SignalLights extends SubsystemBase {
       
       armLEDBuffer.setHSV(i, 120, 61, (int)(55 * Math.sin(i + ((double)(System.currentTimeMillis()*100)))) );
    }
+    EnableSignaling(false);
   }
 
   public void SetArmLEDBufferToAllianceColor(BooleanSupplier isBlueSupplier){
