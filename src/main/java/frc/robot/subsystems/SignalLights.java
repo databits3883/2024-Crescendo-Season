@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.LEDConstants;
 
 public class SignalLights extends SubsystemBase {
+  
   public AddressableLED armLEDs;
   public ScoringArm scoringArm;
   public AddressableLEDBuffer armLEDBuffer = new AddressableLEDBuffer(LEDConstants.kArmLEDCount);
@@ -20,26 +21,34 @@ public class SignalLights extends SubsystemBase {
   public boolean visualizingIntakeSensor = false;
   public boolean idleAnimation = true;
   public Timer animationTimer = new Timer();
+
+  public LightSignal currentSignal = LightSignal.noNote;
+
+  enum LightSignal {
+    noNote,
+    hasNote,
+    intaking,
+    launching,
+    climbPrep,
+    climbFinish
+  }
+
   /** Creates a new SignalLights. */
   public SignalLights(ScoringArm arm) {
     armLEDs = new AddressableLED(LEDConstants.kArmLEDPort);
     scoringArm = arm;
     animationTimer.start();
+
+    armLEDBuffer = new AddressableLEDBuffer(LEDConstants.kArmLEDCount);
+    armLEDs.setLength(LEDConstants.kArmLEDCount);
+    armLEDs.setData(armLEDBuffer);
+    armLEDs.start();
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    boolean sensorBlocked = scoringArm.IntakeSensorBlocked();
-    if (visualizingIntakeSensor && sensorWasBlocked != sensorBlocked) {
-      if(sensorBlocked){
-        SetArmLEDBufferToSolidColorHSV(68, 204, 53);
-      }
-      else{
-        SetArmLEDBufferToSolidColorHSV(189, 53, 204);
-      }
-      
-    }
+
   }
 
   public void SetArmLEDBufferToSolidColorHSV(int h, int s, int v){
@@ -47,7 +56,7 @@ public class SignalLights extends SubsystemBase {
       
       armLEDBuffer.setHSV(i, h%180, s%255, v%255);
    }
-   ApplyLEDBuffer();
+    
   }
 
   public void SetArmLEDBufferToCoolAnimation(){
@@ -55,7 +64,7 @@ public class SignalLights extends SubsystemBase {
       
       armLEDBuffer.setRGB(i, 68, 53, (int)Math.round(204 * Math.sin(i + (animationTimer.get()))) );
    }
-   ApplyLEDBuffer();
+    
   }
 
   public void SetArmLEDBufferToAllianceColor(BooleanSupplier isBlueSupplier){
@@ -71,17 +80,18 @@ public class SignalLights extends SubsystemBase {
       }
 
    }
-   ApplyLEDBuffer();
   }
 
   public void SetArmLEDBufferToDatabitsColors(){
     for (var i = 0; i < armLEDBuffer.getLength(); i++) {
       armLEDBuffer.setHSV(i, 68, 204, 53);
     }
-    ApplyLEDBuffer();
   }
 
-  public void ApplyLEDBuffer(){
-    armLEDs.setData(armLEDBuffer);
+  public void Signal(LightSignal newSignal){
+    currentSignal = newSignal;
   }
+
+
+  
 }
