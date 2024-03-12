@@ -71,12 +71,6 @@ public final class Constants {
     public static final double kLaunchVelConversionFactor = 1;
 
 
-    public static final int kFlapServoChannel = 1;
-    public static final int kClimbLockServoChannel = 2;
-    
-    public static final double kFlapServoOpenPos = 0.4;
-    public static final double kFlapServoClosedPos = 0.8;
-
     public static final double kIntakeP = 0.0002;
     public static final double kIntakeI = 0;
     public static final double kIntakeD = 0;
@@ -190,8 +184,8 @@ public final class Constants {
   }
 
   public static final class LEDConstants{
-    public static final int kArmLEDPort = 4;
-    public static final int kArmLEDCount = 68;
+    public static final int kArmLEDPort = 1;
+    public static final int kArmLEDCount = 1;//68
   }
 
 }

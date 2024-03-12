@@ -61,7 +61,7 @@ public class RobotContainer {
 
   private static VisionSubsystem m_robotVision = new VisionSubsystem();
 
-  private static SignalLights signalLights = new SignalLights();
+  private static SignalLights signalLights;
 
   final SendableChooser<Command> m_autoChooser;
 
@@ -121,7 +121,7 @@ public class RobotContainer {
   public RobotContainer() {
 
     
-
+    signalLights = new SignalLights(m_ScoringArm);
     configureAutoNamedCommands();
     m_autoChooser = AutoBuilder.buildAutoChooser();
 
@@ -264,9 +264,9 @@ public class RobotContainer {
     new JoystickButton(m_driverController, 2).whileTrue(new StaticLaunch(m_ScoringArm, 23, 250));
 
     new JoystickButton(m_driverController, 5).whileTrue(new InstantCommand( () -> signalLights.SetArmLEDBufferToAllianceColor(RobotContainer::isBlueAlliance)));
-    new JoystickButton(m_driverController, 6).whileTrue(new InstantCommand( () -> signalLights.SetArmLEDBufferToCoolAnimation()));
+    new JoystickButton(m_driverController, 6).whileTrue(new InstantCommand( () -> signalLights.SetArmLEDBufferToSolidColorHSV(80,50,50)));
     new JoystickButton(m_driverController, 7).whileTrue(new InstantCommand( () -> signalLights.SetArmLEDBufferToDatabitsColors()));
-
+    //signalLights.setDefaultCommand(new InstantCommand(()->signalLights.SetArmLEDBufferToCoolAnimation()));
   }
 
   /**

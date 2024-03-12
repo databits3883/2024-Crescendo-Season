@@ -8,26 +8,44 @@ import java.util.function.BooleanSupplier;
 
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.LEDConstants;
 
 public class SignalLights extends SubsystemBase {
   public AddressableLED armLEDs;
+  public ScoringArm scoringArm;
   public AddressableLEDBuffer armLEDBuffer = new AddressableLEDBuffer(LEDConstants.kArmLEDCount);
+  public boolean sensorWasBlocked = false;
+  public boolean visualizingIntakeSensor = false;
+  public boolean idleAnimation = true;
+  public Timer animationTimer = new Timer();
   /** Creates a new SignalLights. */
-  public SignalLights() {
+  public SignalLights(ScoringArm arm) {
     armLEDs = new AddressableLED(LEDConstants.kArmLEDPort);
+    scoringArm = arm;
+    animationTimer.start();
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    boolean sensorBlocked = scoringArm.IntakeSensorBlocked();
+    if (visualizingIntakeSensor && sensorWasBlocked != sensorBlocked) {
+      if(sensorBlocked){
+        SetArmLEDBufferToSolidColorHSV(68, 204, 53);
+      }
+      else{
+        SetArmLEDBufferToSolidColorHSV(189, 53, 204);
+      }
+      
+    }
   }
 
-  public void SetArmLEDBufferToSolidColor(int h, int s, int v){
+  public void SetArmLEDBufferToSolidColorHSV(int h, int s, int v){
     for (var i = 0; i < armLEDBuffer.getLength(); i++) {
       
-      armLEDBuffer.setHSV(i, h, s, v);
+      armLEDBuffer.setHSV(i, h%180, s%255, v%255);
    }
    ApplyLEDBuffer();
   }
@@ -35,7 +53,7 @@ public class SignalLights extends SubsystemBase {
   public void SetArmLEDBufferToCoolAnimation(){
     for (var i = 0; i < armLEDBuffer.getLength(); i++) {
       
-      armLEDBuffer.setHSV(i, 120, 61, (int)(55 * Math.sin(i + ((double)(System.currentTimeMillis()*100)))) );
+      armLEDBuffer.setRGB(i, 68, 53, (int)Math.round(204 * Math.sin(i + (animationTimer.get()))) );
    }
    ApplyLEDBuffer();
   }
@@ -46,10 +64,10 @@ public class SignalLights extends SubsystemBase {
     for (var i = 0; i < armLEDBuffer.getLength(); i++) {
 
       if(isBlue){
-        armLEDBuffer.setRGB(i, 0, 0,255);
+        armLEDBuffer.setRGB(i, 0, 0,128);
       }
       else{
-        armLEDBuffer.setRGB(i, 255, 0,0);
+        armLEDBuffer.setRGB(i, 128, 0,0);
       }
 
    }
@@ -58,7 +76,7 @@ public class SignalLights extends SubsystemBase {
 
   public void SetArmLEDBufferToDatabitsColors(){
     for (var i = 0; i < armLEDBuffer.getLength(); i++) {
-      armLEDBuffer.setHSV(i, 120, 61, 55);
+      armLEDBuffer.setHSV(i, 68, 204, 53);
     }
     ApplyLEDBuffer();
   }

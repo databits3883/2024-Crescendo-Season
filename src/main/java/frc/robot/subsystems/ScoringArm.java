@@ -31,9 +31,6 @@ public class ScoringArm extends SubsystemBase {
   public RelativeEncoder topIntakeEncoder;
   public RelativeEncoder bottomIntakeEncoder;
 
-  public Servo flapServo = new Servo(ScoringArmConstants.kFlapServoChannel);
-  public Servo climbLockServo = new Servo(ScoringArmConstants.kClimbLockServoChannel);
-
   public CANSparkMax launchMotorLeader;
   public CANSparkMax launchMotorFollower;
   public RelativeEncoder launchSpeedLeaderEncoder;
@@ -276,7 +273,6 @@ public class ScoringArm extends SubsystemBase {
   }
 
   public void Intake(){
-    SetFlap(false);
     //SetIntakeSpeed(100);
     SetIntakeMotors(0.5);
   }
@@ -308,7 +304,6 @@ public class ScoringArm extends SubsystemBase {
 
   public void Launch(){
     SetIntakeMotors(1.0);
-    SetFlap(true);
     
   }
 
@@ -321,19 +316,8 @@ public class ScoringArm extends SubsystemBase {
     StopIntake();
   }
 
-  public void SetFlap(boolean isOpen){
-    if (isOpen) {
-      flapServo.set(ScoringArmConstants.kFlapServoOpenPos);
-    }
-    else{
-      flapServo.set(ScoringArmConstants.kFlapServoClosedPos);
-    }
-    
-  }
-
 public void StopIntake() {
     SetIntakeMotors(0);
-    SetFlap(false);
 }
 
   public boolean atLaunchSetpoint() {
@@ -343,11 +327,6 @@ public void StopIntake() {
 
   public void UnlatchClimb(){
     ChangeArmAngle(5);
-    climbLockServo.set(0);
-  }
-
-  public void LatchClimb(){
-    climbLockServo.set(1);
   }
 
   public void PrepareClimb(){
@@ -356,7 +335,6 @@ public void StopIntake() {
   }
 
   public void Climb(){
-    LatchClimb();
     SetArmAngle(ScoringArmConstants.kArmPosClimbFinish);
   }
 

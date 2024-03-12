@@ -52,7 +52,7 @@ public class RunIntakeSmart extends Command {
   public void end(boolean interrupted) {
     m_ScoringArm.StopIntake();
     if(launchPrepAfter){
-      m_ScoringArm.SetArmAngle(ScoringArmConstants.kArmPosNearStaticLaunch);
+      m_ScoringArm.SetArmAngle( (ScoringArmConstants.kArmPosNearStaticLaunch+ScoringArmConstants.kArmPosFarStaticLaunch) / 2 );
       m_ScoringArm.SetLaunchSpeed(250);
     }
   }
