@@ -9,6 +9,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj.util.Color8Bit;
 import swervelib.math.Matter;
 import swervelib.parser.PIDFConfig;
 
@@ -185,7 +187,20 @@ public final class Constants {
 
   public static final class LEDConstants{
     public static final int kArmLEDPort = 1;
-    public static final int kArmLEDCount = 1;//68
+    public static final int kArmLEDCount = 68;//68
+
+    public static final Color8Bit kNoNoteColor = new Color8Bit(Color.kYellow);
+    public static final Color8Bit kIntakeColor = new Color8Bit(Color.kYellow);
+    public static final Color8Bit kHasNoteColor = new Color8Bit(Color.kGreen);
+    public static final Color8Bit kLaunchPrepColor = new Color8Bit(Color.kGreen);
+    public static final Color8Bit kLaunchReadyColor = new Color8Bit(Color.kGreen);
+    public static final Color8Bit kClimbColor = new Color8Bit(Color.kPurple);
+    public static final Color8Bit kClimbReadyColor = new Color8Bit(Color.kPurple);
+    public static final Color8Bit kDatabitsColor = new Color8Bit(2,255,4);
+    public static final Color8Bit kOffColor = new Color8Bit(Color.kBlack);
+    public static final Color8Bit kErrorColor = new Color8Bit(Color.kHotPink);
+
+
   }
 
 }

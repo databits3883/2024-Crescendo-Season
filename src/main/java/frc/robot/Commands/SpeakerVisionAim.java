@@ -19,6 +19,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.subsystems.FieldDriverStick;
 import frc.robot.subsystems.ScoringArm;
+import frc.robot.subsystems.SignalLights;
+import frc.robot.subsystems.SignalLights.LightSignal;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import swervelib.SwerveController;
@@ -30,6 +32,7 @@ public class SpeakerVisionAim extends Command {
   public SwerveController swerveController;
   public FieldDriverStick driverJoystick;
   public ScoringArm scoringArm;
+  public SignalLights signalLights;
 
   public PhotonTrackedTarget target;
   
@@ -43,11 +46,12 @@ public class SpeakerVisionAim extends Command {
   
   
   /** Creates a new SpeakerVisionAim. */
-  public SpeakerVisionAim(SwerveSubsystem drive, VisionSubsystem vision, FieldDriverStick joystick, ScoringArm arm) {
+  public SpeakerVisionAim(SwerveSubsystem drive, VisionSubsystem vision, FieldDriverStick joystick, ScoringArm arm, SignalLights lights) {
     drivetrain = drive;
     visionSubsystem = vision;
     driverJoystick = joystick;
     scoringArm = arm;
+    signalLights = lights;
     swerveController = drivetrain.getSwerveController();
     angleController.enableContinuousInput(-180, 180);
     angleController.setIntegratorRange(-0.8, 0.8);
@@ -108,7 +112,7 @@ public class SpeakerVisionAim extends Command {
     pidOutput = angleController.calculate(headingDeg, rotationTarget);
     //pidOutput += Math.signum(pidOutput) * 10;
 
-    System.out.println("pid output: " + pidOutput);
+    //System.out.println("pid output: " + pidOutput);
     // System.out.println("heading: "+ headingDeg);
     drivetrain.drive(new Translation2d(Math.pow(driverJoystick.getX(), 3) * drivetrain.getMaximumVelocity(),
           Math.pow(driverJoystick.getY(), 3) * drivetrain.getMaximumVelocity()),
@@ -118,6 +122,11 @@ public class SpeakerVisionAim extends Command {
 
     if(targetUpdateTimer.hasElapsed(visionUpdateTime)){
       UpdateTarget();
+      signalLights.Signal(LightSignal.launchPrep);
+    }
+
+    if(Math.abs(pidOutput) < 0.005){
+      signalLights.Signal(LightSignal.launchReady);
     }
     
   }

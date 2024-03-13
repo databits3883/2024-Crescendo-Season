@@ -8,6 +8,8 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.ScoringArmConstants;
 import frc.robot.subsystems.ScoringArm;
+import frc.robot.subsystems.SignalLights;
+import frc.robot.subsystems.SignalLights.LightSignal;
 
 public class RunIntakeSmart extends Command {
 
@@ -15,11 +17,13 @@ public class RunIntakeSmart extends Command {
   public Timer stopDelayTimer;
   public boolean sensorTriggered = false;
   public boolean launchPrepAfter = false;
+  public SignalLights signalLights;
   
 
   /** Creates a new RunIntakeSmart. */
-  public RunIntakeSmart(ScoringArm arm, boolean launchPos) {
+  public RunIntakeSmart(ScoringArm arm, SignalLights lights, boolean launchPos) {
     stopDelayTimer = new Timer();
+    signalLights = lights;
     m_ScoringArm = arm;
     launchPrepAfter = launchPos;
     // Use addRequirements() here to declare subsystem dependencies.
@@ -33,6 +37,7 @@ public class RunIntakeSmart extends Command {
     stopDelayTimer.stop();
 
     sensorTriggered = false;
+    signalLights.Signal(LightSignal.intaking);
   }
 
   // Called every time the scheduler runs while the command is scheduled.

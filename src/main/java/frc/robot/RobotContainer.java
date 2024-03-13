@@ -21,17 +21,21 @@ import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj.util.Color8Bit;
 import frc.robot.Commands.ManualArmControl;
 import frc.robot.Commands.OutakeNoteToLaunchPos;
 import frc.robot.Commands.RunIntakeSmart;
 import frc.robot.Commands.SpeakerVisionAim;
 import frc.robot.Commands.StaticLaunch;
+import frc.robot.Constants.LEDConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.Constants.ScoringArmConstants;
 import frc.robot.subsystems.FieldDriverStick;
 import frc.robot.subsystems.ScoringArm;
 import frc.robot.subsystems.SignalLights;
+import frc.robot.subsystems.SignalLights.LightSignal;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -51,9 +55,9 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 public class RobotContainer {
   // The robot's subsystems
   
-  public final ScoringArm m_ScoringArm = new ScoringArm();
+  public final ScoringArm m_ScoringArm;
   //Long Claw
-  private final String ROBOT_IN_USE = Constants.ROBOT_SUPERSONIC_CONFIG_LOCATION;
+  public final String ROBOT_IN_USE = Constants.ROBOT_LONGCLAW_CONFIG_LOCATION;
   //SuperSonic
   //private final String ROBOT_IN_USE = Constants.ROBOT_SUPERSONIC_CONFIG_LOCATION;
   
@@ -119,9 +123,16 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+    if(ROBOT_IN_USE == Constants.ROBOT_SUPERSONIC_CONFIG_LOCATION){
+      m_ScoringArm = new ScoringArm(signalLights);
+    }
+    else{
+      m_ScoringArm = null;
+    }
 
     
-    signalLights = new SignalLights(m_ScoringArm);
+    signalLights = new SignalLights();
+    
     configureAutoNamedCommands();
     m_autoChooser = AutoBuilder.buildAutoChooser();
 
@@ -160,11 +171,12 @@ public class RobotContainer {
   }
 
   public void robotInit(){
+    if(ROBOT_IN_USE == Constants.ROBOT_SUPERSONIC_CONFIG_LOCATION){
     Shuffleboard.getTab("Game HUD").addDouble("Robot Pitch", (()-> drivebase.getPitch().getDegrees())).withWidget(BuiltInWidgets.kDial);
     Shuffleboard.getTab("Game HUD").addDouble("Arm Angle", m_ScoringArm::GetArmAngle);
     Shuffleboard.getTab("Game HUD").addBoolean("Has Note", m_ScoringArm::IntakeSensorBlocked).withSize(6, 6).withWidget(BuiltInWidgets.kBooleanBox);
     //Shuffleboard.getTab("Game HUD").add(autoChooser).withSize(2,1);
-    
+    }
 
 
     m_poseSelector.setDefaultOption("Position 1", positionOne);
@@ -175,12 +187,15 @@ public class RobotContainer {
   }
 
   public void configureAutoNamedCommands(){
-    NamedCommands.registerCommand("Outake Launch Prep", new OutakeNoteToLaunchPos(m_ScoringArm));
-    NamedCommands.registerCommand("Smart Intake", new RunIntakeSmart(m_ScoringArm,true));
-    NamedCommands.registerCommand("Near Static Launch", new StaticLaunch(m_ScoringArm, ScoringArmConstants.kArmPosNearStaticLaunch, 250));
-    NamedCommands.registerCommand("Far Static Launch", new StaticLaunch(m_ScoringArm, 46.0 , 250));
-    NamedCommands.registerCommand("Arm Pickup Pos", new InstantCommand(() -> m_ScoringArm.SetArmAngle(ScoringArmConstants.kArmPosPickup)));
+    if(ROBOT_IN_USE == Constants.ROBOT_SUPERSONIC_CONFIG_LOCATION){
+      NamedCommands.registerCommand("Outake Launch Prep", new OutakeNoteToLaunchPos(m_ScoringArm));
+      NamedCommands.registerCommand("Smart Intake", new RunIntakeSmart(m_ScoringArm,signalLights,true));
+      NamedCommands.registerCommand("Near Static Launch", new StaticLaunch(m_ScoringArm, ScoringArmConstants.kArmPosNearStaticLaunch, 250));
+      NamedCommands.registerCommand("Far Static Launch", new StaticLaunch(m_ScoringArm, 46.0 , 250));
+      NamedCommands.registerCommand("Arm Pickup Pos", new InstantCommand(() -> m_ScoringArm.SetArmAngle(ScoringArmConstants.kArmPosPickup)));
 
+    }
+    
   }
 
   public static DriverStation.Alliance allianceColor = DriverStation.Alliance.Blue;
@@ -232,7 +247,7 @@ public class RobotContainer {
       new Trigger(()-> m_driverController.getTrigger()).whileTrue(new StartEndCommand(() -> m_ScoringArm.Launch(), ()-> m_ScoringArm.StopIntake()));//
       
 
-      new JoystickButton(m_copilotController, 5).whileTrue(new RunIntakeSmart(m_ScoringArm,false));
+      new JoystickButton(m_copilotController, 5).whileTrue(new RunIntakeSmart(m_ScoringArm,signalLights,false));
       new JoystickButton(m_copilotController, 6).whileTrue(new StartEndCommand(() ->m_ScoringArm.Outtake() , () -> m_ScoringArm.StopIntake()));    
       new JoystickButton(m_copilotController, 10).onTrue(new InstantCommand(() -> m_ScoringArm.SetArmAngle(ScoringArmConstants.kArmPosClimbPrep)));
       new JoystickButton(m_copilotController, 9).onTrue(new InstantCommand(() -> m_ScoringArm.Climb()));
@@ -252,20 +267,23 @@ public class RobotContainer {
       // new JoystickButton(m_driverController, 4).onTrue(new InstantCommand( ()-> m_ScoringArm.UnlatchClimb() ) );
       //new JoystickButton(m_driverController, 3).onTrue(new InstantCommand( ()-> m_ScoringArm.SetFlap(true) ) );
       //new JoystickButton(m_driverController, 4).onTrue(new InstantCommand( ()-> m_ScoringArm.SetFlap(false) ) );
+      new JoystickButton(m_driverController, 3).whileTrue(new SpeakerVisionAim(drivebase, m_robotVision, m_driveStick,m_ScoringArm, signalLights));
+      new JoystickButton(m_driverController, 2).whileTrue(new StaticLaunch(m_ScoringArm, 23, 250));
+
     }
     
     //Vision Testing
     
     new JoystickButton(m_driverController, 14).onTrue(new InstantCommand(drivebase::visionPose));
+
+    // new JoystickButton(m_driverController, 5).onTrue(new InstantCommand(() -> signalLights.Signal(LightSignal.launchPrep)));
+    // new JoystickButton(m_driverController, 6).onTrue(new InstantCommand(() -> signalLights.Signal(LightSignal.intaking)));
+    // new JoystickButton(m_driverController, 7).onTrue(new InstantCommand(() -> signalLights.Signal(LightSignal.climbFinish)));
     //new JoystickButton(m_driverController, 13).whileTrue(Commands.deferredProxy(()-> drivebase.aimAtTarget(
       // m_robotVision.getVisibleSpeakerTarget(),
       // m_driveStick)));
-    new JoystickButton(m_driverController, 3).whileTrue(new SpeakerVisionAim(drivebase, m_robotVision, m_driveStick,m_ScoringArm));
-    new JoystickButton(m_driverController, 2).whileTrue(new StaticLaunch(m_ScoringArm, 23, 250));
-
-    new JoystickButton(m_driverController, 5).whileTrue(new InstantCommand( () -> signalLights.SetArmLEDBufferToAllianceColor(RobotContainer::isBlueAlliance)));
-    new JoystickButton(m_driverController, 6).whileTrue(new InstantCommand( () -> signalLights.SetArmLEDBufferToSolidColorHSV(80,50,50)));
-    new JoystickButton(m_driverController, 7).whileTrue(new InstantCommand( () -> signalLights.SetArmLEDBufferToDatabitsColors()));
+    
+    
     //signalLights.setDefaultCommand(new InstantCommand(()->signalLights.SetArmLEDBufferToCoolAnimation()));
   }
 

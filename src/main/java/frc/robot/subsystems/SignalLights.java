@@ -9,53 +9,90 @@ import java.util.function.BooleanSupplier;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.LEDConstants;
 
 public class SignalLights extends SubsystemBase {
   
   public AddressableLED armLEDs;
-  public ScoringArm scoringArm;
   public AddressableLEDBuffer armLEDBuffer = new AddressableLEDBuffer(LEDConstants.kArmLEDCount);
   public boolean sensorWasBlocked = false;
   public boolean visualizingIntakeSensor = false;
   public boolean idleAnimation = true;
   public Timer animationTimer = new Timer();
 
-  public LightSignal currentSignal = LightSignal.noNote;
+  public LightSignal currentSignal = LightSignal.databits;
 
-  enum LightSignal {
+  public enum LightSignal {
     noNote,
     hasNote,
     intaking,
-    launching,
+    launchPrep,
+    launchReady,
     climbPrep,
-    climbFinish
+    climbFinish,
+    databits
   }
 
   /** Creates a new SignalLights. */
-  public SignalLights(ScoringArm arm) {
+  public SignalLights() {
     armLEDs = new AddressableLED(LEDConstants.kArmLEDPort);
-    scoringArm = arm;
     animationTimer.start();
 
     armLEDBuffer = new AddressableLEDBuffer(LEDConstants.kArmLEDCount);
+    SetArmLEDBufferToSolidColor(LEDConstants.kDatabitsColor);
     armLEDs.setLength(LEDConstants.kArmLEDCount);
     armLEDs.setData(armLEDBuffer);
     armLEDs.start();
+    
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    switch (currentSignal) {
+      case noNote:
+        SetArmLEDBufferToSolidColor(LEDConstants.kNoNoteColor);
+        break;
+      case hasNote:
+        SetArmLEDBufferToSolidColor(LEDConstants.kHasNoteColor);
+        break;
+      case intaking:
+        BlinkColorWithTime(LEDConstants.kIntakeColor, LEDConstants.kOffColor, animationTimer.get());
+        break;
+      case launchPrep:
+        BlinkColorWithTime(LEDConstants.kLaunchPrepColor, LEDConstants.kOffColor, animationTimer.get());
+        break;
+      case launchReady:
+        SetArmLEDBufferToSolidColor(LEDConstants.kLaunchReadyColor);
+        break;
+      case climbPrep:
+        BlinkColorWithTime(LEDConstants.kClimbReadyColor, LEDConstants.kOffColor, animationTimer.get());
+        break;
+      case climbFinish:
+        SetArmLEDBufferToSolidColor(LEDConstants.kClimbColor);
+        break;
+      case databits:
+        SetArmLEDBufferToSolidColor(LEDConstants.kDatabitsColor);
+        break;
+    
+      default:
+        SetArmLEDBufferToSolidColor(LEDConstants.kErrorColor);
+        break;
+    }
 
+    armLEDs.setData(armLEDBuffer);
+    armLEDs.start();
   }
 
-  public void SetArmLEDBufferToSolidColorHSV(int h, int s, int v){
+  public void SetArmLEDBufferToSolidColor(Color8Bit color){
+
     for (var i = 0; i < armLEDBuffer.getLength(); i++) {
       
-      armLEDBuffer.setHSV(i, h%180, s%255, v%255);
+      armLEDBuffer.setLED(i, color);
    }
+   
     
   }
 
@@ -90,6 +127,15 @@ public class SignalLights extends SubsystemBase {
 
   public void Signal(LightSignal newSignal){
     currentSignal = newSignal;
+  }
+
+  public void BlinkColorWithTime(Color8Bit activeColor , Color8Bit inactiveColor, double timer){
+    if(timer % 0.5 > 0.25){
+      SetArmLEDBufferToSolidColor(inactiveColor);
+    }
+    else{
+      SetArmLEDBufferToSolidColor(activeColor);
+    }
   }
 
 

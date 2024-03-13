@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ScoringArmConstants;
+import frc.robot.subsystems.SignalLights.LightSignal;
 
 public class ScoringArm extends SubsystemBase {
 
@@ -53,8 +54,10 @@ public class ScoringArm extends SubsystemBase {
   private double sensorOutakeSpeed = 0.1;
   private boolean lastIntakeSensorReading = false;
 
+  public SignalLights signalLights;
+
   /** Creates a new ScoringArm. */
-  public ScoringArm() {
+  public ScoringArm(SignalLights lights) {
 
     armAngleLeaderMotor = new CANSparkMax(ScoringArmConstants.kArmAngleMotor1ID, MotorType.kBrushless);
     armAngleFollowerMotor1i = new CANSparkMax(ScoringArmConstants.kArmAngleMotor2ID, MotorType.kBrushless);
@@ -146,6 +149,8 @@ public class ScoringArm extends SubsystemBase {
     launchSpeedFollowerPIDController.setD(ScoringArmConstants.kLaunchSpeedD);
     launchSpeedFollowerPIDController.setIZone(ScoringArmConstants.kLaunchSpeedIZone);
     launchSpeedFollowerPIDController.setFF(ScoringArmConstants.kLaunchSpeedFF);
+
+    signalLights = lights;
     
     
     //Shuffleboard.getTab("Arm Debug").addDouble("Launch Vel Error", launchSpeedPIDController::getPositionError);
@@ -331,10 +336,12 @@ public void StopIntake() {
 
   public void PrepareClimb(){
     UnlatchClimb();
+    signalLights.Signal(LightSignal.climbPrep);
     SetArmAngle(ScoringArmConstants.kArmPosClimbPrep);
   }
 
   public void Climb(){
+    signalLights.Signal(LightSignal.climbFinish);
     SetArmAngle(ScoringArmConstants.kArmPosClimbFinish);
   }
 
@@ -344,7 +351,16 @@ public void StopIntake() {
 
 
   public boolean IntakeSensorBlocked() {
+    
     boolean pressed = intakeSensor.isPressed();
+    if(lastIntakeSensorReading!=pressed){
+      if(pressed){
+        signalLights.Signal(LightSignal.hasNote);
+      }
+      else{
+        signalLights.Signal(LightSignal.noNote);
+      }
+    }
     boolean errorReduced = lastIntakeSensorReading && pressed;
     lastIntakeSensorReading = pressed;
     return errorReduced;

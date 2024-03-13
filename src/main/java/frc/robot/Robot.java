@@ -67,7 +67,7 @@ public class Robot extends TimedRobot {
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
   public void disabledInit() {
-    m_robotContainer.m_ScoringArm.resetSetpoints();
+    ResetArmSetpoints();
     m_robotContainer.setMotorBrake(true);
 
     disabledTimer.reset();
@@ -86,7 +86,7 @@ public class Robot extends TimedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
-    m_robotContainer.m_ScoringArm.resetSetpoints();
+    ResetArmSetpoints();
     didAutoRun = true;
     m_robotContainer.setMotorBrake(true);
 
@@ -108,7 +108,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
-    m_robotContainer.m_ScoringArm.resetSetpoints();
+    ResetArmSetpoints();
     if (m_autonomousCommand != null)
     {
       m_autonomousCommand.cancel();
@@ -129,7 +129,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void testInit() {
-    m_robotContainer.m_ScoringArm.resetSetpoints();
+    ResetArmSetpoints();
      CommandScheduler.getInstance().cancelAll();
     try
     {
@@ -137,6 +137,14 @@ public class Robot extends TimedRobot {
     } catch (IOException e)
     {
       throw new RuntimeException(e);
+    }
+  }
+
+
+  public void ResetArmSetpoints(){
+    if(m_robotContainer.ROBOT_IN_USE.equals(Constants.ROBOT_SUPERSONIC_CONFIG_LOCATION)){
+      m_robotContainer.m_ScoringArm.resetSetpoints();
+
     }
   }
 
