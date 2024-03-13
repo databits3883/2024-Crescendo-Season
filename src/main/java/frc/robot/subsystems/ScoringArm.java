@@ -26,6 +26,7 @@ public class ScoringArm extends SubsystemBase {
 
   public CANSparkMax topIntakeMotor;
   public CANSparkMax bottomIntakeMotor;
+  public CANSparkMax floorIntakeMotor;
   public SparkLimitSwitch intakeSensor;
   public SparkPIDController topIntakePIDController;
   public SparkPIDController bottomIntakePIDController;
@@ -81,9 +82,11 @@ public class ScoringArm extends SubsystemBase {
     
     topIntakeMotor = new CANSparkMax(ScoringArmConstants.kTopIntakeMotorID, MotorType.kBrushless);
     bottomIntakeMotor = new CANSparkMax(ScoringArmConstants.kBottomIntakeMotorID, MotorType.kBrushless);
+    floorIntakeMotor = new CANSparkMax(ScoringArmConstants.kFloorIntakeMotorID, MotorType.kBrushless);
 
     topIntakeMotor.setInverted(false);
     bottomIntakeMotor.setInverted(true);
+    floorIntakeMotor.setInverted(false);
 
     topIntakePIDController = topIntakeMotor.getPIDController();
     bottomIntakePIDController = bottomIntakeMotor.getPIDController();
@@ -295,6 +298,7 @@ public class ScoringArm extends SubsystemBase {
   public void SetIntakeMotors(double fraction){
     topIntakeMotor.set(fraction);
     bottomIntakeMotor.set(fraction*(0.6));
+    floorIntakeMotor.set(fraction);
   }
 
   public void OutakeToSensorSlow(){

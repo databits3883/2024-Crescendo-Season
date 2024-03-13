@@ -29,6 +29,7 @@ public final class Constants {
 
     public static final int kTopIntakeMotorID = 21;
     public static final int kBottomIntakeMotorID = 18;
+    public static final int kFloorIntakeMotorID = 22;
 
     public static final int kLaunchMotorLeaderID = 19;
     public static final int kLaunchMotorFollowerID = 20;
