@@ -26,6 +26,10 @@ public class SignalLights extends SubsystemBase {
 
   public LightSignal currentSignal = LightSignal.databits;
 
+  //These are used to know when we toggle or change the LED state.
+  private LightSignal previousSignal;
+  private boolean currentBlinkState = false;  //False off, true = on
+
   public enum LightSignal {
     noteSignaling,
     intaking,
@@ -56,6 +60,13 @@ public class SignalLights extends SubsystemBase {
 
   @Override
   public void periodic() {
+    boolean ledChanged = false;
+    //Determine if we push LED update
+    if (previousSignal != currentSignal) 
+    {
+      previousSignal = currentSignal
+      ledChange = true;
+    }
     // This method will be called once per scheduler run
     switch (currentSignal) {
       case noteSignaling:
@@ -67,7 +78,8 @@ public class SignalLights extends SubsystemBase {
         }
         break;
       case intaking:
-        BlinkColorWithTime(LEDConstants.kIntakeColor, LEDConstants.kOffColor, animationTimer.get());
+        //This method should return if it needs to change based on the time
+        ledChange = BlinkColorWithTime(LEDConstants.kIntakeColor, LEDConstants.kOffColor, animationTimer.get());
         break;
       case launchPrep:
         SetArmLEDBufferToSolidColor(LEDConstants.kLaunchPrepColor);
@@ -75,8 +87,8 @@ public class SignalLights extends SubsystemBase {
       case launchReady:
         SetArmLEDBufferToSolidColor(LEDConstants.kLaunchReadyColor);
         break;
-      case climbPrep:
-        BlinkColorWithTime(LEDConstants.kClimbReadyColor, LEDConstants.kOffColor, animationTimer.get());
+      case climbPrep:      
+        ledChange = BlinkColorWithTime(LEDConstants.kClimbReadyColor, LEDConstants.kOffColor, animationTimer.get());
         break;
       case climbFinish:
         SetArmLEDBufferToSolidColor(LEDConstants.kClimbColor);
@@ -86,6 +98,8 @@ public class SignalLights extends SubsystemBase {
         break;
       case databitsAnimated:
         WaveColorWithTime(LEDConstants.kDatabitsColor, animationTimer.get());
+        //This needs to update every loop
+        ledChange = true;
         break;
     
       default:
@@ -93,8 +107,12 @@ public class SignalLights extends SubsystemBase {
         break;
     }
 
-    armLEDs.setData(armLEDBuffer);
-    armLEDs.start();
+    //Only push the LED state if it has changed
+    if (ledChange)
+    {
+      armLEDs.setData(armLEDBuffer);
+      armLEDs.start();
+    }
   }
 
   private void WaveColorWithTime(Color8Bit color, double timer) {
@@ -156,13 +174,25 @@ public class SignalLights extends SubsystemBase {
     currentSignal = newSignal;
   }
 
-  public void BlinkColorWithTime(Color8Bit activeColor , Color8Bit inactiveColor, double timer){
+  public boolean BlinkColorWithTime(Color8Bit activeColor , Color8Bit inactiveColor, double timer){
+    boolean ledChanged = false;
     if(timer % 0.5 > 0.25){
       SetArmLEDBufferToSolidColor(inactiveColor);
+      if (currentBlinkState != false) 
+      {
+        currentBlinkState = false;
+        ledChanged = true;
+      }
     }
     else{
       SetArmLEDBufferToSolidColor(activeColor);
+      if (currentBlinkState == true) 
+      {
+        currentBlinkState = true;
+        ledChanged = true;
+      }
     }
+    return ledChanged;
   }
 
 
