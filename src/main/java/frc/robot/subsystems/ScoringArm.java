@@ -192,7 +192,7 @@ public class ScoringArm extends SubsystemBase {
     if(outakeToSensor){
       if(IntakeSensorBlocked()){
         
-        SetIntakeMotors(-1 * sensorOutakeSpeed);
+        SetIntakeMotors(-1 * sensorOutakeSpeed,false);
       }
       else {
         outakeToSensor = false;
@@ -284,12 +284,12 @@ public class ScoringArm extends SubsystemBase {
 
   public void Intake(){
     //SetIntakeSpeed(100);
-    SetIntakeMotors(0.5);
+    SetIntakeMotors(0.5,true);
   }
 
   public void Outtake(){
     //SetIntakeSpeed(-100);
-    SetIntakeMotors(-0.5);
+    SetIntakeMotors(-0.5,true);
   }
 
   public void SetIntakeSpeed(double speed){
@@ -297,10 +297,13 @@ public class ScoringArm extends SubsystemBase {
     bottomIntakePIDController.setReference(speed, ControlType.kVelocity);
   }
 
-  public void SetIntakeMotors(double fraction){
+  public void SetIntakeMotors(double fraction, boolean disableSensorOuttake){
     topIntakeMotor.set(fraction);
     bottomIntakeMotor.set(fraction*(0.6));
     floorIntakeMotor.set(fraction);
+    if(disableSensorOuttake){
+      outakeToSensor = false;
+    }
   }
 
   public void OutakeToSensorSlow(){
@@ -314,7 +317,7 @@ public class ScoringArm extends SubsystemBase {
   // }
 
   public void Launch(){
-    SetIntakeMotors(1.0);
+    SetIntakeMotors(1.0, true);
     
   }
 
@@ -328,7 +331,7 @@ public class ScoringArm extends SubsystemBase {
   }
 
 public void StopIntake() {
-    SetIntakeMotors(0);
+    SetIntakeMotors(0,true);
 }
 
   public boolean atLaunchSetpoint() {
