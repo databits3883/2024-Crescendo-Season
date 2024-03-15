@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import java.util.function.BooleanSupplier;
 
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.Timer;
@@ -17,46 +18,53 @@ public class SignalLights extends SubsystemBase {
   
   public AddressableLED armLEDs;
   public AddressableLEDBuffer armLEDBuffer = new AddressableLEDBuffer(LEDConstants.kArmLEDCount);
-  public boolean sensorWasBlocked = false;
+  public ScoringArm scoringArm;
   public boolean visualizingIntakeSensor = false;
   public boolean idleAnimation = true;
   public Timer animationTimer = new Timer();
+  public int animationCounter = 0;
 
   public LightSignal currentSignal = LightSignal.databits;
 
   public enum LightSignal {
-    noNote,
-    hasNote,
+    noteSignaling,
     intaking,
     launchPrep,
     launchReady,
     climbPrep,
     climbFinish,
-    databits
+    databits,
+    databitsAnimated
   }
 
   /** Creates a new SignalLights. */
-  public SignalLights() {
+  public SignalLights(ScoringArm arm) {
     armLEDs = new AddressableLED(LEDConstants.kArmLEDPort);
     animationTimer.start();
-
+    animationCounter = 0;
+    scoringArm = arm;
     armLEDBuffer = new AddressableLEDBuffer(LEDConstants.kArmLEDCount);
-    SetArmLEDBufferToSolidColor(LEDConstants.kDatabitsColor);
+    //SetArmLEDBufferToSolidColor(LEDConstants.kDatabitsColor);
     armLEDs.setLength(LEDConstants.kArmLEDCount);
-    armLEDs.setData(armLEDBuffer);
-    armLEDs.start();
-    
+    //armLEDs.setData(armLEDBuffer);
+    //armLEDs.start();
+    currentSignal = LightSignal.databitsAnimated;
+    System.out.println("no note r: " + LEDConstants.kNoNoteColor.red);
+    System.out.println("no note g: " + LEDConstants.kNoNoteColor.green);
+    System.out.println("no note b: " + LEDConstants.kNoNoteColor.blue);
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
     switch (currentSignal) {
-      case noNote:
-        SetArmLEDBufferToSolidColor(LEDConstants.kNoNoteColor);
-        break;
-      case hasNote:
-        SetArmLEDBufferToSolidColor(LEDConstants.kHasNoteColor);
+      case noteSignaling:
+        if(scoringArm.IntakeSensorBlocked()){
+                  SetArmLEDBufferToSolidColor(LEDConstants.kHasNoteColor);
+        }
+        else{
+          SetArmLEDBufferToSolidColor(LEDConstants.kNoNoteColor);
+        }
         break;
       case intaking:
         BlinkColorWithTime(LEDConstants.kIntakeColor, LEDConstants.kOffColor, animationTimer.get());
@@ -76,6 +84,9 @@ public class SignalLights extends SubsystemBase {
       case databits:
         SetArmLEDBufferToSolidColor(LEDConstants.kDatabitsColor);
         break;
+      case databitsAnimated:
+        WaveColorWithTime(LEDConstants.kDatabitsColor, animationTimer.get());
+        break;
     
       default:
         SetArmLEDBufferToSolidColor(LEDConstants.kErrorColor);
@@ -84,6 +95,22 @@ public class SignalLights extends SubsystemBase {
 
     armLEDs.setData(armLEDBuffer);
     armLEDs.start();
+  }
+
+  private void WaveColorWithTime(Color8Bit color, double timer) {
+    animationCounter +=5;
+    if(animationCounter>360){
+      animationCounter = 0;
+    }
+    //double timerDeg = Units.degreesToRadians(timer);
+    double degPart = armLEDBuffer.getLength();
+    for (int i = 0; i < armLEDBuffer.getLength(); i++) {
+      
+      double brightness  = ((Math.sin( Units.degreesToRadians( i*5 + animationCounter ) ) + 1) / 2) / 8;
+      armLEDBuffer.setRGB(i, (int)(brightness * color.red), (int)(brightness * color.green), (int)(brightness * color.blue));
+      
+   }
+   
   }
 
   public void SetArmLEDBufferToSolidColor(Color8Bit color){

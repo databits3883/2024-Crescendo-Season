@@ -57,15 +57,15 @@ public class RobotContainer {
   
   public final ScoringArm m_ScoringArm;
   //Long Claw
-  public final String ROBOT_IN_USE = Constants.ROBOT_LONGCLAW_CONFIG_LOCATION;
+  //public final String ROBOT_IN_USE = Constants.ROBOT_LONGCLAW_CONFIG_LOCATION;
   //SuperSonic
-  //private final String ROBOT_IN_USE = Constants.ROBOT_SUPERSONIC_CONFIG_LOCATION;
+  public final String ROBOT_IN_USE = Constants.ROBOT_SUPERSONIC_CONFIG_LOCATION;
   
   private final SwerveSubsystem drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),ROBOT_IN_USE));
 
   private static VisionSubsystem m_robotVision = new VisionSubsystem();
 
-  private static SignalLights signalLights;
+  public final SignalLights m_signalLights;
 
   final SendableChooser<Command> m_autoChooser;
 
@@ -123,15 +123,16 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+    
     if(ROBOT_IN_USE == Constants.ROBOT_SUPERSONIC_CONFIG_LOCATION){
-      m_ScoringArm = new ScoringArm(signalLights);
+      m_ScoringArm = new ScoringArm();
     }
     else{
       m_ScoringArm = null;
     }
 
-    
-    signalLights = new SignalLights();
+    m_signalLights = new SignalLights(m_ScoringArm);
+    m_ScoringArm.signalLights = m_signalLights;
     
     configureAutoNamedCommands();
     m_autoChooser = AutoBuilder.buildAutoChooser();
@@ -189,7 +190,7 @@ public class RobotContainer {
   public void configureAutoNamedCommands(){
     if(ROBOT_IN_USE == Constants.ROBOT_SUPERSONIC_CONFIG_LOCATION){
       NamedCommands.registerCommand("Outake Launch Prep", new OutakeNoteToLaunchPos(m_ScoringArm));
-      NamedCommands.registerCommand("Smart Intake", new RunIntakeSmart(m_ScoringArm,signalLights,true));
+      NamedCommands.registerCommand("Smart Intake", new RunIntakeSmart(m_ScoringArm,m_signalLights,true));
       NamedCommands.registerCommand("Near Static Launch", new StaticLaunch(m_ScoringArm, ScoringArmConstants.kArmPosNearStaticLaunch, 250));
       NamedCommands.registerCommand("Far Static Launch", new StaticLaunch(m_ScoringArm, 46.0 , 250));
       NamedCommands.registerCommand("Arm Pickup Pos", new InstantCommand(() -> m_ScoringArm.SetArmAngle(ScoringArmConstants.kArmPosPickup)));
@@ -247,7 +248,7 @@ public class RobotContainer {
       new Trigger(()-> m_driverController.getTrigger()).whileTrue(new StartEndCommand(() -> m_ScoringArm.Launch(), ()-> m_ScoringArm.StopIntake()));//
       
 
-      new JoystickButton(m_copilotController, 5).whileTrue(new RunIntakeSmart(m_ScoringArm,signalLights,false));
+      new JoystickButton(m_copilotController, 5).whileTrue(new RunIntakeSmart(m_ScoringArm,m_signalLights,false));
       new JoystickButton(m_copilotController, 6).whileTrue(new StartEndCommand(() ->m_ScoringArm.Outtake() , () -> m_ScoringArm.StopIntake()));    
       new JoystickButton(m_copilotController, 10).onTrue(new InstantCommand(() -> m_ScoringArm.SetArmAngle(ScoringArmConstants.kArmPosClimbPrep)));
       new JoystickButton(m_copilotController, 9).onTrue(new InstantCommand(() -> m_ScoringArm.Climb()));
@@ -267,7 +268,7 @@ public class RobotContainer {
       // new JoystickButton(m_driverController, 4).onTrue(new InstantCommand( ()-> m_ScoringArm.UnlatchClimb() ) );
       //new JoystickButton(m_driverController, 3).onTrue(new InstantCommand( ()-> m_ScoringArm.SetFlap(true) ) );
       //new JoystickButton(m_driverController, 4).onTrue(new InstantCommand( ()-> m_ScoringArm.SetFlap(false) ) );
-      new JoystickButton(m_driverController, 3).whileTrue(new SpeakerVisionAim(drivebase, m_robotVision, m_driveStick,m_ScoringArm, signalLights));
+      new JoystickButton(m_driverController, 3).whileTrue(new SpeakerVisionAim(drivebase, m_robotVision, m_driveStick,m_ScoringArm, m_signalLights));
       new JoystickButton(m_driverController, 2).whileTrue(new StaticLaunch(m_ScoringArm, 23, 250));
 
     }

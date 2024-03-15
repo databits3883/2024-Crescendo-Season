@@ -190,7 +190,7 @@ public final class Constants {
     public static final int kArmLEDPort = 1;
     public static final int kArmLEDCount = 68;//68
 
-    public static final Color8Bit kNoNoteColor = new Color8Bit(Color.kYellow);
+    public static final Color8Bit kNoNoteColor = new Color8Bit((int)(Color.kYellow.red*64),(int)(Color.kYellow.green*64),(int)(Color.kYellow.blue*64));
     public static final Color8Bit kIntakeColor = new Color8Bit(Color.kYellow);
     public static final Color8Bit kHasNoteColor = new Color8Bit(Color.kGreen);
     public static final Color8Bit kLaunchPrepColor = new Color8Bit(Color.kGreen);

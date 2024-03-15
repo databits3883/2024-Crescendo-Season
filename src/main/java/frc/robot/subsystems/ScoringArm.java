@@ -58,7 +58,7 @@ public class ScoringArm extends SubsystemBase {
   public SignalLights signalLights;
 
   /** Creates a new ScoringArm. */
-  public ScoringArm(SignalLights lights) {
+  public ScoringArm() {
 
     armAngleLeaderMotor = new CANSparkMax(ScoringArmConstants.kArmAngleMotor1ID, MotorType.kBrushless);
     armAngleFollowerMotor1i = new CANSparkMax(ScoringArmConstants.kArmAngleMotor2ID, MotorType.kBrushless);
@@ -152,8 +152,6 @@ public class ScoringArm extends SubsystemBase {
     launchSpeedFollowerPIDController.setD(ScoringArmConstants.kLaunchSpeedD);
     launchSpeedFollowerPIDController.setIZone(ScoringArmConstants.kLaunchSpeedIZone);
     launchSpeedFollowerPIDController.setFF(ScoringArmConstants.kLaunchSpeedFF);
-
-    signalLights = lights;
     
     
     //Shuffleboard.getTab("Arm Debug").addDouble("Launch Vel Error", launchSpeedPIDController::getPositionError);
@@ -357,14 +355,7 @@ public void StopIntake() {
   public boolean IntakeSensorBlocked() {
     
     boolean pressed = intakeSensor.isPressed();
-    if(lastIntakeSensorReading!=pressed){
-      if(pressed){
-        signalLights.Signal(LightSignal.hasNote);
-      }
-      else{
-        signalLights.Signal(LightSignal.noNote);
-      }
-    }
+    
     boolean errorReduced = lastIntakeSensorReading && pressed;
     lastIntakeSensorReading = pressed;
     return errorReduced;
