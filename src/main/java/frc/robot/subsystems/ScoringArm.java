@@ -246,6 +246,10 @@ public class ScoringArm extends SubsystemBase {
     SetArmAngle(SmartDashboard.getNumber("ArmAngleSlider", 5));
   }
 
+  public boolean ArmAtAngle(){
+    return anglePIDController.getPositionError() < 5;
+  }
+
   public void RunLaunchSpeedPIDControl(){//can probably be removed, but haven't tried
     //launchMotorLeader.set(launchSpeedPIDController.calculate(launchSpeedEncoder.getVelocity()));
     launchSpeedLeaderPIDController.setReference(1 * launchSpeedSetpoint, ControlType.kVelocity);
@@ -332,12 +336,7 @@ public void StopIntake() {
     return atSP;
   }
 
-  public void UnlatchClimb(){
-    ChangeArmAngle(5);
-  }
-
   public void PrepareClimb(){
-    UnlatchClimb();
     signalLights.Signal(LightSignal.climbPrep);
     SetArmAngle(ScoringArmConstants.kArmPosClimbPrep);
   }

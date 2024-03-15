@@ -122,11 +122,13 @@ public class SpeakerVisionAim extends Command {
 
     if(targetUpdateTimer.hasElapsed(visionUpdateTime)){
       UpdateTarget();
-      signalLights.Signal(LightSignal.launchPrep);
     }
 
-    if(Math.abs(pidOutput) < 0.005){
+    if(Math.abs(pidOutput) < 0.25 && scoringArm.atLaunchSetpoint() && scoringArm.ArmAtAngle()){
       signalLights.Signal(LightSignal.launchReady);
+    }
+    else{
+      signalLights.Signal(LightSignal.launchPrep);
     }
     
   }
@@ -134,6 +136,7 @@ public class SpeakerVisionAim extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+    signalLights.Signal(LightSignal.noteSignaling);
     //drivetrain.drive(new ChassisSpeeds(0,0,0));
   }
 

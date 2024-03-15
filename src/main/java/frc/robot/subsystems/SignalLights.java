@@ -70,7 +70,7 @@ public class SignalLights extends SubsystemBase {
         BlinkColorWithTime(LEDConstants.kIntakeColor, LEDConstants.kOffColor, animationTimer.get());
         break;
       case launchPrep:
-        BlinkColorWithTime(LEDConstants.kLaunchPrepColor, LEDConstants.kOffColor, animationTimer.get());
+        SetArmLEDBufferToSolidColor(LEDConstants.kLaunchPrepColor);
         break;
       case launchReady:
         SetArmLEDBufferToSolidColor(LEDConstants.kLaunchReadyColor);

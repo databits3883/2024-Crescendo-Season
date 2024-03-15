@@ -57,7 +57,7 @@ public class StaticLaunch extends Command {
   @Override
   public boolean isFinished() {
     
-    boolean atArmSP = (m_ScoringArm.anglePIDController.getPositionError() < 5);
+    boolean atArmSP = m_ScoringArm.ArmAtAngle();
 
     if((atArmSP || timeoutTimer.hasElapsed(3)) && launchTimer.get() <= 0.1 && !m_ScoringArm.IntakeSensorBlocked()){
       //m_ScoringArm.SetLaunchSpeed(launchSpeed);

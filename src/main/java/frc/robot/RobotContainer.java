@@ -250,7 +250,7 @@ public class RobotContainer {
 
       new JoystickButton(m_copilotController, 5).whileTrue(new RunIntakeSmart(m_ScoringArm,m_signalLights,false));
       new JoystickButton(m_copilotController, 6).whileTrue(new StartEndCommand(() ->m_ScoringArm.Outtake() , () -> m_ScoringArm.StopIntake()));    
-      new JoystickButton(m_copilotController, 10).onTrue(new InstantCommand(() -> m_ScoringArm.SetArmAngle(ScoringArmConstants.kArmPosClimbPrep)));
+      new JoystickButton(m_copilotController, 10).onTrue(new InstantCommand(() -> m_ScoringArm.PrepareClimb()));
       new JoystickButton(m_copilotController, 9).onTrue(new InstantCommand(() -> m_ScoringArm.Climb()));
       new JoystickButton(m_copilotController, 2).onTrue(new InstantCommand(() -> m_ScoringArm.SetArmAngle(ScoringArmConstants.kArmPosNearStaticLaunch)));
       new JoystickButton(m_copilotController, 1).onTrue(new InstantCommand(() -> m_ScoringArm.SetArmAngle(ScoringArmConstants.kArmPosFarStaticLaunch)));

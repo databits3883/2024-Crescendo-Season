@@ -55,6 +55,7 @@ public class RunIntakeSmart extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+    signalLights.Signal(LightSignal.noteSignaling);
     m_ScoringArm.StopIntake();
     if(launchPrepAfter){
       m_ScoringArm.SetArmAngle( (ScoringArmConstants.kArmPosNearStaticLaunch+ScoringArmConstants.kArmPosFarStaticLaunch) / 2 );
