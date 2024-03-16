@@ -16,6 +16,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants.ScoringArmConstants;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.subsystems.FieldDriverStick;
 import frc.robot.subsystems.ScoringArm;
@@ -39,7 +40,7 @@ public class SpeakerVisionAim extends Command {
   public double rotationTarget = 0;
   public double pidOutput = 0;
   
-  public PIDController angleController = new PIDController(0.05, 0.0, 0);
+  public PIDController angleController = new PIDController(0.06, 0.0, 0);
 
   public Timer targetUpdateTimer = new Timer();
   public double visionUpdateTime = 0.2;
@@ -97,7 +98,18 @@ public class SpeakerVisionAim extends Command {
       Pose3d estimatedRobotPose = ((estimatedRobotPoseOp != null && estimatedRobotPoseOp.isPresent()) ? estimatedRobotPoseOp.get().estimatedPose : null);
       double distance = estimatedRobotPose.getTranslation().getDistance(appriltagPose3d.getTranslation());
 
-      double angle = -4.61 + 26.5 * distance + -2.94 * Math.pow(distance, 2);
+      //double angle = -4.61 + 26.5 * distance + -2.94 * Math.pow(distance, 2);
+      double angle = -35.5 + 55.4 * distance + -9.04 * Math.pow(distance, 2);
+      if(distance > 3.35){
+        angle = ScoringArmConstants.kArmPosFarStaticLaunch;
+      }
+      
+      if(angle > 80){
+        angle = 80;
+      }
+      else if (angle < 0){
+        angle = 0;
+      }
       
       scoringArm.SetArmAngle(angle);
     }
@@ -124,7 +136,7 @@ public class SpeakerVisionAim extends Command {
       UpdateTarget();
     }
 
-    if(Math.abs(pidOutput) < 0.25 && scoringArm.atLaunchSetpoint() && scoringArm.ArmAtAngle()){
+    if(angleController.getPositionError() < 5 && scoringArm.atLaunchSetpoint() && scoringArm.ArmAtAngle() && target != null){
       signalLights.Signal(LightSignal.launchReady);
     }
     else{

@@ -54,6 +54,7 @@ public class ScoringArm extends SubsystemBase {
   private boolean outakeToSensor = false;
   private double sensorOutakeSpeed = 0.1;
   private boolean lastIntakeSensorReading = false;
+  private boolean raisingArm = false;
 
   public SignalLights signalLights;
 
@@ -175,6 +176,7 @@ public class ScoringArm extends SubsystemBase {
 
     if(armControlEnabled){
       RunAnglePIDControl();
+      
     }
     else{
       SetArmAngleMotors(0);
@@ -208,6 +210,15 @@ public class ScoringArm extends SubsystemBase {
   }
 
   public void RunAnglePIDControl(){
+
+    if(anglePIDController.getPositionError() > 5){
+      SetFloorIntakeMotor(1);
+      raisingArm = true;
+    }
+    else if (raisingArm){
+      SetFloorIntakeMotor(0);
+      raisingArm = false;
+    }
     SetArmAngleMotors(anglePIDController.calculate(absArmAngleEncoder.getPosition()));
   }
 
@@ -279,17 +290,20 @@ public class ScoringArm extends SubsystemBase {
   }
 
   public void SuperLaunchSpeed(){
-    SetLaunchSpeedWithOutake(5676);
+    launchMotorLeader.set(1);
+    launchMotorFollower.set(-1);
   }
 
   public void Intake(){
     //SetIntakeSpeed(100);
     SetIntakeMotors(0.5,true);
+    SetFloorIntakeMotor(0.5);
   }
 
   public void Outtake(){
     //SetIntakeSpeed(-100);
     SetIntakeMotors(-0.5,true);
+    SetFloorIntakeMotor(-0.5);
   }
 
   public void SetIntakeSpeed(double speed){
@@ -300,10 +314,14 @@ public class ScoringArm extends SubsystemBase {
   public void SetIntakeMotors(double fraction, boolean disableSensorOuttake){
     topIntakeMotor.set(fraction);
     bottomIntakeMotor.set(fraction*(0.6));
-    floorIntakeMotor.set(fraction);
+    
     if(disableSensorOuttake){
       outakeToSensor = false;
     }
+  }
+
+  public void SetFloorIntakeMotor(double fraction){
+    floorIntakeMotor.set(fraction);
   }
 
   public void OutakeToSensorSlow(){
@@ -318,7 +336,7 @@ public class ScoringArm extends SubsystemBase {
 
   public void Launch(){
     SetIntakeMotors(1.0, true);
-    
+    SetFloorIntakeMotor(1);
   }
 
   public void resetSetpoints(){
@@ -332,6 +350,7 @@ public class ScoringArm extends SubsystemBase {
 
 public void StopIntake() {
     SetIntakeMotors(0,true);
+    SetFloorIntakeMotor(0);
 }
 
   public boolean atLaunchSetpoint() {

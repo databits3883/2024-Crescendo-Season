@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
+import frc.robot.Commands.DeathSpin;
 import frc.robot.Commands.ManualArmControl;
 import frc.robot.Commands.OutakeNoteToLaunchPos;
 import frc.robot.Commands.RunIntakeSmart;
@@ -258,7 +259,7 @@ public class RobotContainer {
       new JoystickButton(m_copilotController, 4).onTrue(new InstantCommand(() -> m_ScoringArm.SetArmAngle(ScoringArmConstants.kArmPosPickup)));
       new Trigger(() -> (m_copilotController.getRawAxis(3) > 0.5)).whileTrue(new StartEndCommand(() -> m_ScoringArm.SetLaunchSpeedWithOutake(250), () -> m_ScoringArm.CoastLaunchMotors()));
       new Trigger(() -> (m_copilotController.getRawAxis(2) > 0.5)).whileTrue(new StartEndCommand(() -> m_ScoringArm.Launch(), ()-> m_ScoringArm.StopIntake()));//
-      new JoystickButton(m_copilotController, 8).whileTrue(new ManualArmControl(m_ScoringArm, ()-> ((( -m_copilotController.getRawAxis(5)+1)/2) * 180 ) ) ) ;
+      new JoystickButton(m_copilotController, 8).whileTrue(new ManualArmControl(m_ScoringArm, ()-> ((( -m_copilotController.getRawAxis(5)+1)/2) * 60 ) ) ) ;//change the 60 to 180
       new JoystickButton(m_copilotController,7).whileTrue(new StartEndCommand(() -> m_ScoringArm.SuperLaunchSpeed(), () -> m_ScoringArm.CoastLaunchMotors()));
       
       //new JoystickButton(m_copilotController, 11).onTrue(new InstantCommand(()-> m_ScoringArm.SetArmAngleToSDBValue()));
@@ -270,6 +271,7 @@ public class RobotContainer {
       //new JoystickButton(m_driverController, 4).onTrue(new InstantCommand( ()-> m_ScoringArm.SetFlap(false) ) );
       new JoystickButton(m_driverController, 3).whileTrue(new SpeakerVisionAim(drivebase, m_robotVision, m_driveStick,m_ScoringArm, m_signalLights));
       new JoystickButton(m_driverController, 2).whileTrue(new StaticLaunch(m_ScoringArm, 23, 250));
+      new JoystickButton(m_driverController, 7).whileTrue(new DeathSpin(drivebase));
 
     }
     

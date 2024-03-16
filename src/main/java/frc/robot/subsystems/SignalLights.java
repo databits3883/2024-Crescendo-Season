@@ -29,6 +29,7 @@ public class SignalLights extends SubsystemBase {
   //These are used to know when we toggle or change the LED state.
   private LightSignal previousSignal;
   private boolean currentBlinkState = false;  //False off, true = on
+  private boolean previousNoteState = false;
 
   public enum LightSignal {
     noteSignaling,
@@ -64,22 +65,29 @@ public class SignalLights extends SubsystemBase {
     //Determine if we push LED update
     if (previousSignal != currentSignal) 
     {
-      previousSignal = currentSignal
-      ledChange = true;
+      previousSignal = currentSignal;
+      ledChanged = true;
     }
     // This method will be called once per scheduler run
     switch (currentSignal) {
       case noteSignaling:
-        if(scoringArm.IntakeSensorBlocked()){
-                  SetArmLEDBufferToSolidColor(LEDConstants.kHasNoteColor);
+        boolean hasNote = scoringArm.IntakeSensorBlocked();
+          if(hasNote != previousNoteState){
+            if(hasNote){
+              SetArmLEDBufferToSolidColor(LEDConstants.kHasNoteColor);
+              ledChanged = true;
+            }
+            else{
+              SetArmLEDBufferToSolidColor(LEDConstants.kNoNoteColor);
+              ledChanged = true;
+            }
         }
-        else{
-          SetArmLEDBufferToSolidColor(LEDConstants.kNoNoteColor);
-        }
+        
+        previousNoteState = hasNote;
         break;
       case intaking:
         //This method should return if it needs to change based on the time
-        ledChange = BlinkColorWithTime(LEDConstants.kIntakeColor, LEDConstants.kOffColor, animationTimer.get());
+        ledChanged = BlinkColorWithTime(LEDConstants.kIntakeColor, LEDConstants.kOffColor, animationTimer.get());
         break;
       case launchPrep:
         SetArmLEDBufferToSolidColor(LEDConstants.kLaunchPrepColor);
@@ -88,7 +96,7 @@ public class SignalLights extends SubsystemBase {
         SetArmLEDBufferToSolidColor(LEDConstants.kLaunchReadyColor);
         break;
       case climbPrep:      
-        ledChange = BlinkColorWithTime(LEDConstants.kClimbReadyColor, LEDConstants.kOffColor, animationTimer.get());
+        ledChanged = BlinkColorWithTime(LEDConstants.kClimbReadyColor, LEDConstants.kOffColor, animationTimer.get());
         break;
       case climbFinish:
         SetArmLEDBufferToSolidColor(LEDConstants.kClimbColor);
@@ -99,7 +107,7 @@ public class SignalLights extends SubsystemBase {
       case databitsAnimated:
         WaveColorWithTime(LEDConstants.kDatabitsColor, animationTimer.get());
         //This needs to update every loop
-        ledChange = true;
+        ledChanged = true;
         break;
     
       default:
@@ -108,7 +116,7 @@ public class SignalLights extends SubsystemBase {
     }
 
     //Only push the LED state if it has changed
-    if (ledChange)
+    if (ledChanged)
     {
       armLEDs.setData(armLEDBuffer);
       armLEDs.start();
@@ -171,6 +179,9 @@ public class SignalLights extends SubsystemBase {
   }
 
   public void Signal(LightSignal newSignal){
+    if(newSignal == LightSignal.noteSignaling){
+      ResetNoteSignalState();
+    }
     currentSignal = newSignal;
   }
 
@@ -186,13 +197,17 @@ public class SignalLights extends SubsystemBase {
     }
     else{
       SetArmLEDBufferToSolidColor(activeColor);
-      if (currentBlinkState == true) 
+      if (currentBlinkState != true) 
       {
         currentBlinkState = true;
         ledChanged = true;
       }
     }
     return ledChanged;
+  }
+
+  public void ResetNoteSignalState(){
+    previousNoteState = !scoringArm.IntakeSensorBlocked();
   }
 
 

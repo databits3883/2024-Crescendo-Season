@@ -158,6 +158,7 @@ public class Robot extends TimedRobot {
   }
   
   public void NoteSignalLights(){
+    m_robotContainer.m_signalLights.ResetNoteSignalState();
     m_robotContainer.m_signalLights.Signal(LightSignal.noteSignaling);
   }
 
