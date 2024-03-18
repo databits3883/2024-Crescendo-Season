@@ -55,6 +55,7 @@ public class ScoringArm extends SubsystemBase {
   private double sensorOutakeSpeed = 0.1;
   private boolean lastIntakeSensorReading = false;
   private boolean raisingArm = false;
+  private boolean superLaunchSpeed = false;
 
   public SignalLights signalLights;
 
@@ -187,6 +188,9 @@ public class ScoringArm extends SubsystemBase {
     if(launchCoastMode){
       CoastLaunchMotors();
     }
+    else if(superLaunchSpeed){
+      SuperLaunchSpeed();
+    }
     else{
       RunLaunchSpeedPIDControl();
     }
@@ -292,6 +296,7 @@ public class ScoringArm extends SubsystemBase {
   public void SuperLaunchSpeed(){
     launchMotorLeader.set(1);
     launchMotorFollower.set(-1);
+    superLaunchSpeed = true;
   }
 
   public void Intake(){
@@ -345,6 +350,7 @@ public class ScoringArm extends SubsystemBase {
     anglePIDController.setSetpoint(absArmAngleEncoder.getPosition());
     EnableArmAngleControl(false);
     outakeToSensor = false;
+    superLaunchSpeed = false;
     StopIntake();
   }
 

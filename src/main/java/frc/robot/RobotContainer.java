@@ -259,7 +259,7 @@ public class RobotContainer {
       new JoystickButton(m_copilotController, 4).onTrue(new InstantCommand(() -> m_ScoringArm.SetArmAngle(ScoringArmConstants.kArmPosPickup)));
       new Trigger(() -> (m_copilotController.getRawAxis(3) > 0.5)).whileTrue(new StartEndCommand(() -> m_ScoringArm.SetLaunchSpeedWithOutake(250), () -> m_ScoringArm.CoastLaunchMotors()));
       new Trigger(() -> (m_copilotController.getRawAxis(2) > 0.5)).whileTrue(new StartEndCommand(() -> m_ScoringArm.Launch(), ()-> m_ScoringArm.StopIntake()));//
-      new JoystickButton(m_copilotController, 8).whileTrue(new ManualArmControl(m_ScoringArm, ()-> ((( -m_copilotController.getRawAxis(5)+1)/2) * 60 ) ) ) ;//change the 60 to 180
+      new JoystickButton(m_copilotController, 8).whileTrue(new ManualArmControl(m_ScoringArm, ()-> ((( -m_copilotController.getRawAxis(5)+1)/2) * 180 ) ) ) ;//change the 60 to 180
       new JoystickButton(m_copilotController,7).whileTrue(new StartEndCommand(() -> m_ScoringArm.SuperLaunchSpeed(), () -> m_ScoringArm.CoastLaunchMotors()));
       
       //new JoystickButton(m_copilotController, 11).onTrue(new InstantCommand(()-> m_ScoringArm.SetArmAngleToSDBValue()));
