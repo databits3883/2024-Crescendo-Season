@@ -40,7 +40,7 @@ public class SpeakerVisionAim extends Command {
   public double rotationTarget = 0;
   public double pidOutput = 0;
   
-  public PIDController angleController = new PIDController(0.06, 0.0, 0);
+  public PIDController angleController = new PIDController(0.01, 0.06, 0);//p: 0.06 i: 0 d: 0
 
   public Timer targetUpdateTimer = new Timer();
   public double visionUpdateTime = 0.2;
@@ -55,7 +55,7 @@ public class SpeakerVisionAim extends Command {
     signalLights = lights;
     swerveController = drivetrain.getSwerveController();
     angleController.enableContinuousInput(-180, 180);
-    angleController.setIntegratorRange(-0.8, 0.8);
+    angleController.setIntegratorRange(-0.03, 0.03);//0.8
     
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(drivetrain);
@@ -110,8 +110,8 @@ public class SpeakerVisionAim extends Command {
       else if (angle < 0){
         angle = 0;
       }
-      
-      scoringArm.SetArmAngle(angle);
+      System.out.println("dist: "+ distance);
+      //scoringArm.SetArmAngle(angle);
     }
     
     

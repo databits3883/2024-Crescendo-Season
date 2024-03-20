@@ -176,7 +176,7 @@ public class RobotContainer {
     if(ROBOT_IN_USE == Constants.ROBOT_SUPERSONIC_CONFIG_LOCATION){
     Shuffleboard.getTab("Game HUD").addDouble("Robot Pitch", (()-> drivebase.getPitch().getDegrees())).withWidget(BuiltInWidgets.kDial);
     Shuffleboard.getTab("Game HUD").addDouble("Arm Angle", m_ScoringArm::GetArmAngle);
-    Shuffleboard.getTab("Game HUD").addBoolean("Has Note", m_ScoringArm::IntakeSensorBlocked).withSize(6, 6).withWidget(BuiltInWidgets.kBooleanBox);
+    Shuffleboard.getTab("Game HUD").addBoolean("Has Note", m_ScoringArm::LowIntakeSensorBlocked).withSize(6, 6).withWidget(BuiltInWidgets.kBooleanBox);
     //Shuffleboard.getTab("Game HUD").add(autoChooser).withSize(2,1);
     }
 

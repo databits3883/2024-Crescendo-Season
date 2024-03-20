@@ -308,7 +308,7 @@ public class SwerveSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // Only run vision when in teleop
-    // TODO: Perhaps only run vision position based on button?
+    // Perhaps only run vision position based on button?
 
     if (RobotState.isEnabled() && RobotState.isTeleop()) {
       // See if we log this event

@@ -5,42 +5,35 @@
 package frc.robot.Commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants.ScoringArmConstants;
 import frc.robot.subsystems.ScoringArm;
 
-public class OutakeNoteToLaunchPos extends Command {
+public class SmartLaunch extends Command {
+  public double launchSpeed = 250;
+  public ScoringArm scoringArm;
 
-  ScoringArm scoringArm;
-  
-  /** Creates a new OutakeNoteToLaunchPos. */
-  public OutakeNoteToLaunchPos(ScoringArm arm) {
-    scoringArm = arm;
+  /** Creates a new SmartLaunch. */
+  public SmartLaunch(ScoringArm arm) {
     // Use addRequirements() here to declare subsystem dependencies.
+    scoringArm = arm;
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {
-    scoringArm.SetArmAngle(ScoringArmConstants.kArmPosNearStaticLaunch);
-    scoringArm.CoastLaunchMotors();
-  
-  }
+  public void initialize() {}
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    scoringArm.SetIntakeMotors(-0.3,true);
+    
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {
-    scoringArm.StopIntake();
-  }
+  public void end(boolean interrupted) {}
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return !scoringArm.HighIntakeSensorBlocked();
+    return false;
   }
 }

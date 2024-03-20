@@ -71,7 +71,7 @@ public class SignalLights extends SubsystemBase {
     // This method will be called once per scheduler run
     switch (currentSignal) {
       case noteSignaling:
-        boolean hasNote = scoringArm.IntakeSensorBlocked();
+        boolean hasNote = scoringArm.LowIntakeSensorBlocked();
           if(hasNote != previousNoteState){
             if(hasNote){
               SetArmLEDBufferToSolidColor(LEDConstants.kHasNoteColor);
@@ -207,7 +207,7 @@ public class SignalLights extends SubsystemBase {
   }
 
   public void ResetNoteSignalState(){
-    previousNoteState = !scoringArm.IntakeSensorBlocked();
+    previousNoteState = !scoringArm.LowIntakeSensorBlocked();
   }
 
 

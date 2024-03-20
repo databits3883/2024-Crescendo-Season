@@ -24,6 +24,12 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "Arm Pickup Pos"
+          }
+        },
+        {
           "type": "parallel",
           "data": {
             "commands": [
@@ -49,6 +55,12 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "Arm Pickup Pos"
+          }
+        },
+        {
           "type": "parallel",
           "data": {
             "commands": [
@@ -71,6 +83,12 @@
           "type": "named",
           "data": {
             "name": "Far Static Launch"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Arm Pickup Pos"
           }
         },
         {

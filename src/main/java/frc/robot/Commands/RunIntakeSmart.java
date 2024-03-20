@@ -47,7 +47,7 @@ public class RunIntakeSmart extends Command {
     
     
 
-    if (!sensorTriggered && m_ScoringArm.IntakeSensorBlocked()) {
+    if (!sensorTriggered && m_ScoringArm.LowIntakeSensorBlocked()) {
       stopDelayTimer.start();
     }
   }
@@ -61,13 +61,14 @@ public class RunIntakeSmart extends Command {
       m_ScoringArm.SetArmAngle( (ScoringArmConstants.kArmPosNearStaticLaunch+ScoringArmConstants.kArmPosFarStaticLaunch) / 2 );
       m_ScoringArm.SetLaunchSpeed(250);
     }
+    m_ScoringArm.OutakeToSensorSlow();
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
 
-    if (m_ScoringArm.IntakeSensorBlocked()) {
+    if (m_ScoringArm.LowIntakeSensorBlocked()) {
       sensorTriggered = true;
     }
 
@@ -75,7 +76,7 @@ public class RunIntakeSmart extends Command {
       return stopDelayTimer.hasElapsed(1);
     }
     else{
-      return m_ScoringArm.IntakeSensorBlocked();
+      return m_ScoringArm.LowIntakeSensorBlocked();
     }
 
     

@@ -27,7 +27,8 @@ public class ScoringArm extends SubsystemBase {
   public CANSparkMax topIntakeMotor;
   public CANSparkMax bottomIntakeMotor;
   public CANSparkMax floorIntakeMotor;
-  public SparkLimitSwitch intakeSensor;
+  public SparkLimitSwitch lowIntakeSensor;
+  public SparkLimitSwitch highIntakeSensor;
   public SparkPIDController topIntakePIDController;
   public SparkPIDController bottomIntakePIDController;
   public RelativeEncoder topIntakeEncoder;
@@ -53,7 +54,6 @@ public class ScoringArm extends SubsystemBase {
   private boolean armControlEnabled = false;
   private boolean outakeToSensor = false;
   private double sensorOutakeSpeed = 0.1;
-  private boolean lastIntakeSensorReading = false;
   private boolean raisingArm = false;
   private boolean superLaunchSpeed = false;
 
@@ -120,7 +120,8 @@ public class ScoringArm extends SubsystemBase {
     launchSpeedFollowerEncoder.setPositionConversionFactor(ScoringArmConstants.kLaunchPosConversionFactor);//diameter of wheel times pi
     launchSpeedFollowerEncoder.setVelocityConversionFactor(ScoringArmConstants.kLaunchVelConversionFactor);
     
-    intakeSensor = topIntakeMotor.getForwardLimitSwitch(Type.kNormallyOpen);
+    lowIntakeSensor = topIntakeMotor.getForwardLimitSwitch(Type.kNormallyOpen);
+    highIntakeSensor = topIntakeMotor.getReverseLimitSwitch(Type.kNormallyOpen);
     
 
     absArmAngleEncoder = armAngleLeaderMotor.getAbsoluteEncoder(SparkAbsoluteEncoder.Type.kDutyCycle);
@@ -196,7 +197,7 @@ public class ScoringArm extends SubsystemBase {
     }
 
     if(outakeToSensor){
-      if(IntakeSensorBlocked()){
+      if(HighIntakeSensorBlocked()){
         
         SetIntakeMotors(-1 * sensorOutakeSpeed,false);
       }
@@ -291,6 +292,7 @@ public class ScoringArm extends SubsystemBase {
     launchMotorLeader.set(0);
     launchMotorFollower.set(0);
     launchCoastMode = true;
+    superLaunchSpeed = false;
   }
 
   public void SuperLaunchSpeed(){
@@ -379,13 +381,18 @@ public void StopIntake() {
   }
 
 
-  public boolean IntakeSensorBlocked() {
+  public boolean LowIntakeSensorBlocked() {
     
-    boolean pressed = intakeSensor.isPressed();
+    boolean pressed = lowIntakeSensor.isPressed();
+    return pressed;
+  }
+
+  public boolean HighIntakeSensorBlocked() {
     
-    boolean errorReduced = lastIntakeSensorReading && pressed;
-    lastIntakeSensorReading = pressed;
-    return errorReduced;
+    boolean pressed = highIntakeSensor.isPressed();
+    
+   
+    return pressed;
   }
 
   public void AmpPreparation () {

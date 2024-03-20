@@ -59,16 +59,16 @@ public class StaticLaunch extends Command {
     
     boolean atArmSP = m_ScoringArm.ArmAtAngle();
 
-    if((atArmSP || timeoutTimer.hasElapsed(3)) && launchTimer.get() <= 0.1 && !m_ScoringArm.IntakeSensorBlocked()){
+    if((atArmSP || timeoutTimer.hasElapsed(3)) && launchTimer.get() <= 0.1 && !m_ScoringArm.HighIntakeSensorBlocked()){
       //m_ScoringArm.SetLaunchSpeed(launchSpeed);
       launchTimer.start();
     }
 
-    if(launchTimer.hasElapsed(0.5) && m_ScoringArm.atLaunchSetpoint() && !m_ScoringArm.IntakeSensorBlocked()){
+    if(launchTimer.hasElapsed(0.5) && m_ScoringArm.atLaunchSetpoint() && !m_ScoringArm.HighIntakeSensorBlocked()){
       m_ScoringArm.Launch();
     }
 
-    return launchTimer.hasElapsed(2) && !m_ScoringArm.IntakeSensorBlocked();
+    return launchTimer.hasElapsed(2) && !m_ScoringArm.HighIntakeSensorBlocked();
     
     
   }
