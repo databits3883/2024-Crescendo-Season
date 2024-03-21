@@ -15,6 +15,7 @@ public class RunIntakeSmart extends Command {
 
   public ScoringArm m_ScoringArm;
   public Timer stopDelayTimer;
+  public Timer timeoutTimer;
   public boolean sensorTriggered = false;
   public boolean launchPrepAfter = false;
   public SignalLights signalLights;
@@ -23,6 +24,7 @@ public class RunIntakeSmart extends Command {
   /** Creates a new RunIntakeSmart. */
   public RunIntakeSmart(ScoringArm arm, SignalLights lights, boolean launchPos) {
     stopDelayTimer = new Timer();
+    timeoutTimer = new Timer();
     signalLights = lights;
     m_ScoringArm = arm;
     launchPrepAfter = launchPos;
@@ -38,6 +40,7 @@ public class RunIntakeSmart extends Command {
 
     sensorTriggered = false;
     signalLights.Signal(LightSignal.intaking);
+    timeoutTimer.restart();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -57,10 +60,12 @@ public class RunIntakeSmart extends Command {
   public void end(boolean interrupted) {
     signalLights.Signal(LightSignal.noteSignaling);
     m_ScoringArm.StopIntake();
+
     if(launchPrepAfter){
       m_ScoringArm.SetArmAngle( (ScoringArmConstants.kArmPosNearStaticLaunch+ScoringArmConstants.kArmPosFarStaticLaunch) / 2 );
       m_ScoringArm.SetLaunchSpeed(250);
     }
+
     m_ScoringArm.OutakeToSensorSlow();
   }
 
@@ -76,7 +81,8 @@ public class RunIntakeSmart extends Command {
       return stopDelayTimer.hasElapsed(1);
     }
     else{
-      return m_ScoringArm.LowIntakeSensorBlocked();
+      return m_ScoringArm.LowIntakeSensorBlocked() || (launchPrepAfter && timeoutTimer.hasElapsed(5));
+      //return m_ScoringArm.LowIntakeSensorBlocked();
     }
 
     

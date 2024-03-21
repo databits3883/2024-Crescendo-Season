@@ -13,6 +13,7 @@ public class StaticLaunch extends Command {
   double launchSpeed;
   double launchAngle;
   Timer timeoutTimer;
+  Timer noNoteStopDelayTimer;
   Timer launchTimer;
   boolean wasAtSP = false;
 
@@ -23,6 +24,7 @@ public class StaticLaunch extends Command {
     launchAngle = angle;
     launchSpeed = speed;
     timeoutTimer = new Timer();
+    noNoteStopDelayTimer = new Timer();
     launchTimer = new Timer();
   }
 
@@ -32,6 +34,9 @@ public class StaticLaunch extends Command {
     m_ScoringArm.SetArmAngle(launchAngle);
     m_ScoringArm.SetLaunchSpeed(launchSpeed);
     m_ScoringArm.OutakeToSensorSlow();
+
+    noNoteStopDelayTimer.reset();
+    noNoteStopDelayTimer.stop();
     
     timeoutTimer.reset();
     timeoutTimer.start();
@@ -68,7 +73,11 @@ public class StaticLaunch extends Command {
       m_ScoringArm.Launch();
     }
 
-    return launchTimer.hasElapsed(2) && !m_ScoringArm.HighIntakeSensorBlocked();
+    if(!m_ScoringArm.HasNote()){
+      noNoteStopDelayTimer.start();
+    }
+
+    return (launchTimer.hasElapsed(2) && !m_ScoringArm.HighIntakeSensorBlocked()) || noNoteStopDelayTimer.hasElapsed(0.125);
     
     
   }

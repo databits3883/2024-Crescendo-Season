@@ -303,14 +303,14 @@ public class ScoringArm extends SubsystemBase {
 
   public void Intake(){
     //SetIntakeSpeed(100);
-    SetIntakeMotors(0.5,true);
-    SetFloorIntakeMotor(0.5);
+    SetIntakeMotors(0.75,true);
+    SetFloorIntakeMotor(1);
   }
 
   public void Outtake(){
     //SetIntakeSpeed(-100);
     SetIntakeMotors(-0.5,true);
-    SetFloorIntakeMotor(-0.5);
+    SetFloorIntakeMotor(-1);
   }
 
   public void SetIntakeSpeed(double speed){
@@ -322,24 +322,34 @@ public class ScoringArm extends SubsystemBase {
     topIntakeMotor.set(fraction);
     bottomIntakeMotor.set(fraction*(0.6));
     
-    if(disableSensorOuttake){
+    if(disableSensorOuttake && outakeToSensor){
+      if(outakeToSensor){
+        System.out.println("stopping the sensor outtake");
+
+      }
       outakeToSensor = false;
     }
   }
+
+
 
   public void SetFloorIntakeMotor(double fraction){
     floorIntakeMotor.set(fraction);
   }
 
   public void OutakeToSensorSlow(){
-    outakeToSensor = true;
-    sensorOutakeSpeed = 0.1;
+    OutakeToSensor(0.1);
   }
 
-  // public void OutakeToSensorFast(){
-  //   outakeToSensor = true;
-  //   sensorOutakeSpeed = 0.3;
-  // }
+  public void OutakeToSensorFast(){
+    OutakeToSensor(0.3);
+  }
+
+  public void OutakeToSensor(double speed){
+    outakeToSensor = true;
+    sensorOutakeSpeed = speed;
+    System.out.println("outaking to sensor");
+  }
 
   public void Launch(){
     SetIntakeMotors(1.0, true);
@@ -391,8 +401,11 @@ public void StopIntake() {
     
     boolean pressed = highIntakeSensor.isPressed();
     
-   
     return pressed;
+  }
+
+  public boolean HasNote(){
+    return HighIntakeSensorBlocked() || LowIntakeSensorBlocked();
   }
 
   public void AmpPreparation () {

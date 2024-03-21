@@ -40,10 +40,10 @@ public class SpeakerVisionAim extends Command {
   public double rotationTarget = 0;
   public double pidOutput = 0;
   
-  public PIDController angleController = new PIDController(0.01, 0.06, 0);//p: 0.06 i: 0 d: 0
+  public PIDController angleController = new PIDController(0.06, 0, 0);//p: 0.06 i: 0 d: 0
 
   public Timer targetUpdateTimer = new Timer();
-  public double visionUpdateTime = 0.2;
+  public double visionUpdateTime = 1.0;
   
   
   /** Creates a new SpeakerVisionAim. */
@@ -55,7 +55,7 @@ public class SpeakerVisionAim extends Command {
     signalLights = lights;
     swerveController = drivetrain.getSwerveController();
     angleController.enableContinuousInput(-180, 180);
-    angleController.setIntegratorRange(-0.03, 0.03);//0.8
+    angleController.setIntegratorRange(-0.3, 0.3);//0.8
     
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(drivetrain);
@@ -65,11 +65,14 @@ public class SpeakerVisionAim extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    UpdateTarget();
     rotationTarget = drivetrain.getHeading().getDegrees();
+
+    UpdateTarget();
     if(target != null){
       VisionArmAngle();
     }
+    System.out.println("rotation target: "+ rotationTarget);
+    System.out.println("current angle: " + drivetrain.getHeading().getDegrees());
   }
 
 
@@ -81,7 +84,7 @@ public class SpeakerVisionAim extends Command {
       Double roughDeltaDeg = Units.millisecondsToSeconds(visionSubsystem.getLatency()) * drivetrain.getRobotVelocity().omegaRadiansPerSecond;
       Rotation2d headingAtTime = drivetrain.getHeading().plus(Rotation2d.fromDegrees(roughDeltaDeg));
       rotationTarget = headingAtTime.getDegrees() - target.getYaw() + VisionConstants.SScameraZYaw;
-      System.out.println("rotation target: "+ rotationTarget);
+      //System.out.println("rotation target: "+ rotationTarget);
       
     }
     targetUpdateTimer.restart();
@@ -111,7 +114,7 @@ public class SpeakerVisionAim extends Command {
         angle = 0;
       }
       System.out.println("dist: "+ distance);
-      //scoringArm.SetArmAngle(angle);
+      scoringArm.SetArmAngle(angle);
     }
     
     
