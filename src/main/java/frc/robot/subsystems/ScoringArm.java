@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems;
 
+import java.io.IOException;
+
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
@@ -11,6 +13,7 @@ import com.revrobotics.SparkAbsoluteEncoder;
 import com.revrobotics.SparkLimitSwitch;
 import com.revrobotics.SparkPIDController;
 import com.revrobotics.CANSparkBase.ControlType;
+import com.revrobotics.CANSparkBase.SoftLimitDirection;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.SparkLimitSwitch.Type;
 
@@ -202,7 +205,8 @@ public class ScoringArm extends SubsystemBase {
         SetIntakeMotors(-1 * sensorOutakeSpeed,false);
       }
       else {
-        outakeToSensor = false;
+        
+        SetOutakeToSensor(false);;
         StopIntake();
       }
     }
@@ -298,6 +302,7 @@ public class ScoringArm extends SubsystemBase {
   public void SuperLaunchSpeed(){
     launchMotorLeader.set(1);
     launchMotorFollower.set(-1);
+    launchCoastMode = false;
     superLaunchSpeed = true;
   }
 
@@ -323,11 +328,8 @@ public class ScoringArm extends SubsystemBase {
     bottomIntakeMotor.set(fraction*(0.6));
     
     if(disableSensorOuttake && outakeToSensor){
-      if(outakeToSensor){
-        System.out.println("stopping the sensor outtake");
-
-      }
-      outakeToSensor = false;
+      
+      SetOutakeToSensor(false);
     }
   }
 
@@ -335,6 +337,15 @@ public class ScoringArm extends SubsystemBase {
 
   public void SetFloorIntakeMotor(double fraction){
     floorIntakeMotor.set(fraction);
+  }
+
+  public void EnableIntakeLimits(){
+    lowIntakeSensor.enableLimitSwitch(true);
+  }
+
+  public void DisableIntakeLimits(){
+    lowIntakeSensor.enableLimitSwitch(false);
+    
   }
 
   public void OutakeToSensorSlow(){
@@ -346,9 +357,14 @@ public class ScoringArm extends SubsystemBase {
   }
 
   public void OutakeToSensor(double speed){
-    outakeToSensor = true;
+    SetOutakeToSensor(true);
     sensorOutakeSpeed = speed;
-    System.out.println("outaking to sensor");
+  }
+
+  public void SetOutakeToSensor(boolean enabled){
+    outakeToSensor = enabled;
+    
+
   }
 
   public void Launch(){
@@ -361,9 +377,11 @@ public class ScoringArm extends SubsystemBase {
     SetLaunchSpeed(0);//theoretical max of 622.9 meters per second
     anglePIDController.setSetpoint(absArmAngleEncoder.getPosition());
     EnableArmAngleControl(false);
-    outakeToSensor = false;
+    SetOutakeToSensor(false);
     superLaunchSpeed = false;
+    HasNote();
     StopIntake();
+    DisableIntakeLimits();
   }
 
 public void StopIntake() {

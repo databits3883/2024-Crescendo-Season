@@ -29,6 +29,7 @@ import frc.robot.Commands.OutakeNoteToLaunchPos;
 import frc.robot.Commands.RunIntakeSmart;
 import frc.robot.Commands.SpeakerVisionAim;
 import frc.robot.Commands.StaticLaunch;
+import frc.robot.Commands.VisionAim;
 import frc.robot.Constants.LEDConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.OperatorConstants;
@@ -176,7 +177,9 @@ public class RobotContainer {
     if(ROBOT_IN_USE == Constants.ROBOT_SUPERSONIC_CONFIG_LOCATION){
     Shuffleboard.getTab("Game HUD").addDouble("Robot Pitch", (()-> drivebase.getPitch().getDegrees())).withWidget(BuiltInWidgets.kDial);
     Shuffleboard.getTab("Game HUD").addDouble("Arm Angle", m_ScoringArm::GetArmAngle);
-    Shuffleboard.getTab("Game HUD").addBoolean("Has Note", m_ScoringArm::LowIntakeSensorBlocked).withSize(6, 6).withWidget(BuiltInWidgets.kBooleanBox);
+    Shuffleboard.getTab("Game HUD").addBoolean("Has Note", m_ScoringArm::HasNote).withSize(6, 6).withWidget(BuiltInWidgets.kBooleanBox);
+    Shuffleboard.getTab("Arm HUD").addBoolean("High Sensor", m_ScoringArm::HighIntakeSensorBlocked);
+    Shuffleboard.getTab("Arm HUD").addBoolean("Low Sensor", m_ScoringArm::LowIntakeSensorBlocked);
     //Shuffleboard.getTab("Game HUD").add(autoChooser).withSize(2,1);
     }
 
@@ -270,6 +273,7 @@ public class RobotContainer {
       //new JoystickButton(m_driverController, 3).onTrue(new InstantCommand( ()-> m_ScoringArm.SetFlap(true) ) );
       //new JoystickButton(m_driverController, 4).onTrue(new InstantCommand( ()-> m_ScoringArm.SetFlap(false) ) );
       new JoystickButton(m_driverController, 3).whileTrue(new SpeakerVisionAim(drivebase, m_robotVision, m_driveStick,m_ScoringArm, m_signalLights));
+      new JoystickButton(m_driverController, 4).whileTrue(new VisionAim(drivebase, m_robotVision, m_driveStick, m_signalLights));
       new JoystickButton(m_driverController, 2).whileTrue(new StaticLaunch(m_ScoringArm, 23, 250));
       new JoystickButton(m_driverController, 7).whileTrue(new DeathSpin(drivebase));
 
